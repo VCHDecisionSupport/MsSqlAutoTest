@@ -1,0 +1,11 @@
+USE AutoTest
+GO
+
+SET NOCOUNT ON;
+
+IF SCHEMA_ID('SnapShot') IS NULL
+BEGIN
+	DECLARE @sql VARCHAR(max) = 'CREATE SCHEMA SnapShot;'
+	EXEC (@sql);
+END
+GO

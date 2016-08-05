@@ -1,0 +1,13 @@
+USE master
+GO
+
+IF DB_ID('AutoTest') IS NOT NULL
+DROP DATABASE AutoTest;
+GO
+
+IF DB_ID('AutoTest') IS NULL
+CREATE DATABASE AutoTest;
+GO
+
+USE AutoTest
+GO
