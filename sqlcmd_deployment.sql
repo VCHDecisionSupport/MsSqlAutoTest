@@ -32,8 +32,9 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\Database\Procedure\dbo.uspCreateProfile.sql
 :r $(pathvar)\Database\Procedure\dbo.uspCreateQuerySnapShot.sql
 :r $(pathvar)\Database\Procedure\dbo.uspDataCompare.sql
-:r $(pathvar)\Database\Procedure\dbo.uspPkgExecAutoTest.sql
-:r $(pathvar)\Database\Procedure\dbo.uspAdHocComparisonSetup.sql
+:r $(pathvar)\Database\Procedure\dbo.uspInitPkgRegressionTest.sql
+:r $(pathvar)\Database\Procedure\dbo.uspPkgRegressionTest.sql
+:r $(pathvar)\Database\Procedure\dbo.uspAdHocDataCompare.sql
 -- :r $(pathvar)\Database\Procedure\
 -- :r $(pathvar)\Database\Procedure\
 -- :r $(pathvar)\Database\Procedure\
