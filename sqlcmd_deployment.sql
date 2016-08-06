@@ -11,8 +11,10 @@ RAISERROR('@path = $(pathvar) = %s
 
 :r $(pathvar)\Database\DATABASE-AutoTest.sql
 :r $(pathvar)\Database\SCHEMA-SnapShot.sql
-:r $(pathvar)\Database\Table\TestConfigLog.sql
+:r $(pathvar)\Database\Table\TestConfig.sql
 :r $(pathvar)\Database\Table\TestType.sql
+:r $(pathvar)\Database\Table\TestConfigSource.sql
+:r $(pathvar)\Database\Table\TestConfigLog.sql
 :r $(pathvar)\Database\Table\TableProfile.sql
 :r $(pathvar)\Database\Table\TableProfileType.sql
 :r $(pathvar)\Database\Table\ColumnProfile.sql
