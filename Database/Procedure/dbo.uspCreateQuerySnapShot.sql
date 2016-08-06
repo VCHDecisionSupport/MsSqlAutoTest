@@ -79,7 +79,7 @@ BEGIN
 		%s
 		) sub
 	',@IdCol, @pPkField, @destFullName, @pQuery)
-	-- RAISERROR(@sql,1,1) WITH NOWAIT;
+	RAISERROR(@sql,1,1) WITH NOWAIT;
 	EXEC(@sql);
 	SET @rowcount=@@ROWCOUNT;
 
@@ -99,7 +99,7 @@ BEGIN
 		RAISERROR('WARNING: dbo.uspCreateQuerySnapShot no clustered index will be added to snapshot. (@pPkField IS NULL AND @pIncludeIdentityPk = 0)',10,1) WITH NOWAIT;
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('    uspCreateQuerySnapShot runtime: %i seconds (rowcount: %i)',0,1, @runtime,@rowcount) WITH NOWAIT;
-	RETURN(@rowcount);
+	RETURN(@runtime);
 END
 GO
  --EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM DSDW.BedMap.vwBedMap', @pPkField='CalendarDate',@pDestTableName='TestSnapShot'

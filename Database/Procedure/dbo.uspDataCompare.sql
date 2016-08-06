@@ -1,4 +1,3 @@
---#region CREATE/ALTER PROC dbo.uspDataCompare
 USE AutoTest
 GO
 
@@ -23,8 +22,8 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspDataCompare'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	SELECT @fmt='dbo.uspDataCompare (TestConfigLogID %i)'
+	RAISERROR(@fmt, 0, 1, @pTestConfigLogID) WITH NOWAIT;
 	
 	DECLARE @sql varchar(max);
 	DECLARE @vsql varchar(max);
@@ -83,13 +82,16 @@ MergedKeyMatchName: %s
 	--#region Table SnapShot and Profile: Record Match (unchaged records)
 
 
-	EXEC dbo.uspGetColumnNames 
+	EXEC AutoTest.dbo.uspGetColumnNames 
 		@pDatabaseName=@SnapShotDatabaseName
 		,@pSchemaName=@SnapShotSchemaName
 		,@pObjectName=@preEtlSnapName
 		,@pIntersectingObjectName=@postEtlSnapName
 		,@pFmt=@pFmt
 		,@pColStr=@pColStr OUTPUT
+	
+	RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
+	
 	SET @sql = FORMATMESSAGE('
 	SELECT * 
 	FROM 
@@ -228,15 +230,7 @@ SET @vsql = REPLACE('
 	EXEC(@vsql)
 	SET @MergedKeyMatchRowCount = @@ROWCOUNT
 --EXEC @MergedKeyMatchRowCount = AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@vsql, @pDestTableName = @MergedKeyMatchName, @pIncludeIdentityPk = 1
-IF @MergedKeyMatchRowCount > 0
-	BEGIN
-		--SELECT @MergedKeyMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PostEtlKeyMisMatchTableProfile'
-		--SELECT @MergedKeyMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PostEtlKeyMisMatchColumnProfile'
-		--SELECT @MergedKeyMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PostEtlKeyMisMatchColumnHistogram'
-		PRINT 'sdfs'
-	END
-	ELSE 
-		RAISERROR('     MergedKeyMatch profile skipped',0,1) WITH NOWAIT;
+
 --#endregion SnapShot: Key Match
 
 
@@ -362,6 +356,8 @@ EXEC dbo.uspGetColumnNames
 		CLOSE columnCursor;
 		DEALLOCATE columnCursor;
 	END
+ELSE 
+	RAISERROR('     MergedKeyMatch profile skipped',0,1) WITH NOWAIT;
 --#endregion Column Profiles: Key Match Value Match/MisMatch
 
 
@@ -369,9 +365,9 @@ EXEC dbo.uspGetColumnNames
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
-END
+END	
+
 GO
---#endregion CREATE/ALTER PROC dbo.uspDataCompare
 DECLARE 
 	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'
 	,@pPostEtlBaseName varchar(100) = 'SM_03_DischargeFact' + 'Adhoc'
@@ -379,9 +375,7 @@ DECLARE
 
 SET @pPreEtlBaseName = 'FactResellerSales' + 'Adhoc'
 SET @pPostEtlBaseName = 'FactResellerSales' + 'Adhoc'
-SET @pTestConfigLogID = 123
+SET @pTestConfigLogID = 11
 
 EXEC dbo.uspDataCompare 
-	@pPreEtlBaseName = @pPreEtlBaseName
-	,@pPostEtlBaseName = @pPostEtlBaseName
-	,@pTestConfigLogID = @pTestConfigLogID
+	@pTestConfigLogID = @pTestConfigLogID

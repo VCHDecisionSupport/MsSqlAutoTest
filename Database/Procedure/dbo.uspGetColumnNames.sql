@@ -17,9 +17,9 @@ ALTER PROC dbo.uspGetColumnNames
 	@pDatabaseName varchar(100)
 	,@pSchemaName varchar(100)
 	,@pObjectName varchar(100)
-	,@pIntersectingDatabaseName varchar(100) = @pDatabaseName
-	,@pIntersectingSchemaName varchar(100) = @pSchemaName
-	,@pIntersectingObjectName varchar(100) = @pObjectName
+	,@pIntersectingDatabaseName varchar(100) = NULL
+	,@pIntersectingSchemaName varchar(100) = NULL
+	,@pIntersectingObjectName varchar(100) = NULL
 	,@pFmt varchar(max) = ',%s'
 	,@pColStr varchar(max) OUTPUT
 	,@pSkipPkHash bit = 0
@@ -29,12 +29,16 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetColumnNames'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	SELECT @fmt='dbo.uspGetColumnNames(%s.%s.%s)'
+	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	
+	SET @pIntersectingDatabaseName = ISNULL(@pIntersectingDatabaseName,@pDatabaseName)
+	SET @pIntersectingSchemaName = ISNULL(@pIntersectingSchemaName,@pSchemaName)
+	SET @pIntersectingObjectName = ISNULL(@pIntersectingObjectName,@pObjectName)
+
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
 	SET @pFmt = ISNULL(@pFmt, ',%s')
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
