@@ -186,4 +186,3 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---#endregion CREATE/ALTER PROC

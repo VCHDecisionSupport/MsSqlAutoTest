@@ -76,31 +76,36 @@ BEGIN
 
 	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID
 
+	UPDATE TestConfigLog SET
+		ComparisonRuntimeSeconds = @ComparisonRuntimeSeconds
+	FROM TestConfigLog tlog
+	WHERE tlog.TestConfigLogID = @TestConfigLogID
+
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspAdHocDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
-DECLARE 
-	@pPreEtlDatabaseName varchar(100) = 'Lien'
-	,@pPreEtlSchemaName varchar(100) = 'Adtc'
-	,@pPreEtlTableName varchar(100) = 'SM_02_DischargeFact'
-	,@pPostEtlDatabaseName varchar(100) = 'Lien'
-	,@pPostEtlSchemaName varchar(100) = 'Adtc'
-	,@pPostEtlTableName varchar(100) = 'SM_03_DischargeFact'
-	,@pObjectPkColumns varchar(100) = 'PatientID, AccountNum'
---SET @pPreEtlDatabaseName = 'Prod'
---SET @pPreEtlSchemaName = 'dbo'
---SET @pPreEtlTableName = 'FactResellerSales's
---SET @pPostEtlDatabaseName = 'Prod'
---SET @pPostEtlSchemaName = 'dbo'
---SET @pPostEtlTableName = 'FactResellerSales'
---SET @pObjectPkColumns = '[SalesOrderNumber], [SalesOrderLineNumber]'
-EXEC AutoTest.dbo.uspAdHocDataCompare 
-	@pPreEtlDatabaseName = @pPreEtlDatabaseName
-	,@pPreEtlSchemaName = @pPreEtlSchemaName
-	,@pPreEtlTableName = @pPreEtlTableName
-	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
-	,@pPostEtlSchemaName = @pPostEtlSchemaName
-	,@pPostEtlTableName = @pPostEtlTableName
-	,@pObjectPkColumns = @pObjectPkColumns
+-- DECLARE 
+-- 	@pPreEtlDatabaseName varchar(100) = 'Lien'
+-- 	,@pPreEtlSchemaName varchar(100) = 'Adtc'
+-- 	,@pPreEtlTableName varchar(100) = 'SM_02_DischargeFact'
+-- 	,@pPostEtlDatabaseName varchar(100) = 'Lien'
+-- 	,@pPostEtlSchemaName varchar(100) = 'Adtc'
+-- 	,@pPostEtlTableName varchar(100) = 'SM_03_DischargeFact'
+-- 	,@pObjectPkColumns varchar(100) = 'PatientID, AccountNum'
+-- --SET @pPreEtlDatabaseName = 'Prod'
+-- --SET @pPreEtlSchemaName = 'dbo'
+-- --SET @pPreEtlTableName = 'FactResellerSales's
+-- --SET @pPostEtlDatabaseName = 'Prod'
+-- --SET @pPostEtlSchemaName = 'dbo'
+-- --SET @pPostEtlTableName = 'FactResellerSales'
+-- --SET @pObjectPkColumns = '[SalesOrderNumber], [SalesOrderLineNumber]'
+-- EXEC AutoTest.dbo.uspAdHocDataCompare 
+-- 	@pPreEtlDatabaseName = @pPreEtlDatabaseName
+-- 	,@pPreEtlSchemaName = @pPreEtlSchemaName
+-- 	,@pPreEtlTableName = @pPreEtlTableName
+-- 	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
+-- 	,@pPostEtlSchemaName = @pPostEtlSchemaName
+-- 	,@pPostEtlTableName = @pPostEtlTableName
+-- 	,@pObjectPkColumns = @pObjectPkColumns
