@@ -43,35 +43,35 @@ BEGIN
 	FROM DQMF.dbo.AuditPkgExecution AS pkgExec
 	WHERE pkgExec.PkgExecKey = @pPkgExecKey
 
---#region Set SnapShot Prefix, Save TestConfig specs (one record for each pre vs post comparison)
+--#region Set SnapShot Prefix, Save TestConfigLog specs (one record for each pre vs post comparison)
 	IF @pIsProcessStart = 1
 	BEGIN
-		RAISERROR ('Populate TestConfig table from DataRequestTestConfig', 0, 1) WITH NOWAIT;
+		RAISERROR ('Populate TestConfigLog table from DataRequestTestConfig', 0, 1) WITH NOWAIT;
 		SELECT @snapShotDataDesc = 'PreEtl'
-		EXEC AutoTest.dbo.uspInsTestConfig @pPkgId = @pkgId, @pPkgExecKey = @pPkgExecKey
+		EXEC AutoTest.dbo.uspInsTestConfigLog @pPkgId = @pkgId, @pPkgExecKey = @pPkgExecKey
 	END
 	ELSE IF @pIsProcessStart = 0
 	BEGIN
 		SELECT @snapShotDataDesc = 'PostEtl'
 	END
---#endregion Set SnapShot Prefix, Save TestConfig specs (one record for each pre vs post comparison)
+--#endregion Set SnapShot Prefix, Save TestConfigLog specs (one record for each pre vs post comparison)
 	
 --#region Create SnapShot
 	BEGIN
 		DECLARE cur CURSOR
 		FOR
-		SELECT DISTINCT db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, obj.ObjectID, config.TestConfigID, config.DataRequestID, config.PkgID
-		FROM AutoTest.dbo.TestConfig AS config
+		SELECT DISTINCT db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, obj.ObjectID, config.TestConfigLogID, config.DataRequestID, config.PkgID
+		FROM AutoTest.dbo.TestConfigLog AS config
 		INNER JOIN DQMF.dbo.MD_Object AS obj
 			ON config.ObjectID = obj.ObjectID
 		INNER JOIN DQMF.dbo.MD_Database AS db
 			ON obj.DatabaseId = db.DatabaseId
 		WHERE PkgExecKey = @pPkgExecKey;
-		DECLARE @databaseName VARCHAR(100), @schemaName VARCHAR(100), @tableName VARCHAR(100), @objectID INT, @testConfigID INT, @dataRequestID INT, @tableProfileID INT, @snapShotName VARCHAR(100);
+		DECLARE @databaseName VARCHAR(100), @schemaName VARCHAR(100), @tableName VARCHAR(100), @objectID INT, @TestConfigLogID INT, @dataRequestID INT, @tableProfileID INT, @snapShotName VARCHAR(100);
 		OPEN cur;
 		FETCH NEXT
 		FROM cur
-		INTO @databaseName, @schemaName, @tableName, @objectID, @testConfigID, @dataRequestID, @pkgID;
+		INTO @databaseName, @schemaName, @tableName, @objectID, @TestConfigLogID, @dataRequestID, @pkgID;
 
 		WHILE @@FETCH_STATUS = 0
 		BEGIN
@@ -93,7 +93,7 @@ BEGIN
 			SELECT @PreEtlBaseName = AutoTest.dbo.ufnGetSnapShotName('', @dataRequestID, @tableName, @pPkgExecKey, NULL);
 			SELECT @PostEtlBaseName = AutoTest.dbo.ufnGetSnapShotName('', @dataRequestID, @tableName, @pPkgExecKey, NULL);
 			
-			EXEC AutoTest.dbo.uspDataCompare @pPreEtlBaseName = @PreEtlBaseName, @pPostEtlBaseName = @PostEtlBaseName, @pTestConfigID = @testConfigID
+			EXEC AutoTest.dbo.uspDataCompare @pPreEtlBaseName = @PreEtlBaseName, @pPostEtlBaseName = @PostEtlBaseName, @pTestConfigLogID = @TestConfigLogID
 			RAISERROR ('Regression Test complete.', 0, 1);
 		END
 --#endregion Do Regression Test
@@ -101,7 +101,7 @@ BEGIN
 
 			FETCH NEXT
 			FROM cur
-			INTO @databaseName, @schemaName, @tableName, @objectID, @testConfigID, @dataRequestID, @pkgID;
+			INTO @databaseName, @schemaName, @tableName, @objectID, @TestConfigLogID, @dataRequestID, @pkgID;
 		END
 		CLOSE cur;
 		DEALLOCATE cur;

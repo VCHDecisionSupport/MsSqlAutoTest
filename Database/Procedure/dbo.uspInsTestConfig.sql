@@ -21,9 +21,8 @@ AS
 BEGIN
 	RAISERROR('uspInsTestConfig: PkgID: %i (PkgExecKey: %i)', 0, 1, @pPkgId, @pPkgExecKey) WITH NOWAIT;
 
-	INSERT INTO dbo.TestConfig
-	(
-		DataRequestTestConfigID
+	INSERT INTO dboTestConfigLog 	(
+		DataRequestTestConfigLogID
 		,DataRequestID
 		,PkgID
 		,ObjectID
@@ -31,13 +30,13 @@ BEGIN
 		,TestTypeID
 	)
 	SELECT 
-		config.DataRequestTestConfigID
+		config.DataRequestTestConfigLogID
 		,config.DataRequestID
 		,config.PkgID
 		,config.ObjectID
 		,@pPkgExecKey
 		,1
-	FROM AutoTest.dbo.DataRequestTestConfig AS config
+	FROM AutoTest.dbo.DataRequestTestConfigLog AS config
 	JOIN DQMF.dbo.ETL_Package AS pkg
 	ON config.PkgID = pkg.PkgID
 	JOIN DQMF.dbo.MD_Object AS obj
@@ -48,9 +47,8 @@ BEGIN
 
 
 
-	INSERT INTO dbo.TestConfig
-	(
-		DataRequestTestConfigID
+	INSERT INTO dboTestConfigLog 	(
+		DataRequestTestConfigLogID
 		,DataRequestID
 		,PkgID
 		,ObjectID
@@ -59,7 +57,7 @@ BEGIN
 	)
 	SELECT 
 		DISTINCT
-		--config.DataRequestTestConfigID
+		--config.DataRequestTestConfigLogID
 		--,config.DataRequestID
 		NULL
 		,NULL
@@ -76,18 +74,18 @@ BEGIN
 	ON obj.DatabaseId = db.DatabaseId
 	WHERE pkg.PkgID = @pPkgId
 
-	DECLARE @TestConfigID int = @@identity;
-	RAISERROR('uspInsTestConfig: TestConfigID: %i', 0, 1, @TestConfigID) WITH NOWAIT;
+	DECLARE @TestConfigLogID int = @@identity;
+	RAISERROR('uspInsTestConfig: TestConfigLogID: %i', 0, 1, @TestConfigLogID) WITH NOWAIT;
 	--;WITH src AS (
 
 	--	SELECT 
-	--		config.DataRequestTestConfigID
+	--		config.DataRequestTestConfigLogID
 	--		,config.DataRequestID
 	--		,config.PkgID
 	--		,config.ObjectID
 	--		--,@pPkgExecKey
 	--		--,@pTestTypeDesc
-	--	FROM dbo.DataRequestTestConfig AS config
+	--	FROM dbo.DataRequestTestConfigLog AS config
 	--	JOIN DQMF.dbo.ETL_Package AS pkg
 	--	ON config.PkgID = pkg.PkgID
 	--	JOIN DQMF.dbo.MD_Object AS obj
@@ -96,7 +94,7 @@ BEGIN
 	--	ON obj.DatabaseId = db.DatabaseId
 	--	WHERE pkg.PkgID = @pPkgId
 	--)
-	--MERGE INTO dbo.TestConfig AS dst
+	--MERGE INTO dbo.TestConfigLog AS dst
 
 END
 GO
@@ -105,7 +103,7 @@ GO
 -- 	,@pPkgExecKey int = 1
 -- 	,@pTestTypeDesc varchar(100) = 'hi there'
 
--- EXEC dbo.uspInsTestConfig 
+-- EXEC dbo.uspInsTestConfigLog 
 -- 	@pPkgId = @pPkgId
 -- 	,@pPkgExecKey = @pPkgExecKey
 -- 	,@pTestTypeDesc = @pTestTypeDesc

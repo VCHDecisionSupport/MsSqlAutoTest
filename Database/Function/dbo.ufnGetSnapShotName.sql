@@ -29,4 +29,4 @@ GO
 -- SET @pDataRequestID = 666;
 -- SET @pPkgExecKey = 1;
 -- SET @pDataDesc = 'DataDoom';
--- SELECT @pDataRequestID AS DataRequestTestConfigID, @pPkgExecKey AS PkgExecKey, @pDataDesc AS ObjectName, dbo.ufnGetSnapShotName(NULL, @pDataRequestID, @pDataDesc, @pPkgExecKey, NULL) AS ufnGetSnapShotName;
+-- SELECT @pDataRequestID AS DataRequestTestConfigLogID, @pPkgExecKey AS PkgExecKey, @pDataDesc AS ObjectName, dbo.ufnGetSnapShotName(NULL, @pDataRequestID, @pDataDesc, @pPkgExecKey, NULL) AS ufnGetSnapShotName;

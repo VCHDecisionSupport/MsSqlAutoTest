@@ -2,7 +2,7 @@ USE DQMF
 GO
 SET NOCOUNT ON;
 
-DELETE AutoTest.dbo.TestConfig;
+DELETE AutoTest.dboTestConfigLog 
 --DELETE AutoTest.dbo.DataRequestTestConfig;
 DELETE DQMF.dbo.ETL_PackageObject;
 
@@ -35,7 +35,7 @@ SELECT
 	--,@pObjectID AS ObjectID
 	--,@pDataRequestID AS DataRequestID
 
---INSERT INTO TestLog.dbo.DataRequestTestConfig VALUES(@pDataRequestID, @pPkgId, @pObjectID);
+--INSERT INTO TestLog.dbo.DataRequestTestConfigLog VALUES(@pDataRequestID, @pPkgId, @pObjectID);
 INSERT INTO DQMF.dbo.ETL_PackageObject VALUES(@pPkgId, @pObjectID);
 
 DECLARE
