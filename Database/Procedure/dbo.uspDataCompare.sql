@@ -16,9 +16,7 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspDataCompare
-	@pPreEtlBaseName varchar(100)
-	,@pPostEtlBaseName varchar(100)
-	,@pTestConfigLogID int
+	@pTestConfigLogID int
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -37,12 +35,18 @@ BEGIN
 	DECLARE @PreEtlKeyMisMatchRowCount int = 0;
 	DECLARE @PostEtlKeyMisMatchRowCount int = 0;
 	DECLARE @MergedKeyMatchRowCount int = 0;
-	DECLARE @preEtlSnapName VARCHAR(100) = 'PreEtl_'+ @pPreEtlBaseName
-	DECLARE @postEtlSnapName VARCHAR(100) = 'PostEtl_'+ @pPostEtlBaseName
-	DECLARE @RecordMatchName VARCHAR(100) = 'RecordMatch_'+ @pPreEtlBaseName+'_'+@pPostEtlBaseName
-	DECLARE @PreEtlKeyMisMatchName VARCHAR(100) = 'PreEtlKeyMisMatch_'+ @pPreEtlBaseName
-	DECLARE @PostEtlKeyMisMatchName VARCHAR(100) = 'PostEtlKeyMisMatch_'+ @pPostEtlBaseName
-	DECLARE @MergedKeyMatchName VARCHAR(100) = 'KeyMatch_'+ @pPreEtlBaseName+'_'+@pPostEtlBaseName
+	DECLARE @SnapShotBaseName varchar(100)
+
+	SELECT @SnapShotBaseName = SnapShotBaseName
+	FROM AutoTest.dbo.TestConfigLog
+	WHERE TestConfigLogID = @pTestConfigLogID
+
+	DECLARE @preEtlSnapName VARCHAR(100) = 'PreEtl_'+ @SnapShotBaseName
+	DECLARE @postEtlSnapName VARCHAR(100) = 'PostEtl_'+ @SnapShotBaseName
+	DECLARE @RecordMatchName VARCHAR(100) = 'RecordMatch_'+ @SnapShotBaseName
+	DECLARE @PreEtlKeyMisMatchName VARCHAR(100) = 'PreEtlKeyMisMatch_'+ @SnapShotBaseName
+	DECLARE @PostEtlKeyMisMatchName VARCHAR(100) = 'PostEtlKeyMisMatch_'+ @SnapShotBaseName
+	DECLARE @MergedKeyMatchName VARCHAR(100) = 'KeyMatch_'+ @SnapShotBaseName
 	DECLARE @maxDistinctCount int = 500;
 	SET @fmt = '
 preEtlSnapName: %s

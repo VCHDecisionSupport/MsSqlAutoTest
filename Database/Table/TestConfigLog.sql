@@ -11,8 +11,7 @@ CREATE TABLE dbo.TestConfigLog (
 	TestConfigLogID INT IDENTITY(1, 1) NOT NULL
 	,PreEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view
 	,PostEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view same as above if Etl Regression Test (ie not AdHoc)
-	,PreEtlSnapShotName varchar(200) NOT NULL -- name of table in SnapShot schema
-	,PostEtlSnapShotName varchar(200) NOT NULL -- name of table in SnapShot schema
+	,SnapShotBaseName varchar(200) NOT NULL -- suffix of names of tables in SnapShot schema
 	,ObjectID INT NULL -- FK to DQMF.dbo.MD_Object; null if AdHoc
 	,TestConfigID INT NULL -- FK to TestConfig; null if AdHoc
 	,PkgExecKey INT NULL -- FK to DQMF.dbo.AuditPackageExecution; null if AdHoc
