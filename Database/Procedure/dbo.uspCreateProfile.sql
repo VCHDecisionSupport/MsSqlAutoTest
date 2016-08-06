@@ -15,7 +15,7 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspCreateProfile
-	@pTestConfigID int,
+	@pTestConfigLogID int,
 	@pTargetDatabaseName nvarchar(200) = 'AutoTest',
 	@pTargetSchemaName nvarchar(200) = 'SnapShot',
 	@pTargetTableName nvarchar(200),
@@ -34,7 +34,7 @@ BEGIN
 	DECLARE @param nvarchar(max);
 	-- objectID
 	DECLARE @objectID int;
-	SELECT @objectID=objectID FROM TestConfig WHERE TestConfigID = @pTestConfigID
+	SELECT @objectID=objectID FROM TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
 
 	SELECT @pSubQueryFilter = ISNULL(@pSubQueryFilter, '')
 
@@ -48,7 +48,7 @@ BEGIN
 
 	EXEC sp_executesql @sql, @param, @table_row_countOUT = @table_row_count OUT;
 	RAISERROR('record count: %i', 0, 1, @table_row_count);
-	SET @sql = FORMATMESSAGE(N'INSERT INTO AutoTest.dbo.TableProfile (TestConfigID, RecordCount, TableProfileDate, TableProfileTypeID) VALUES(%i, %i, GETDATE(), %i)',@pTestConfigID, @table_row_count, @pTableProfileTypeID);
+	SET @sql = FORMATMESSAGE(N'INSERT INTO AutoTest.dbo.TableProfile (TestConfigLogID, RecordCount, TableProfileDate, TableProfileTypeID) VALUES(%i, %i, GETDATE(), %i)',@pTestConfigLogID, @table_row_count, @pTableProfileTypeID);
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 	EXEC(@sql);
@@ -186,4 +186,3 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---#endregion CREATE/ALTER PROC

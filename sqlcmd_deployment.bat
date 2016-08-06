@@ -8,5 +8,14 @@ SET script_path=%pathvar%\sqlcmd_deployment.sql
 
 ECHO starting sql script: %script_path%
 
-SQLCMD -Slocalhost -E -dmaster -m  -i "%script_path%" -v pathvar="%pathvar%"
+SET /P server=Enter Deployment Destination Server:
+IF "%server%"=="" GOTO JustDoIt
+:JustDoIt
+SET server=STDBDECSUP01
+
+ECHO Default is %server%
+GOTO DoIt
+
+:DoIt
+SQLCMD -S%server% -E -dmaster -m 0 -i "%script_path%" -v pathvar="%pathvar%"
 PAUSE

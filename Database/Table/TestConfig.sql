@@ -9,14 +9,10 @@ IF OBJECT_ID('dbo.TestConfig') IS NOT NULL
 GO
 CREATE TABLE dbo.TestConfig (
 	TestConfigID INT IDENTITY(1, 1) NOT NULL
-	,DataRequestTestConfigID INT NULL
-	,PkgID INT NULL
-	,ObjectID INT NULL
-	,PkgExecKey INT NULL
-	,TestTypeID INT NOT NULL
-	,DataRequestID INT NULL
-	,PreEtlSnapShotSourceName varchar(200)
-	,PostEtlSnapShotSourceName varchar(200)
+	,TestTypeID INT NOT NULL -- FK to TestType
+	,ObjectID INT NOT NULL -- FK to DQMF.dbo.MD_Object; null if AdHoc
+	,PkgID INT NOT NULL -- FK to DQMF.dbo.AuditPackageExecution; null if AdHoc
+	,TestConfigSourceID INT NOT NULL -- FK TestConfigSourceType
 )
 GO
 ALTER TABLE dbo.TestConfig ADD CONSTRAINT TestConfig_PK PRIMARY KEY CLUSTERED (TestConfigID)

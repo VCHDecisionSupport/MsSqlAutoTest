@@ -52,4 +52,4 @@ BEGIN
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspDropSnapShot
-EXEC dbo.uspDropSnapShot
+-- EXEC dbo.uspDropSnapShot
