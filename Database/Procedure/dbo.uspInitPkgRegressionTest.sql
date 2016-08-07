@@ -33,12 +33,13 @@ BEGIN
 		,@PostEtlSourceObjectFullName varchar(200)
 		,@SnapShotBaseName varchar(200)
 		,@PreEtlSnapShotCreationElapsedSeconds int
-		,@PreSnapShotName varchar(200)
+		,@PreEtlSnapShotName varchar(200)
 
-INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
+INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, TestConfigID, PkgExecKey)
 SELECT 
 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
 	,db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PostEtlSourceObjectFullName
+	,GETDATE()
 	,obj.ObjectID
 	,config.TestConfigID
 	,pkglog.PkgExecKey
@@ -57,33 +58,32 @@ SELECT
 	,PreEtlSourceObjectFullName
 	,PostEtlSourceObjectFullName
 	,SnapShotBaseName
+	,PreEtlSnapShotName
 FROM AutoTest.dbo.TestConfigLog
 WHERE PkgExecKey = @pPkgExecKey
 
 OPEN cur;
 
-FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
-	SELECT @PreSnapShotName = 'PreEtl_'+@SnapShotBaseName
+	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
+	-- SELECT @PreEtlSnapShotName = 'PreEtl_'+@SnapShotBaseName
 	DECLARE @PreEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PreEtlSourceObjectFullName);
 	
-	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pDestTableName = @PreSnapShotName
+	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pDestTableName = @PreEtlSnapShotName
 
 	UPDATE TestConfigLog SET
 		PreEtlSourceObjectFullName = @PreEtlSourceObjectFullName
 		,PostEtlSourceObjectFullName = @PostEtlSourceObjectFullName
 		,PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
-		,SnapShotBaseName = @SnapShotBaseName
+		-- ,SnapShotBaseName = @SnapShotBaseName
 	FROM TestConfigLog tlog
 	WHERE tlog.TestConfigLogID = @TestConfigLogID
 
-	FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+	FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
 END
-
-
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;

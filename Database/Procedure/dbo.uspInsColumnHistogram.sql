@@ -1,4 +1,3 @@
---#region CREATE/ALTER PROC
 USE AutoTest
 GO
 
@@ -8,9 +7,10 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspInsColumnHistogram';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
+RAISERROR(@name, 0, 0) WITH NOWAIT;
+
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
-	RAISERROR(@sql, 0, 0) WITH NOWAIT;
 	EXEC(@sql);
 END
 GO
@@ -31,7 +31,7 @@ BEGIN
 	DECLARE @param nvarchar(max);
 	DECLARE @full_table_name varchar(200) = FORMATMESSAGE('%s.%s.%s',@pTargetDatabaseName,@pTargetSchemaName, @pTargetTableName)
 
-	SET @sql = FORMATMESSAGE('      uspInsColumnHistogram: @pColumnProfileID=%i  @pTargetTableName=%s  @pTargetColumnName=%s',@pColumnProfileID, @pTargetTableName, @pTargetColumnName)
+	SET @sql = FORMATMESSAGE('        uspInsColumnHistogram: @pColumnProfileID=%i  @pTargetTableName=%s  @pTargetColumnName=%s',@pColumnProfileID, @pTargetTableName, @pTargetColumnName)
 	 RAISERROR(@sql,0,1) WITH NOWAIT;
 
 	SELECT @pSubQueryFilter = ISNULL(@pSubQueryFilter, '')
@@ -59,7 +59,7 @@ BEGIN
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
 		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID) VALUES (%i, ''%s'', %i, %i)',@pColumnProfileID, CAST(@columnValue AS varchar(200)), @valueCount, @pColumnHistogramTypeID)
-		-- RAISERROR(@sql, 0, 1) WITH NOWAIT;
+		 --RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql);
 		FETCH NEXT FROM valueCursor INTO @valueCount, @columnValue;
 	END
@@ -71,9 +71,8 @@ BEGIN
 	--EXEC sp_executesql @sql, @param, @null_countOUT = @null_count OUT;
 	--RAISERROR('@null_count: %i',0,1,@null_count);
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('      !uspInsColumnHistogram: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	RAISERROR('        !uspInsColumnHistogram: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
---#endregion CREATE/ALTER PROC
 --EXEC dbo.uspInsColumnHistogram @pColumnProfileID=6,  @pTargetTableName='PreDR123AssessmentContactFactPkgExecKey312705',  @pTargetColumnName='UDFTable'

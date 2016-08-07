@@ -7,9 +7,10 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspGetColumnNames';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
+RAISERROR(@name, 0, 0) WITH NOWAIT;
+
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
-	RAISERROR(@sql, 0, 0) WITH NOWAIT;
 	EXEC(@sql);
 END
 GO
@@ -29,8 +30,8 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetColumnNames(%s.%s.%s)'
-	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
+	SELECT @fmt='        dbo.uspGetColumnNames(%s.%s.%s)'
+	--RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -39,15 +40,27 @@ BEGIN
 	SET @pIntersectingSchemaName = ISNULL(@pIntersectingSchemaName,@pSchemaName)
 	SET @pIntersectingObjectName = ISNULL(@pIntersectingObjectName,@pObjectName)
 
+	DECLARE @full_object_name varchar(300) = @pDatabaseName+'.'+@pSchemaName+'.'+@pObjectName
+		,@full_intersecting_object_name varchar(300) = @pIntersectingDatabaseName+'.'+@pIntersectingSchemaName+'.'+@pIntersectingObjectName
+		,@object_id int
+		,@intersecting_object_id int
+
+
+	-- get object id
+	SELECT @object_id=OBJECT_ID(@full_object_name)
+		,@intersecting_object_id=OBJECT_ID(@full_intersecting_object_name)
+
+
+
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
 	SET @pFmt = ISNULL(@pFmt, ',%s')
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
 
 	SET @param = '
-	@pObjectNameIN varchar(200)
-	,@pSchemaNameIN varchar(200)
-	,@pIntersectingObjectNameIN varchar(200)
-	,@pIntersectingSchemaNameIN varchar(200)
+	@pObject_IDIN int
+	--,@pSchemaNameIN varchar(200)
+	,@pIntersectingObject_IDIN int
+	--,@pIntersectingSchemaNameIN varchar(200)
 	,@pSkipPkHashIN bit
 	,@pColStrOUT varchar(max) OUTPUT
 	'
@@ -62,8 +75,9 @@ BEGIN
 		JOIN %s.sys.schemas as sch
 		ON tab.schema_id = sch.schema_id
 		WHERE 1=1
-		AND tab.name = @pObjectNameIN
-		AND sch.name = @pSchemaNameIN
+		--AND tab.name = @pObjectNameIN
+		--AND sch.name = @pSchemaNameIN
+		AND tab.object_id = @pObject_IDIN
 		UNION ALL
 		SELECT col.name AS column_name
 		FROM %s.sys.columns as col
@@ -72,8 +86,9 @@ BEGIN
 		JOIN %s.sys.schemas as sch
 		ON vw.schema_id = sch.schema_id
 		WHERE 1=1
-		AND vw.name = @pObjectNameIN
-		AND sch.name = @pSchemaNameIN
+		--AND vw.name = @pObjectNameIN
+		--AND sch.name = @pSchemaNameIN
+		AND vw.object_id = @pObject_IDIN
 	)
 INTERSECT
 	(
@@ -84,8 +99,9 @@ INTERSECT
 		JOIN %s.sys.schemas as sch
 		ON tab.schema_id = sch.schema_id
 		WHERE 1=1
-		AND tab.name = @pIntersectingObjectNameIN
-		AND sch.name = @pIntersectingSchemaNameIN
+		--AND tab.name = @pIntersectingObjectNameIN
+		--AND sch.name = @pIntersectingSchemaNameIN
+		AND tab.object_id = @pIntersectingObject_IDIN
 		UNION ALL
 		SELECT col.name AS column_name
 		FROM %s.sys.columns as col
@@ -94,8 +110,9 @@ INTERSECT
 		JOIN %s.sys.schemas as sch
 		ON vw.schema_id = sch.schema_id
 		WHERE 1=1
-		AND vw.name = @pIntersectingObjectNameIN
-		AND sch.name = @pIntersectingSchemaNameIN
+		--AND vw.name = @pIntersectingObjectNameIN
+		--AND sch.name = @pIntersectingSchemaNameIN
+		AND vw.object_id = @pIntersectingObject_IDIN
 	)
 ) 
 SELECT @pColStrOUT = SUBSTRING((
@@ -112,7 +129,8 @@ FOR XML PATH('''')),1,10000)
 
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
-	EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName, @pIntersectingSchemaNameIN = @pIntersectingSchemaName, @pIntersectingObjectNameIN = @pIntersectingObjectName, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
+	--EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName, @pIntersectingSchemaNameIN = @pIntersectingSchemaName, @pIntersectingObjectNameIN = @pIntersectingObjectName, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
+	EXEC sp_executesql @sql, @param, @pObject_IDIN = @Object_ID, @pIntersectingObject_IDIN = @Intersecting_Object_ID, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
 
 	SET @pColStr = LTRIM(RTRIM(@pColStr))
 	IF CHARINDEX(',',@pColStr,1) = 1
@@ -122,7 +140,7 @@ FOR XML PATH('''')),1,10000)
 	SET @pColStr = @pColStr
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	--RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO

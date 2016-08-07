@@ -9,7 +9,6 @@ SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name)
 
 RAISERROR(@name, 0, 0) WITH NOWAIT;
 
-
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
 	EXEC(@sql);

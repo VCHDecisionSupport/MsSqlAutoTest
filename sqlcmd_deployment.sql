@@ -27,7 +27,7 @@ RAISERROR('@path = $(pathvar) = %s
 
 :r $(pathvar)\Database\Procedure\dbo.uspGetKey.sql
 :r $(pathvar)\Database\Procedure\dbo.uspDropSnapShot.sql
-:r $(pathvar)\Database\Procedure\dbo.uspInsTestConfig.sql
+-- :r $(pathvar)\Database\Procedure\dbo.uspInsTestConfig.sql
 :r $(pathvar)\Database\Procedure\dbo.uspGetColumnNames.sql
 :r $(pathvar)\Database\Procedure\dbo.uspInsColumnHistogram.sql
 :r $(pathvar)\Database\Procedure\dbo.uspCreateProfile.sql
