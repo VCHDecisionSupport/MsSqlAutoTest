@@ -127,4 +127,59 @@ AND pre.PatientID = post.PatientID
 WHERE post.AccountNum IS NULL
 GROUP BY pre.AdmissionDateID
 ORDER BY pre.AdmissionDateID
+
+
+-- Key Match
+SET @ColumnHistogramTypeDesc = 'KeyMatchValueMatchColumnHistogram'
+SET @ColumnName = 'DischargeTimeID'
+SELECT tab_pro.RecordCount, tab_pro_dim.TableProfileTypeDesc
+	,log.TestConfigLogID
+	,col_pro.ColumnProfileID
+	,col_pro.ColumnName
+	,col_pro.ColumnCount
+	,col_pro_dim.ColumnProfileTypeDesc
+	,col_hist.ColumnValue
+	,col_hist.ValueCount
+	,col_hist_dim.ColumnHistogramTypeDesc
+FROM TestConfigLog AS log
+JOIN TableProfile AS tab_pro
+ON log.TestConfigLogID = tab_pro.TestConfigLogID
+JOIN TableProfileType AS tab_pro_dim
+ON tab_pro.TableProfileTypeID = tab_pro_dim.TableProfileTypeID
+JOIN ColumnProfile AS col_pro
+ON tab_pro.TableProfileID = col_pro.TableProfileID
+JOIN ColumnProfileType AS col_pro_dim
+ON col_pro.ColumnProfileTypeID = col_pro_dim.ColumnProfileTypeID
+JOIN ColumnHistogram AS col_hist
+ON col_pro.ColumnProfileID = col_hist.ColumnProfileID
+JOIN ColumnHistogramType AS col_hist_dim
+ON col_hist.ColumnHistogramTypeID = col_hist_dim.ColumnHistogramTypeID
+WHERE 1=1
+AND log.PreEtlSourceObjectFullName = @PreEtlSourceObjectFullName
+AND log.PreEtlSourceObjectFullName = @PreEtlSourceObjectFullName
+--AND col_pro.ColumnName = @ColumnName
+AND col_hist_dim.ColumnHistogramTypeDesc = @ColumnHistogramTypeDesc
+ORDER BY col_hist.ColumnValue
+
+SET @ColumnName = 'DischargeTimeID'
+
+SELECT pre.DischargeTimeID AS ColumnValue, COUNT(*) AS KeyMatchValueMatchCount
+FROM Lien.Adtc.SM_02_DischargeFact pre
+JOIN Lien.Adtc.SM_03_DischargeFact post
+ON pre.AccountNum = post.AccountNum
+AND pre.PatientID = post.PatientID
+AND pre.DischargeTimeID = post.DischargeTimeID
+GROUP BY pre.DischargeTimeID
+ORDER BY pre.DischargeTimeID
+
+SELECT *, col_hist.ColumnHistogramTypeID, col_hist_dim.ColumnHistogramTypeDesc
+FROM AutoTest.dbo.ColumnHistogram AS col_hist
+JOIN ColumnProfile AS col_pro
+ON col_hist.ColumnProfileID = col_pro.ColumnProfileID
+JOIN ColumnHistogramType AS col_hist_dim
+ON col_hist.ColumnHistogramTypeID = col_hist_dim.ColumnHistogramTypeID
+WHERE col_pro.ColumnName = @ColumnName
+ORDER BY col_hist.ColumnHistogramTypeID, col_hist_dim.ColumnHistogramTypeDesc
+
+
 --#endregion ColumnHistogram
