@@ -140,8 +140,6 @@ BEGIN
 		RAISERROR('      RecordMatchSnapShotName profile skipped',0,1) WITH NOWAIT;
 --#endregion Record Match (unchaged records)
 
-
-
 --#region Table SnapShot and Profile: Pre-Etl Key MisMatch (deleted)
 SET @pFmt = 'pre.%s,'
 
@@ -170,10 +168,6 @@ EXEC dbo.uspGetColumnNames
 	ELSE 
 		RAISERROR('      PreEtlKeyMisMatchName profile skipped',0,1) WITH NOWAIT;
 --#endregion Table SnapShot and Profile: Pre-Etl Key MisMatch (deleted)
-
-
-
-
 
 --#region Table SnapShot and Profile: Post-Etl Key MisMatch (new records)
 	SET @pFmt = 'post.%s,'
@@ -249,7 +243,6 @@ SET @vsql = REPLACE('
 --EXEC @KeyMatchRowCount = AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@vsql, @pDestTableName = @KeyMatchSnapShotName, @pIncludeIdentityPk = 1
 
 --#endregion SnapShot: Key Match
-
 
 --#region TableProfile: KeyMatchProfile
 IF @KeyMatchRowCount > 0
@@ -377,8 +370,6 @@ EXEC dbo.uspGetColumnNames
 ELSE 
 	RAISERROR('     KeyMatch profile skipped',0,1) WITH NOWAIT;
 --#endregion Column Profiles: Key Match Value Match/MisMatch
-
-
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;

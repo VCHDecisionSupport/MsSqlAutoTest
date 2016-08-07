@@ -30,8 +30,8 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetColumnNames(%s.%s.%s)'
-	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
+	SELECT @fmt='        dbo.uspGetColumnNames(%s.%s.%s)'
+	--RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -130,7 +130,7 @@ FOR XML PATH('''')),1,10000)
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 	--EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName, @pIntersectingSchemaNameIN = @pIntersectingSchemaName, @pIntersectingObjectNameIN = @pIntersectingObjectName, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
-	EXEC sp_executesql @sql, @param, @pObject_IDIN = @pObject_ID, @pIntersectingObject_IDIN = @pIntersectingObject_ID, @pColStrOUT = @pColStr OUTPUT 
+	EXEC sp_executesql @sql, @param, @pObject_IDIN = @Object_ID, @pIntersectingObject_IDIN = @Intersecting_Object_ID, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
 
 	SET @pColStr = LTRIM(RTRIM(@pColStr))
 	IF CHARINDEX(',',@pColStr,1) = 1

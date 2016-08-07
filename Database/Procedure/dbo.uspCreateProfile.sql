@@ -33,21 +33,21 @@ BEGIN
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	-- objectID
-	DECLARE @objectID int;
-	SELECT @objectID=objectID FROM TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
-
+	
+	-- not used but allows for customization
 	SELECT @pSubQueryFilter = ISNULL(@pSubQueryFilter, '')
 
 	DECLARE @full_table_name varchar(200) = FORMATMESSAGE('%s.%s.%s',@pTargetDatabaseName,@pTargetSchemaName, @pTargetTableName)
 	-- RAISERROR('full_table_name: %s',0,1,@full_table_name) WITH NOWAIT;
 
+--#region TableProfile
 	DECLARE @table_row_count int;
 	SET @sql = FORMATMESSAGE(N'SELECT @table_row_countOUT = COUNT(*) FROM %s AS tab WHERE 1=1 %s', @full_table_name, @pSubQueryFilter);
 	SET @param = '@table_row_countOUT int OUT';
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 	EXEC sp_executesql @sql, @param, @table_row_countOUT = @table_row_count OUT;
-	RAISERROR('record count: %i', 0, 1, @table_row_count);
+	RAISERROR('      record count: %i', 0, 1, @table_row_count);
 	SET @sql = FORMATMESSAGE(N'INSERT INTO AutoTest.dbo.TableProfile (TestConfigLogID, RecordCount, TableProfileDate, TableProfileTypeID) VALUES(%i, %i, GETDATE(), %i)',@pTestConfigLogID, @table_row_count, @pTableProfileTypeID);
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
@@ -55,15 +55,9 @@ BEGIN
 	DECLARE @tableProfileID int;
 	SET @tableProfileID = @@IDENTITY;
 	-- RAISERROR('tableProfileID: %i', 0, 1, @tableProfileID) WITH NOWAIT;
+--#endregion TableProfile
 
-
-
-
-
-
-
-
-
+--#region ColumnProfile
 	DECLARE @pAggFmt nvarchar(max) = ', COUNT(DISTINCT %s) AS %s'
 	DECLARE @AggCols nvarchar(max);
 	DECLARE @cols nvarchar(max);
@@ -74,7 +68,7 @@ BEGIN
 	,@pFmt=@pAggFmt
 	,@pColStr=@AggCols OUTPUT
 	,@pSkipPkHash = 1
-	RAISERROR(@AggCols, 0,0) WITH NOWAIT;
+	--RAISERROR(@AggCols, 0,0) WITH NOWAIT;
 
 	EXEC dbo.uspGetColumnNames 
 	@pDatabaseName='AutoTest'
@@ -82,128 +76,91 @@ BEGIN
 	,@pObjectName=@pTargetTableName
 	,@pColStr=@cols OUTPUT
 	,@pSkipPkHash = 1
-	RAISERROR(@cols, 0,0) WITH NOWAIT;
+	--RAISERROR(@cols, 0,0) WITH NOWAIT;
 
 	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
 
-	IF OBJECT_ID('tempdb..##AutoTestCreateProfileWorking') IS NOT NULL
-		DROP TABLE ##AutoTestCreateProfileWorking;
-	SET @sql = FORMATMESSAGE('SELECT %s INTO ##AutoTestCreateProfileWorking FROM %s;',@AggCols, @FullTargetTableName);
-	RAISERROR(@cols, 0,0) WITH NOWAIT;
+	SET @sql = FORMATMESSAGE('
+	INSERT INTO AutoTest.dbo.ColumnProfile (ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID FROM (SELECT %s FROM %s) sub UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt
+	', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
+	--RAISERROR(@sql, 0,0) WITH NOWAIT;
 	EXEC(@sql);
-	SELECT * FROM ##AutoTestCreateProfileWorking;
-	
-	SET @sql = FORMATMESSAGE('SELECT * FROM ##AutoTestCreateProfileWorking UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt',@cols);
-	RAISERROR(@sql, 0,0) WITH NOWAIT;
-	EXEC(@sql);
+--#endregion ColumnProfile
 
-
-	SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnProfile (ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID) SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID FROM (SELECT %s FROM %s) sub UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
-	RAISERROR(@sql, 0,0) WITH NOWAIT;
-	EXEC(@sql);
-
-	SELECT * FROM AutoTest.dbo.ColumnProfile
-
-	DECLARE columnCursor CURSOR
+--#region ColumnHistogram
+	DECLARE cur CURSOR
 	FOR
-	SELECT 
-		attr.AttributePhysicalName AS ColumnName
-		,attr.Sequence AS ColumnID
-	FROM DQMF.dbo.MD_ObjectAttribute AS attr
-	WHERE ObjectID = @objectID
-	AND ISActive = 1
+	SELECT ColumnProfileID
+		,ColumnName
+		,ColumnCount
+		,TableProfileID
+		,ColumnProfileTypeID
+	FROM AutoTest.dbo.ColumnProfile AS col_pro
+	WHERE col_pro.TableProfileID = @tableProfileID
 
-	OPEN columnCursor;
+	OPEN cur;
 
-	DECLARE @column_name nvarchar(100)
-		,@columnId int
-		,@full_column_name nvarchar(300)
-		,@column_type sysname
-		,@null_count int
-		,@distinct_count int
-		,@zero_count int
-		,@blank_count int
+	DECLARE
+		@ColumnProfileID int
+		,@ColumnName varchar(100)
+		,@ColumnCount int
+		--,@TableProfileID int
+		,@ColumnProfileTypeID int
 
-	FETCH NEXT FROM columnCursor INTO @column_name, @columnID;
+	FETCH NEXT FROM cur INTO 
+		@ColumnProfileID
+		,@ColumnName
+		,@ColumnCount
+		,@TableProfileID
+		,@ColumnProfileTypeID
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		-- RAISERROR('@full_table_name: %s',0,1,@full_table_name);
-		-- RAISERROR('@column_name: %s',0,1,@column_name);
-		-- SET @full_column_name = @full_table_name+'.'+@column_name
-		-- -- RAISERROR('@full_column_name: %s',0,1,@full_column_name);
-		
-		-- SET @sql = FORMATMESSAGE(N'SELECT @null_countOUT = COUNT(*) FROM %s WHERE %s IS NULL %s;', @full_table_name, @column_name, @pSubQueryFilter); 
-		-- SET @param = FORMATMESSAGE(N'@null_countOUT int OUT');
-		-- EXEC sp_executesql @sql, @param, @null_countOUT = @null_count OUT;
-		-- -- RAISERROR('@null_count: %i',0,1,@null_count);
 
-		 SET @sql = FORMATMESSAGE(N'SELECT @distinct_countOUT = COUNT(DISTINCT %s) FROM %s WHERE 1=1 %s', @column_name, @full_table_name, @pSubQueryFilter); 
-		 SET @param = FORMATMESSAGE(N'@distinct_countOUT int OUT');
-		 EXEC sp_executesql @sql, @param, @distinct_countOUT = @distinct_count OUT;
-		 -- RAISERROR('@distinct_count: %i',0,1,@distinct_count);
-
-		-- SET @sql = FORMATMESSAGE(N'SELECT @zero_countOUT = COUNT(*) FROM %s WHERE CAST(%s AS varchar(100))= ''0'' %s;', @full_table_name, @column_name, @pSubQueryFilter); 
-		-- SET @param = FORMATMESSAGE(N'@zero_countOUT int OUT');
-		-- EXEC sp_executesql @sql, @param, @zero_countOUT = @zero_count OUT;
-		-- -- RAISERROR('@zero_count: %i',0,1,@zero_count);
-
-		-- SET @sql = FORMATMESSAGE(N'SELECT @blank_countOUT = COUNT(*) FROM %s WHERE %s= '''' %s;', @full_table_name, @column_name, @pSubQueryFilter); 
-		-- SET @param = FORMATMESSAGE(N'@blank_countOUT int OUT');
-		-- EXEC sp_executesql @sql, @param, @blank_countOUT = @blank_count OUT;
-		-- -- RAISERROR('@blank_count: %i',0,1,@blank_count);
-		
-		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnProfile (ColumnID, ColumnCount, TableProfileID, ColumnProfileTypeID) VALUES (%i, %i, %i, %i);',@columnId, @distinct_count, @tableProfileID, @pColumnProfileTypeID);
-		RAISERROR(@sql, 0, 1) WITH NOWAIT;
-		EXEC(@sql);
-
-		DECLARE @columnProfileID int;
-		SET @columnProfileID = @@IDENTITY;
-		-- RAISERROR('@columnProfileID = %i', 0, 1, @columnProfileID) WITH NOWAIT;
-		
-		SELECT @pColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'SimpleColumnHistogram'
-		IF @distinct_count < 1000 
+		IF @ColumnCount < 1000 
 		BEGIN
 			-- RAISERROR('creating ColumnHistogram',0,1) WITH NOWAIT;
 			EXEC dbo.uspInsColumnHistogram 
-				@pColumnProfileID = @columnProfileID,
+				@pColumnProfileID = @ColumnProfileID,
 				@pTargetDatabaseName = @pTargetDatabaseName,
 				@pTargetSchemaName = @pTargetSchemaName,
 				@pTargetTableName = @pTargetTableName,
-				@pTargetColumnName = @column_name,
+				@pTargetColumnName = @ColumnName,
 				@pSubQueryFilter = @pSubQueryFilter,
 				@pColumnHistogramTypeID = @pColumnHistogramTypeID
 			-- RAISERROR('ColumnHistogram complete',0,1) WITH NOWAIT;
 
 		END
-
-
-		FETCH NEXT FROM columnCursor INTO @column_name, @columnID;
-		
-
+		FETCH NEXT FROM cur INTO 
+			@ColumnProfileID
+			,@ColumnName
+			,@ColumnCount
+			,@TableProfileID
+			,@ColumnProfileTypeID
 	END
 
 
-	CLOSE columnCursor;
-	DEALLOCATE columnCursor;
+	CLOSE cur;
+	DEALLOCATE cur;
+--#endregion ColumnHistogram
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('      !uspCreateProfile: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
-DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
-DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
-DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
-SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
-SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
-SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
+--DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
+--DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
+--DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
+--SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
+--SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
+--SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
 
-DECLARE @pTestConfigLogID int = 2;
-SELECT @pTestConfigLogID=MAX(TestConfigLogID) FROM AutoTest.dbo.TestConfigLog
-DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100);
-SELECT @PreEtlKeyMisMatchSnapShotName = PreEtlKeyMisMatchSnapShotName
-FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
+--DECLARE @pTestConfigLogID int = 2;
+--SELECT @pTestConfigLogID=MAX(TestConfigLogID) FROM AutoTest.dbo.TestConfigLog
+--DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100);
+--SELECT @PreEtlKeyMisMatchSnapShotName = PreEtlKeyMisMatchSnapShotName
+--FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
 
 
-EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
+--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
