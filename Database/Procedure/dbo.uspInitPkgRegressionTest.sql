@@ -35,10 +35,11 @@ BEGIN
 		,@PreEtlSnapShotCreationElapsedSeconds int
 		,@PreSnapShotName varchar(200)
 
-INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
+INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, TestConfigID, PkgExecKey)
 SELECT 
 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
 	,db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PostEtlSourceObjectFullName
+	,GETDATE()
 	,obj.ObjectID
 	,config.TestConfigID
 	,pkglog.PkgExecKey

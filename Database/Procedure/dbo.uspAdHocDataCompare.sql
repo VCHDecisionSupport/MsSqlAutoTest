@@ -7,9 +7,10 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspAdHocDataCompare';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
+RAISERROR(@name, 0, 0) WITH NOWAIT;
+
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
-	RAISERROR(@sql, 0, 0) WITH NOWAIT;
 	EXEC(@sql);
 END
 GO
@@ -48,7 +49,7 @@ BEGIN
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
 	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
 
-	INSERT INTO TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName) VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName);
+	INSERT INTO TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
 	SET @TestConfigLogID = @@IDENTITY;
 
 	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
