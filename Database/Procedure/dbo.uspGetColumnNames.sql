@@ -30,7 +30,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetColumnNames(%s.%s.%s)'
+	--SELECT @fmt='dbo.uspGetColumnNames(%s.%s.%s)'
 	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
@@ -123,7 +123,7 @@ FOR XML PATH('''')),1,10000)
 	SET @pColStr = @pColStr
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	--RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO

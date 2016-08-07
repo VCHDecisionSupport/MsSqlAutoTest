@@ -98,6 +98,9 @@ BEGIN
 	AND attr.ObjectID = pvt.ObjectID
 	',@TableProfileID, @pColumnProfileTypeID, @objectID, @AggCols, @full_table_name, @cols)
 
+	--Raiserror(@sql, 0,0) WITH NOWAIT;
+	--EXEC(@sql)
+
 	DECLARE columnCursor CURSOR
 	FOR
 	SELECT 
@@ -186,3 +189,14 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
+--DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
+--DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
+--DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
+--SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
+--SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
+--SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
+
+--DECLARE @PreEtlKeyMisMatchName varchar(100);
+--DECLARE @pTestConfigLogID int;
+
+--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;

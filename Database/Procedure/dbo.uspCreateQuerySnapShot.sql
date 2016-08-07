@@ -33,6 +33,7 @@ BEGIN
 		,@destFullName nvarchar(500)
 		,@srcFullName nvarchar(500)
 		,@IdCol nvarchar(500) = ''
+	RAISERROR('    uspCreateQuerySnapShot(%s)',0,0,@pDestTableName);
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
 	
 	IF @pPkField IS NOT NULL
@@ -63,8 +64,6 @@ BEGIN
 		SET @IdCol = 'ID = IDENTITY(int, 1,1),'
 	END
 
-	RAISERROR('    uspCreateQuerySnapShot: QUERY -> %s',0,1, @destFullName) WITH NOWAIT;
-
 	IF OBJECT_ID(@destFullName,'U') IS NOT NULL
 	BEGIN
 		SET @sql = FORMATMESSAGE('		DROP TABLE %s;', @destFullName)
@@ -79,7 +78,7 @@ BEGIN
 		%s
 		) sub
 	',@IdCol, @pPkField, @destFullName, @pQuery)
-	RAISERROR(@sql,1,1) WITH NOWAIT;
+	--RAISERROR(@sql,1,1) WITH NOWAIT;
 	EXEC(@sql);
 	SET @rowcount=@@ROWCOUNT;
 
@@ -98,8 +97,8 @@ BEGIN
 	ELSE
 		RAISERROR('WARNING: dbo.uspCreateQuerySnapShot no clustered index will be added to snapshot. (@pPkField IS NULL AND @pIncludeIdentityPk = 0)',10,1) WITH NOWAIT;
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('    uspCreateQuerySnapShot runtime: %i seconds (rowcount: %i)',0,1, @runtime,@rowcount) WITH NOWAIT;
-	RETURN(@runtime);
+	RAISERROR('    !uspCreateQuerySnapShot runtime: %i seconds (rowcount: %i)',0,1, @runtime,@rowcount) WITH NOWAIT;
+	RETURN(@rowcount);
 END
 GO
  --EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM DSDW.BedMap.vwBedMap', @pPkField='CalendarDate',@pDestTableName='TestSnapShot'

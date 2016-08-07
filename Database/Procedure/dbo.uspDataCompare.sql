@@ -71,17 +71,25 @@ MergedKeyMatchName: %s
 	DECLARE @RecordMatchTableProfileTypeID int;
 	DECLARE @RecordMatchColumnProfileTypeID int;
 	DECLARE @RecordMatchColumnHistogramTypeID int;
+	SELECT @RecordMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'RecordMatchTableProfile'
+	SELECT @RecordMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'RecordMatchColumnProfile'
+	SELECT @RecordMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'RecordMatchColumnHistogram'
 
 	DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
 	DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
 	DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
+	SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
+	SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
+	SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
 
 	DECLARE @PostEtlKeyMisMatchTableProfileTypeID int;
 	DECLARE @PostEtlKeyMisMatchColumnProfileTypeID int;
 	DECLARE @PostEtlKeyMisMatchColumnHistogramTypeID int;
-	--#region Table SnapShot and Profile: Record Match (unchaged records)
-
-
+	SELECT @PostEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PostEtlKeyMisMatchTableProfile'
+	SELECT @PostEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PostEtlKeyMisMatchColumnProfile'
+	SELECT @PostEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PostEtlKeyMisMatchColumnHistogram'
+		
+--#region Table SnapShot and Profile: Record Match (unchaged records)
 	EXEC AutoTest.dbo.uspGetColumnNames 
 		@pDatabaseName=@SnapShotDatabaseName
 		,@pSchemaName=@SnapShotSchemaName
@@ -89,8 +97,7 @@ MergedKeyMatchName: %s
 		,@pIntersectingObjectName=@postEtlSnapName
 		,@pFmt=@pFmt
 		,@pColStr=@pColStr OUTPUT
-	
-	RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
+	--RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
 	
 	SET @sql = FORMATMESSAGE('
 	SELECT * 
@@ -108,9 +115,6 @@ MergedKeyMatchName: %s
 	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pPkField = NULL, @pDestTableName = @RecordMatchName
 	IF @RecordMatchRowCount > 0
 	BEGIN
-		SELECT @RecordMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'RecordMatchTableProfile'
-		SELECT @RecordMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'RecordMatchColumnProfile'
-		SELECT @RecordMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'RecordMatchColumnHistogram'
 		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @RecordMatchName, @pTableProfileTypeID = @RecordMatchTableProfileTypeID, @pColumnProfileTypeID = @RecordMatchColumnProfileTypeID, @pColumnHistogramTypeID = @RecordMatchColumnHistogramTypeID;
 	END
 	ELSE 
@@ -138,13 +142,10 @@ EXEC dbo.uspGetColumnNames
 	AND pre.__pkhash__ NOT IN (
 		SELECT __pkhash__
 		FROM AutoTest.SnapShot.%s AS post
-	)', @pColStr, @preEtlSnapName, @RecordMatchName)
+	)', @pColStr, @preEtlSnapName, @postEtlSnapName)
 	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PreEtlKeyMisMatchName
 	IF @PreEtlKeyMisMatchRowCount > 0
 	BEGIN
-		SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
-		SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
-		SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
 		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
 	END
 	ELSE 
@@ -173,13 +174,10 @@ SET @sql = FORMATMESSAGE('
 	AND post.__pkhash__ NOT IN (
 		SELECT __pkhash__
 		FROM AutoTest.SnapShot.%s AS pre
-	)', @pColStr, @postEtlSnapName, @RecordMatchName)
+	)', @pColStr, @postEtlSnapName, @preEtlSnapName)
 	EXEC @PostEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PostEtlKeyMisMatchName
 	IF @PostEtlKeyMisMatchRowCount > 0
 	BEGIN
-		SELECT @PostEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PostEtlKeyMisMatchTableProfile'
-		SELECT @PostEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PostEtlKeyMisMatchColumnProfile'
-		SELECT @PostEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PostEtlKeyMisMatchColumnHistogram'
 		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PostEtlKeyMisMatchName, @pTableProfileTypeID = @PostEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PostEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PostEtlKeyMisMatchColumnHistogramTypeID;
 	END
 	ELSE 
@@ -197,7 +195,6 @@ EXEC dbo.uspGetColumnNames
 	,@pFmt=@pFmt
 	,@pColStr=@pColStr OUTPUT
 	,@pSkipPkHash = 1
-RAISERROR('column names: %s',0,1,@pColStr) WITH NOWAIT;
 
 --SET @pColStr = FORMATMESSAGE('%s',@pColStr)
 IF OBJECT_ID('AutoTest.SnapShot.'+@MergedKeyMatchName,'U') IS NOT NULL
@@ -229,6 +226,7 @@ SET @vsql = REPLACE('
 	RAISERROR(@vsql,0,1) WITH NOWAIT;
 	EXEC(@vsql)
 	SET @MergedKeyMatchRowCount = @@ROWCOUNT
+	RAISERROR('    uspDataCompare->MergedKeyMatch snap shot created (%i rows)',0,0,@MergedKeyMatchRowCount);
 --EXEC @MergedKeyMatchRowCount = AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@vsql, @pDestTableName = @MergedKeyMatchName, @pIncludeIdentityPk = 1
 
 --#endregion SnapShot: Key Match

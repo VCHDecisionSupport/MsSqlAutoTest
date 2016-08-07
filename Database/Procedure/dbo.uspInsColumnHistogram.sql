@@ -1,4 +1,3 @@
---#region CREATE/ALTER PROC
 USE AutoTest
 GO
 
@@ -76,5 +75,4 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---#endregion CREATE/ALTER PROC
 --EXEC dbo.uspInsColumnHistogram @pColumnProfileID=6,  @pTargetTableName='PreDR123AssessmentContactFactPkgExecKey312705',  @pTargetColumnName='UDFTable'
