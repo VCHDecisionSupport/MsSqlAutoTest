@@ -69,37 +69,40 @@ BEGIN
 	DECLARE @cols nvarchar(max);
 	EXEC dbo.uspGetColumnNames 
 	@pDatabaseName='AutoTest'
-	,@pSchemaName='dbo'
+	,@pSchemaName='SnapShot'
 	,@pObjectName=@pTargetTableName
 	,@pFmt=@pAggFmt
 	,@pColStr=@AggCols OUTPUT
 	,@pSkipPkHash = 1
+	RAISERROR(@AggCols, 0,0) WITH NOWAIT;
 
 	EXEC dbo.uspGetColumnNames 
 	@pDatabaseName='AutoTest'
-	,@pSchemaName='dbo'
+	,@pSchemaName='SnapShot'
 	,@pObjectName=@pTargetTableName
 	,@pColStr=@cols OUTPUT
 	,@pSkipPkHash = 1
+	RAISERROR(@cols, 0,0) WITH NOWAIT;
+
+	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
+
+	IF OBJECT_ID('tempdb..##AutoTestCreateProfileWorking') IS NOT NULL
+		DROP TABLE ##AutoTestCreateProfileWorking;
+	SET @sql = FORMATMESSAGE('SELECT %s INTO ##AutoTestCreateProfileWorking FROM %s;',@AggCols, @FullTargetTableName);
+	RAISERROR(@cols, 0,0) WITH NOWAIT;
+	EXEC(@sql);
+	SELECT * FROM ##AutoTestCreateProfileWorking;
+	
+	SET @sql = FORMATMESSAGE('SELECT * FROM ##AutoTestCreateProfileWorking UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt',@cols);
+	RAISERROR(@sql, 0,0) WITH NOWAIT;
+	EXEC(@sql);
 
 
-	SET @sql = FORMATMESSAGE('
-	INSERT INTO AutoTest.dbo.ColumnProfile (ColumnID, ColumnCount, TableProfileID, ColumnProfileTypeID)
-	SELECT attr.Sequence AS ColumnID, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID
-	FROM (
-	SELECT %i AS ObjectID, %s FROM %s
-	) AS sub
-	UNPIVOT 
-	(
-		ColumnCount FOR ColumnName IN (%s)
-	) AS pvt
-	JOIN DQMF.dbo.MD_ObjectAttribute AS attr
-	ON attr.AttributePhysicalName = pvt.ColumnName
-	AND attr.ObjectID = pvt.ObjectID
-	',@TableProfileID, @pColumnProfileTypeID, @objectID, @AggCols, @full_table_name, @cols)
+	SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnProfile (ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID) SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID FROM (SELECT %s FROM %s) sub UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
+	RAISERROR(@sql, 0,0) WITH NOWAIT;
+	EXEC(@sql);
 
-	--Raiserror(@sql, 0,0) WITH NOWAIT;
-	--EXEC(@sql)
+	SELECT * FROM AutoTest.dbo.ColumnProfile
 
 	DECLARE columnCursor CURSOR
 	FOR
@@ -189,14 +192,18 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
---DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
---DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
---SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
---SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
---SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
+DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
+DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
+DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
+SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
+SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
+SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
 
---DECLARE @PreEtlKeyMisMatchName varchar(100);
---DECLARE @pTestConfigLogID int;
+DECLARE @pTestConfigLogID int = 2;
+SELECT @pTestConfigLogID=MAX(TestConfigLogID) FROM AutoTest.dbo.TestConfigLog
+DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100);
+SELECT @PreEtlKeyMisMatchSnapShotName = PreEtlKeyMisMatchSnapShotName
+FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
 
---EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
+
+EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
