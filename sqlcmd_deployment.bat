@@ -19,3 +19,4 @@ GOTO DoIt
 :DoIt
 SQLCMD -S%server% -E -dmaster -m 0 -i "%script_path%" -v pathvar="%pathvar%"
 PAUSE
+

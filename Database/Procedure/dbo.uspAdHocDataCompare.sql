@@ -36,8 +36,8 @@ BEGIN
 	
 	DECLARE 
 		@Prefix varchar(100)
-		,@PreSnapShotName varchar(200)
-		,@PostSnapShotName varchar(200)
+		,@PreEtlSnapShotName varchar(200)
+		,@PostEtlSnapShotName varchar(200)
 		,@PreEtlSourceObjectFullName varchar(500)
 		,@PostEtlSourceObjectFullName varchar(500)
 		,@TestConfigLogID int
@@ -49,30 +49,33 @@ BEGIN
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
 	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
 
-	INSERT INTO TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
+	INSERT INTO TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) 
+	VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
+	
 	SET @TestConfigLogID = @@IDENTITY;
 
-	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
-	RAISERROR('@SnapShotBaseName=%s', 0, 1, @SnapShotBaseName) WITH NOWAIT;
+	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
+	-- RAISERROR('@SnapShotBaseName=%s', 0, 1, @SnapShotBaseName) WITH NOWAIT;
 	
-
-	-- set snap shot names
-	SELECT @PreSnapShotName = 'PreEtl_'+@SnapShotBaseName
-	SELECT @PostSnapShotName = 'PostEtl_'+@SnapShotBaseName
-	RAISERROR('@@PostSnapShotName=%s', 0, 1, @PreSnapShotName) WITH NOWAIT;
-	RAISERROR('@@PostSnapShotName=%s', 0, 1, @PostSnapShotName) WITH NOWAIT;
+	-- get SnapShot names from calculated columns in TestConfigLog
+	SELECT 
+		@PreEtlSnapShotName = PreEtlSnapShotName
+		,@PostEtlSnapShotName = PostEtlSnapShotName
+	FROM AutoTest.dbo.TestConfigLog tlog
+	WHERE tlog.TestConfigLogID = @TestConfigLogID
 
 	-- create snap shots
 	DECLARE @pPreEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s.%s.%s) ', @pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName);
-	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPreEtlQuery, @pPkField = @pObjectPkColumns, @pDestTableName = @PreSnapShotName
+	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPreEtlQuery, @pPkField = @pObjectPkColumns, @pDestTableName = @PreEtlSnapShotName
 	DECLARE @pPostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s.%s.%s) ', @pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName);
-	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPostEtlQuery, @pPkField = @pObjectPkColumns, @pDestTableName = @PostSnapShotName
+	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPostEtlQuery, @pPkField = @pObjectPkColumns, @pDestTableName = @PostEtlSnapShotName
 
 	UPDATE TestConfigLog SET
-		SnapShotBaseName = @SnapShotBaseName
-		,PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
+		-- SnapShotBaseName = @SnapShotBaseName
+		-- ,
+		PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
 		,PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
-	FROM TestConfigLog tlog
+	FROM AutoTest.dbo.TestConfigLog tlog
 	WHERE tlog.TestConfigLogID = @TestConfigLogID
 
 	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID

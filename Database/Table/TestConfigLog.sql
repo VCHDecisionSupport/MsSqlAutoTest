@@ -12,7 +12,14 @@ CREATE TABLE dbo.TestConfigLog (
 	,PreEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view
 	,PostEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view same as above if Etl Regression Test (ie not AdHoc)
 	,TestDate datetime NOT NULL
-	,SnapShotBaseName varchar(200) NULL -- only null initially, suffix of names of tables in SnapShot schema
+	--,SnapShotBaseName varchar(200) NULL -- only null initially, suffix of names of tables in SnapShot schema
+	,SnapShotBaseName AS 'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,PreEtlSnapShotName AS 'PreEtl_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,PostEtlSnapShotName AS 'PostEtl_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,RecordMatchSnapShotName AS 'RecordMatch_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,PreEtlKeyMisMatchSnapShotName AS 'PreEtlKeyMisMatch_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,PostEtlKeyMisMatchSnapShotName AS 'PostEtlKeyMisMatch_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
+	,KeyMatchSnapShotName AS 'KeyMatch_'+'TestConfigLogID'+CAST(TestConfigLogID AS varchar)
 	,ObjectID INT NULL -- FK to DQMF.dbo.MD_Object; null if AdHoc
 	,TestConfigID INT NULL -- FK to TestConfig; null if AdHoc
 	,PkgExecKey INT NULL -- FK to DQMF.dbo.AuditPackageExecution; null if AdHoc
