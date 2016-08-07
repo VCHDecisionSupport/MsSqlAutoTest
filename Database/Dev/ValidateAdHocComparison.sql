@@ -172,7 +172,7 @@ AND pre.DischargeTimeID = post.DischargeTimeID
 GROUP BY pre.DischargeTimeID
 ORDER BY pre.DischargeTimeID
 
-SELECT *, col_hist.ColumnHistogramTypeID, col_hist_dim.ColumnHistogramTypeDesc
+SELECT col_pro.ColumnName, col_hist.ColumnHistogramTypeID, col_hist_dim.ColumnHistogramTypeDesc, col_hist.*
 FROM AutoTest.dbo.ColumnHistogram AS col_hist
 JOIN ColumnProfile AS col_pro
 ON col_hist.ColumnProfileID = col_pro.ColumnProfileID

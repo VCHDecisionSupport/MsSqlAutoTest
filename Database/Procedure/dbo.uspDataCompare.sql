@@ -134,7 +134,8 @@ BEGIN
 	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pPkField = NULL, @pDestTableName = @RecordMatchSnapShotName
 	IF @RecordMatchRowCount > 0
 	BEGIN
-		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @RecordMatchSnapShotName, @pTableProfileTypeID = @RecordMatchTableProfileTypeID, @pColumnProfileTypeID = @RecordMatchColumnProfileTypeID, @pColumnHistogramTypeID = @RecordMatchColumnHistogramTypeID;
+		SET @param = '';
+		--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @RecordMatchSnapShotName, @pTableProfileTypeID = @RecordMatchTableProfileTypeID, @pColumnProfileTypeID = @RecordMatchColumnProfileTypeID, @pColumnHistogramTypeID = @RecordMatchColumnHistogramTypeID;
 	END
 	ELSE 
 		RAISERROR('      RecordMatchSnapShotName profile skipped',0,1) WITH NOWAIT;
@@ -163,7 +164,8 @@ EXEC dbo.uspGetColumnNames
 	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PreEtlKeyMisMatchSnapShotName
 	IF @PreEtlKeyMisMatchRowCount > 0
 	BEGIN
-		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
+		SET @param = '';
+		--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
 	END
 	ELSE 
 		RAISERROR('      PreEtlKeyMisMatchName profile skipped',0,1) WITH NOWAIT;
@@ -191,7 +193,8 @@ SET @sql = FORMATMESSAGE('
 	EXEC @PostEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PostEtlKeyMisMatchSnapShotName
 	IF @PostEtlKeyMisMatchRowCount > 0
 	BEGIN
-		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PostEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PostEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PostEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PostEtlKeyMisMatchColumnHistogramTypeID;
+		SET @param = '';
+		--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PostEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PostEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PostEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PostEtlKeyMisMatchColumnHistogramTypeID;
 	END
 	ELSE 
 		RAISERROR('      PostEtlKeyMisMatchName profile skipped',0,1) WITH NOWAIT;
@@ -293,11 +296,12 @@ EXEC dbo.uspGetColumnNames
 		SELECT @PreEtlKeyMatchValueMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMatchValueMisMatchColumnHistogram'
 		DECLARE @PostEtlKeyMatchValueMisMatchColumnHistogramTypeID int;
 		SELECT @PostEtlKeyMatchValueMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PostEtlKeyMatchValueMisMatchColumnHistogram'
-		
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
 		IF OBJECT_ID('tempdb..#AutoTestTemp') IS NOT NULL
 			DROP TABLE #AutoTestTemp;
 		CREATE TABLE #AutoTestTemp (
-			x int
+			KeyMatchValueMatchColumnCount int
 		);
 		SET @sql = FORMATMESSAGE('
 		INSERT INTO AutoTest.dbo.ColumnProfile (TableProfileID, ColumnName, ColumnCount, ColumnProfileTypeID)
@@ -309,19 +313,18 @@ EXEC dbo.uspGetColumnNames
 		-- RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql);
 
-		SELECT x FROM #AutoTestTemp;
+		SELECT KeyMatchValueMatchColumnCount FROM #AutoTestTemp;
 
 		SET @KeyMatchValueMatchColumnProfileID = @@IDENTITY
 
 		INSERT INTO AutoTest.dbo.ColumnProfile (TableProfileID, ColumnName, ColumnCount, ColumnProfileTypeID) 
-		SELECT TOP 1 @KeyMatchTableProfileID AS TableProfileID, @column_name AS ColumnName, @KeyMatchRowCount - x AS ColumnCount, @KeyMatchValueMisMatchColumnProfileTypeID AS ColumnProfileTypeID
+		SELECT @KeyMatchTableProfileID AS TableProfileID, @column_name AS ColumnName, @KeyMatchRowCount - KeyMatchValueMatchColumnCount AS ColumnCount, @KeyMatchValueMisMatchColumnProfileTypeID AS ColumnProfileTypeID
 		FROM #AutoTestTemp;
 		SET @KeyMatchValueMisMatchColumnProfileID = @@IDENTITY
 
 		DECLARE @insert_count int
 
-		WHILE @@FETCH_STATUS = 0
-		BEGIN
+		
 			SELECT @column_name AS ColumnName;
 			SELECT @KeyMatchValueMisMatchColumnProfileID AS KeyMatchValueMisMatchColumnProfileID;
 			SELECT @KeyMatchValueMatchColumnProfileID AS KeyMatchValueMatchColumnProfileID;
