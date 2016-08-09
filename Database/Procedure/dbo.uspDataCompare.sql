@@ -312,7 +312,7 @@ EXEC dbo.uspGetColumnNames
 		-- RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql);
 
-		SELECT KeyMatchValueMatchColumnCount FROM #AutoTestTemp;
+		--SELECT KeyMatchValueMatchColumnCount FROM #AutoTestTemp;
 
 		SET @KeyMatchValueMatchColumnProfileID = @@IDENTITY
 
@@ -362,7 +362,7 @@ EXEC dbo.uspGetColumnNames
 			SELECT *
 			FROM post
 			)
-			--INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID)
+			INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID)
 			SELECT *
 			FROM both
 			', @column_name, @column_name, @KeyMatchSnapShotName, @column_name, @column_name, 
