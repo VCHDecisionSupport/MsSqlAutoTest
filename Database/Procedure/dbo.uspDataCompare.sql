@@ -131,7 +131,7 @@ BEGIN
 		FROM AutoTest.SnapShot.%s
 	) gcwashere', @pColStr, @PreEtlSnapShotName, @pColStr, @PostEtlSnapShotName)
 
-	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pPkField = NULL, @pDestTableName = @RecordMatchSnapShotName
+	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
 	IF @RecordMatchRowCount > 0
 	BEGIN
 		SET @param = '';
@@ -157,11 +157,11 @@ EXEC dbo.uspGetColumnNames
 		%s
 	FROM AutoTest.SnapShot.%s AS pre
 	WHERE 1=1
-	AND pre.__pkhash__ NOT IN (
-		SELECT __pkhash__
+	AND pre.__hashkey__ NOT IN (
+		SELECT __hashkey__
 		FROM AutoTest.SnapShot.%s AS post
 	)', @pColStr, @PreEtlSnapShotName, @PostEtlSnapShotName)
-	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PreEtlKeyMisMatchSnapShotName
+	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pKeyColumns = '__hashkey__', @pDestTableName = @PreEtlKeyMisMatchSnapShotName
 	IF @PreEtlKeyMisMatchRowCount > 0
 	BEGIN
 		SET @param = '';
@@ -186,11 +186,11 @@ SET @sql = FORMATMESSAGE('
 		%s 
 	FROM AutoTest.SnapShot.%s AS post
 	WHERE 1=1
-	AND post.__pkhash__ NOT IN (
-		SELECT __pkhash__
+	AND post.__hashkey__ NOT IN (
+		SELECT __hashkey__
 		FROM AutoTest.SnapShot.%s AS pre
 	)', @pColStr, @PostEtlSnapShotName, @PreEtlSnapShotName)
-	EXEC @PostEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pDestTableName = @PostEtlKeyMisMatchSnapShotName
+	EXEC @PostEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pKeyColumns = '__hashkey__', @pDestTableName = @PostEtlKeyMisMatchSnapShotName
 	IF @PostEtlKeyMisMatchRowCount > 0
 	BEGIN
 		SET @param = '';
@@ -225,14 +225,14 @@ SET @vsql = REPLACE('
 	INTO AutoTest.SnapShot.<merged>
 	FROM AutoTest.SnapShot.<post> AS post
 	INNER JOIN AutoTest.SnapShot.<pre> AS pre
-	ON pre.__pkhash__=post.__pkhash__
+	ON pre.__hashkey__=post.__hashkey__
 	WHERE 1=1
-	AND pre.__pkhash__ NOT IN (
-		SELECT __pkhash__
+	AND pre.__hashkey__ NOT IN (
+		SELECT __hashkey__
 		FROM AutoTest.SnapShot.<rm> AS rm
 	)
-	AND post.__pkhash__ NOT IN (
-		SELECT __pkhash__
+	AND post.__hashkey__ NOT IN (
+		SELECT __hashkey__
 		FROM AutoTest.SnapShot.<rm> AS rm
 	)', '<col>', @pColStr)
 	SET @vsql = REPLACE(@vsql, '<merged>', CAST(@KeyMatchSnapShotName AS varchar(500)))

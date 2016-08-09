@@ -26,8 +26,8 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetKey'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	SELECT @fmt='dbo.uspGetKey(%s.%s.%s)'
+	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -104,20 +104,15 @@ BEGIN
 	'
 
 	SET @sql = FORMATMESSAGE('
-;WITH db_obj AS (
-		SELECT col.name AS column_name
-		FROM %s.sys.columns as col
-		JOIN %s.sys.tables as tab
-		ON col.object_id=tab.object_id
-		JOIN %s.sys.schemas as sch
-		ON tab.schema_id = sch.schema_id
-		JOIN %s.sys.indexes ind
-		ON ind.object_id = tab.object_id
-		JOIN %s.sys.index_columns indcol
-		ON indcol.object_id = tab.object_id
+	;WITH db_obj AS (
+	SELECT col.name AS column_name
+	FROM %s.sys.index_columns AS ind_col
+	JOIN %s.sys.columns AS col
+	ON ind_col.object_id = col.object_id
+	AND ind_col.column_id = col.column_id
 		WHERE 1=1
-		AND tab.name = @pObjectNameIN
-		AND sch.name = @pSchemaNameIN
+		AND OBJECT_NAME(ind_col.object_id) = @pObjectNameIN
+		AND OBJECT_SCHEMA_NAME(ind_col.object_id) = @pSchemaNameIN
 ) 
 SELECT @pColStrOUT = SUBSTRING((
 SELECT REPLACE(''%s'', ''%s'',db_obj.column_name)
@@ -125,16 +120,18 @@ FROM db_obj
 ORDER BY db_obj.column_name
 FOR XML PATH('''')),1,10000)
 '
-,@pDatabaseName, @pDatabaseName, @pDatabaseName, @pDatabaseName, @pDatabaseName
+,@pDatabaseName, @pDatabaseName
 ,@pFmt,'%s')
 
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	--PRINT @sql
 	EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
 END
 
 IF @pColStr IS NULL
 BEGIN
 	RAISERROR('No PK is sys views',1,1)
+END
 
 	SET @pColStr = LTRIM(RTRIM(@pColStr))
 	IF CHARINDEX(',',@pColStr,1) = 1
@@ -145,7 +142,6 @@ BEGIN
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspGetKey: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
-END
 
 	RETURN(@runtime);
 END
@@ -171,3 +167,5 @@ GO
 --BEGIN 
 --	PRINT 'null';
 --END
+
+

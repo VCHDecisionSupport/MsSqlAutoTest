@@ -14,54 +14,71 @@ BEGIN
 	EXEC(@sql);
 END
 GO
+
 ALTER PROC dbo.uspCreateQuerySnapShot
 	@pQuery varchar(max),
-	@pPkField varchar(max) = NULL, -- 
+	@pKeyColumns varchar(max) = NULL,
+	@pHashKeyColumns varchar(max) = NULL,
 	@pDestDatabaseName varchar(100) = 'AutoTest',
 	@pDestSchemaName varchar(100) = 'SnapShot',
-	@pDestTableName varchar(100),
-	@pIncludeIdentityPk bit = 0 -- if @pIncludeIdentityPk=0 assume pk is given by @pPkField or pk column of table/view exists and is __pkhash__  ELSE IF @pIncludeIdentityPk=1 make new ID column as pk
-
-AS
+	@pDestTableName varchar(100)
+AS 
 BEGIN
+-- if @pHashKeyColumns is not null AND @pKeyColumns is not null
+-- 	- make __keyhash__ column using HASHBYTES
+-- 	- put CLUTERED index on __keyhash__ column
+-- 	- put NONCLUTERED index on @pKeyColumns column(s)
+
+-- if @pHashKeyColumns is not null AND @pKeyColumns is null
+-- 	- make __keyhash__ column using HASHBYTES
+-- 	- put CLUTERED index on __keyhash__ column
+
+-- if @pHashKeyColumns is null AND @pKeyColumns is not null
+-- 	- put CLUTERED index on @pKeyColumns column(s)
+
+-- if @pHashKeyColumns is null AND @pKeyColumns is null AND __hashkey__ column exists then
+-- 	- put CLUTERED index on __keyhash__ column
+
+-- if @pHashKeyColumns is null AND @pKeyColumns is null AND __hashkey__ column does not exists then
+-- 	- make __idkey__ column using IDENTITY(1,1)
+-- 	- put CLUTERED index on __idkey__ column
+
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @rowcount int;
 	DECLARE @sql nvarchar(max)
-		,@cols nvarchar(max)
 		,@destFullName nvarchar(500)
-		,@srcFullName nvarchar(500)
-		,@IdCol nvarchar(500) = ''
-	RAISERROR('    uspCreateQuerySnapShot(%s)',0,0,@pDestTableName);
+		,@HashKeySql varchar(max) = ''
+		,@IdColSql varchar(max) = ''
+	RAISERROR('uspCreateQuerySnapShot(%s)',0,0,@pDestTableName);
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
 	
-	IF @pPkField IS NOT NULL
+	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
+
+	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
-		DECLARE @pFmt nvarchar(max) = '+CAST(%s AS VARCHAR)'
-		SELECT @pPkField =SUBSTRING((
-		SELECT REPLACE(@pFmt, '%s',item)
-		FROM (
-			SELECT RTRIM(LTRIM(item)) as item 
-			FROM dbo.strSplit(@pPkField, ',')
-		) sub
-		FOR XML PATH('')),1,8000)
-		SET @pPkField  = LTRIM(RTRIM(@pPkField ))
-		IF CHARINDEX('+',@pPkField ,1) = 1
-			SET @pPkField  = SUBSTRING(@pPkField , 2, LEN(@pPkField ))
-		IF CHARINDEX('+',REVERSE(@pPkField ),1) = 1
-			SET @pPkField  = SUBSTRING(@pPkField , 1, LEN(@pPkField )-1)
-		SET @pPkField = FORMATMESSAGE('HASHBYTES(''MD5'', %s) AS __pkhash__,',@pPkField)
+		SELECT @HashKeySql=
+			SUBSTRING(
+				(
+					SELECT item AS [text()]
+					FROM (
+						SELECT REPLACE(@pFmt, '#column_name#', RTRIM(LTRIM(item))) AS item
+						FROM dbo.strSplit(@pHashKeyColumns, ',')
+					) sub
+					FOR XML PATH('')
+				),2,8000)
+		SET @HashKeySql  = LTRIM(RTRIM(@HashKeySql ))
+		IF CHARINDEX('+',@HashKeySql ,1) = 1
+			SET @HashKeySql  = SUBSTRING(@HashKeySql , 2, LEN(@HashKeySql ))
+		IF CHARINDEX('+',REVERSE(@HashKeySql ),1) = 1
+			SET @HashKeySql  = SUBSTRING(@HashKeySql , 1, LEN(@HashKeySql )-1)
+		SET @HashKeySql = FORMATMESSAGE('HASHBYTES(''MD5'', %s) AS __hashkey__,',@HashKeySql)
 	END
-	
-	
 
-	ELSE 
-		SET @pPkField = ''
-
-	IF @pIncludeIdentityPk = 1
+	IF @pKeyColumns IS NULL
 	BEGIN
-		SET @IdCol = 'ID = IDENTITY(int, 1,1),'
+		SET @IdColSql = '__idkey__ = IDENTITY(int, 1,1),'
 	END
 
 	IF OBJECT_ID(@destFullName,'U') IS NOT NULL
@@ -70,39 +87,70 @@ BEGIN
 		RAISERROR(@sql,1,1) WITH NOWAIT;
 		EXEC(@sql)
 	END
+
 	SET @sql = FORMATMESSAGE('
-	
 		SELECT %s %s * 
 		INTO %s 
 		FROM (
 		%s
 		) sub
-	',@IdCol, @pPkField, @destFullName, @pQuery)
-	--RAISERROR(@sql,1,1) WITH NOWAIT;
-	EXEC(@sql);
-	SET @rowcount=@@ROWCOUNT;
+	',@IdColSql, @HashKeySql, @destFullName, @pQuery)
 
-	IF @pIncludeIdentityPk = 1
+	PRINT @sql
+	EXEC(@sql);
+
+
+
+	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
-		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX PK_%s ON %s (ID);',@pDestTableName,@destFullName);
-		-- RAISERROR(@sql,1,1) WITH NOWAIT;
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKeyHash_%s ON %s(__hashkey__);',@pDestTableName,@destFullName);
+		PRINT @sql
 		EXEC(@sql);
+		IF @pKeyColumns IS NOT NULL
+		BEGIN
+			SET @sql = FORMATMESSAGE('CREATE NONCLUSTERED INDEX IxNonClustKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
+			PRINT @sql
+			EXEC(@sql);
+		END
+		ELSE 
+		BEGIN
+			SET @sql = FORMATMESSAGE('CREATE NONCLUSTERED INDEX IxNonClustKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pHashKeyColumns);
+			PRINT @sql
+			EXEC(@sql);
+		END
+
 	END
-	ELSE IF EXISTS(SELECT * FROM sys.columns WHERE name = '__pkhash__' AND OBJECT_NAME(object_id) = @pDestTableName)
+	ELSE IF @pKeyColumns IS NOT NULL
 	BEGIN
-		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX PK_%s ON %s (__pkhash__);',@pDestTableName,@destFullName);
-		-- RAISERROR(@sql,1,1) WITH NOWAIT;
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
+		PRINT @sql
 		EXEC(@sql);
 	END
 	ELSE
-		RAISERROR('WARNING: dbo.uspCreateQuerySnapShot no clustered index will be added to snapshot. (@pPkField IS NULL AND @pIncludeIdentityPk = 0)',10,1) WITH NOWAIT;
-	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('    !uspCreateQuerySnapShot runtime: %i seconds (rowcount: %i)',0,1, @runtime,@rowcount) WITH NOWAIT;
-	RETURN(@rowcount);
+	BEGIN
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxId_%s ON %s (__idkey__);',@pDestTableName,@destFullName);
+		PRINT @sql
+		EXEC(@sql);
+	END
+
+
 END
 GO
- --EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM DSDW.BedMap.vwBedMap', @pPkField='CalendarDate',@pDestTableName='TestSnapShot'
- --EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM DSDW.BedMap.vwBedMap',@pDestTableName='TestSnapShot'
- -- EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM DSDW.BedMap.vwBedMap',@pDestTableName='TestSnapShot', @pIncludeIdentityPk = 1
- -- EXEC dbo.uspCreateQuerySnapShot @pQuery='SELECT * FROM Prod.dbo.FactSalesQuota',@pDestTableName='TestSnapShot', @pIncludeIdentityPk = 0
+-- DECLARE 
+-- 	@pPreEtlDatabaseName varchar(100) = 'Lien'
+-- 	,@pPreEtlSchemaName varchar(100) = 'Adtc'
+-- 	,@pPreEtlTableName varchar(100) = 'SM_02_DischargeFact'
+-- 	,@pPostEtlDatabaseName varchar(100) = 'Lien'
+-- 	,@pPostEtlSchemaName varchar(100) = 'Adtc'
+-- 	,@pPostEtlTableName varchar(100) = 'SM_03_DischargeFact'
+-- 	,@pObjectPkColumns varchar(100) = 'PatientID, AccountNum'
+-- DECLARE @pQuery varchar(max),
+-- 	@pKeyColumns varchar(max) = @pObjectPkColumns,
+-- 	@pHashKeyColumns varchar(max) = @pObjectPkColumns,
+-- 	@pDestDatabaseName varchar(100) = 'AutoTest',
+-- 	@pDestSchemaName varchar(100) = 'SnapShot',
+-- 	@pDestTableName varchar(100) = 'waldo'
 
+-- SET @pQuery = FORMATMESSAGE('SELECT * FROM %s.%s.%s', @pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
+
+-- EXEC dbo.uspCreateQuerySnapShot @pQuery=@pQuery, @pKeyColumns=@pKeyColumns, @pHashKeyColumns=@pHashKeyColumns, @pDestDatabaseName=@pDestDatabaseName,@pDestSchemaName=@pDestSchemaName,@pDestTableName=@pDestTableName

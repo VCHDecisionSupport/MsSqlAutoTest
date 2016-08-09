@@ -32,9 +32,13 @@ BEGIN
 		,@PreEtlSourceObjectFullName varchar(200)
 		,@PostEtlSourceObjectFullName varchar(200)
 		,@SnapShotBaseName varchar(200)
+		,@KeyColumns varchar(500)
 		,@PostEtlSnapShotCreationElapsedSeconds int
 		,@PostSnapShotName varchar(200)
 		,@ComparisonRuntimeSeconds int
+		,@DatabaseName varchar(200)
+		,@SchemaName varchar(200)
+		,@TableName varchar(200)
 
 -- INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
 -- SELECT 
@@ -70,8 +74,12 @@ BEGIN
 	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
 	SELECT @PostSnapShotName = 'PostEtl_'+@SnapShotBaseName
 	DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
-	
-	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pDestTableName = @PostSnapShotName
+	SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
+	SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
+	SET @TableName = PARSENAME(@PreEtlSourceObjectFullName,1)
+	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pTableName = @TableName, @pColStr=@KeyColumns OUTPUT
+	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pTableName = @TableName, @pColStr=@KeyColumns OUTPUT
+	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pDestTableName = @PostSnapShotName
 
 	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID
 

@@ -26,12 +26,11 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\Database\Function\dbo.strSplit.sql
 
 :r $(pathvar)\Database\Procedure\dbo.uspGetKey.sql
+:r $(pathvar)\Database\Procedure\dbo.uspCreateQuerySnapShot.sql
 :r $(pathvar)\Database\Procedure\dbo.uspDropSnapShot.sql
--- :r $(pathvar)\Database\Procedure\dbo.uspInsTestConfig.sql
 :r $(pathvar)\Database\Procedure\dbo.uspGetColumnNames.sql
 :r $(pathvar)\Database\Procedure\dbo.uspInsColumnHistogram.sql
 :r $(pathvar)\Database\Procedure\dbo.uspCreateProfile.sql
-:r $(pathvar)\Database\Procedure\dbo.uspCreateQuerySnapShot.sql
 :r $(pathvar)\Database\Procedure\dbo.uspDataCompare.sql
 :r $(pathvar)\Database\Procedure\dbo.uspInitPkgRegressionTest.sql
 :r $(pathvar)\Database\Procedure\dbo.uspPkgRegressionTest.sql

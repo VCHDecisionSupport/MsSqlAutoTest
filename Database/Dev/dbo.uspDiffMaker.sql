@@ -53,7 +53,7 @@ BEGIN
 	--SELECT @col_name;
 	IF @col_name LIKE '%ID'-- AND @col_name NOT LIKE 'ETLAuditID'
 	BEGIN
-		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT __PKHASH__ FROM %s ORDER BY NEWID()) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.__PKHASH__ = cte.__PKHASH__;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
+		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT __hashkey__ FROM %s ORDER BY NEWID()) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.__hashkey__ = cte.__hashkey__;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;

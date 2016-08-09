@@ -118,8 +118,8 @@ INTERSECT
 SELECT @pColStrOUT = SUBSTRING((
 SELECT REPLACE(''%s'', ''%s'',db_obj.column_name)
 FROM db_obj
-WHERE (db_obj.column_name LIKE ''__pkhash__'' AND @pSkipPkHashIN = 0)
-OR db_obj.column_name NOT LIKE ''__pkhash__''
+WHERE (db_obj.column_name LIKE ''__hashkey__'' AND @pSkipPkHashIN = 0)
+OR db_obj.column_name NOT LIKE ''__hashkey__''
 ORDER BY db_obj.column_name
 FOR XML PATH('''')),1,10000)
 '
