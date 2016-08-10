@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "AutoTestResultsReport", "AutoTestResultsReport.rptproj", "{ECF9CBFC-5232-485A-9829-7194318B03CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Debug|Default.ActiveCfg = Debug
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Debug|Default.Build.0 = DebugLocal
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Debug|Default.Deploy.0 = DebugLocal
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.DebugLocal|Default.Build.0 = DebugLocal
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Release|Default.ActiveCfg = Release
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Release|Default.Build.0 = Release
+		{ECF9CBFC-5232-485A-9829-7194318B03CD}.Release|Default.Deploy.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

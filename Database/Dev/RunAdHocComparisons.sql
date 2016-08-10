@@ -26,42 +26,42 @@ EXEC AutoTest.dbo.uspAdHocDataCompare
 	,@pPostEtlTableName = @pPostEtlTableName
 	,@pObjectPkColumns = @pObjectPkColumns
 
---SET @pPreEtlTableName = 'SM_02_DischargeFact'
---SET @pPostEtlTableName = 'SM_03_DischargeFact'
---SET @pObjectPkColumns = 'AccountNum'
---EXEC AutoTest.dbo.uspAdHocDataCompare 
---	@pPreEtlDatabaseName = @pPreEtlDatabaseName
---	,@pPreEtlSchemaName = @pPreEtlSchemaName
---	,@pPreEtlTableName = @pPreEtlTableName
---	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
---	,@pPostEtlSchemaName = @pPostEtlSchemaName
---	,@pPostEtlTableName = @pPostEtlTableName
---	,@pObjectPkColumns = @pObjectPkColumns
+SET @pPreEtlTableName = 'SM_02_DischargeFact'
+SET @pPostEtlTableName = 'SM_03_DischargeFact'
+SET @pObjectPkColumns = 'AccountNum'
+EXEC AutoTest.dbo.uspAdHocDataCompare 
+	@pPreEtlDatabaseName = @pPreEtlDatabaseName
+	,@pPreEtlSchemaName = @pPreEtlSchemaName
+	,@pPreEtlTableName = @pPreEtlTableName
+	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
+	,@pPostEtlSchemaName = @pPostEtlSchemaName
+	,@pPostEtlTableName = @pPostEtlTableName
+	,@pObjectPkColumns = @pObjectPkColumns
 
---SET @pPreEtlTableName = 'SM_02_AdmissionFact'
---SET @pPostEtlTableName = 'SM_03_AdmissionFact'
---SET @pObjectPkColumns = 'AccountNum'
---EXEC AutoTest.dbo.uspAdHocDataCompare 
---	@pPreEtlDatabaseName = @pPreEtlDatabaseName
---	,@pPreEtlSchemaName = @pPreEtlSchemaName
---	,@pPreEtlTableName = @pPreEtlTableName
---	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
---	,@pPostEtlSchemaName = @pPostEtlSchemaName
---	,@pPostEtlTableName = @pPostEtlTableName
---	,@pObjectPkColumns = @pObjectPkColumns
+SET @pPreEtlTableName = 'SM_02_AdmissionFact'
+SET @pPostEtlTableName = 'SM_03_AdmissionFact'
+SET @pObjectPkColumns = 'AccountNum'
+EXEC AutoTest.dbo.uspAdHocDataCompare 
+	@pPreEtlDatabaseName = @pPreEtlDatabaseName
+	,@pPreEtlSchemaName = @pPreEtlSchemaName
+	,@pPreEtlTableName = @pPreEtlTableName
+	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
+	,@pPostEtlSchemaName = @pPostEtlSchemaName
+	,@pPostEtlTableName = @pPostEtlTableName
+	,@pObjectPkColumns = @pObjectPkColumns
 
---SET @pPreEtlTableName = 'SM_02_AdmissionFact'
---SET @pPostEtlTableName = 'SM_04_AdmissionFact'
---SET @pObjectPkColumns = 'AccountNum'
---EXEC AutoTest.dbo.uspAdHocDataCompare 
---	@pPreEtlDatabaseName = @pPreEtlDatabaseName
---	,@pPreEtlSchemaName = @pPreEtlSchemaName
---	,@pPreEtlTableName = @pPreEtlTableName
---	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
---	,@pPostEtlSchemaName = @pPostEtlSchemaName
---	,@pPostEtlTableName = @pPostEtlTableName
---	,@pObjectPkColumns = @pObjectPkColumns
-----#endregion AdHocDataCompare Tests
+SET @pPreEtlTableName = 'SM_02_AdmissionFact'
+SET @pPostEtlTableName = 'SM_04_AdmissionFact'
+SET @pObjectPkColumns = 'AccountNum'
+EXEC AutoTest.dbo.uspAdHocDataCompare 
+	@pPreEtlDatabaseName = @pPreEtlDatabaseName
+	,@pPreEtlSchemaName = @pPreEtlSchemaName
+	,@pPreEtlTableName = @pPreEtlTableName
+	,@pPostEtlDatabaseName = @pPostEtlDatabaseName
+	,@pPostEtlSchemaName = @pPostEtlSchemaName
+	,@pPostEtlTableName = @pPostEtlTableName
+	,@pObjectPkColumns = @pObjectPkColumns
+--#endregion AdHocDataCompare Tests
 
 
 

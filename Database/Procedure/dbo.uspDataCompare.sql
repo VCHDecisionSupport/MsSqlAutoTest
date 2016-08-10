@@ -324,10 +324,10 @@ EXEC dbo.uspGetColumnNames
 		DECLARE @insert_count int
 
 		
-			SELECT @column_name AS ColumnName;
-			SELECT @KeyMatchValueMisMatchColumnProfileID AS KeyMatchValueMisMatchColumnProfileID;
-			SELECT @KeyMatchValueMatchColumnProfileID AS KeyMatchValueMatchColumnProfileID;
-			SELECT @column_name AS ColumnName;
+			--SELECT @column_name AS ColumnName;
+			--SELECT @KeyMatchValueMisMatchColumnProfileID AS KeyMatchValueMisMatchColumnProfileID;
+			--SELECT @KeyMatchValueMatchColumnProfileID AS KeyMatchValueMatchColumnProfileID;
+			--SELECT @column_name AS ColumnName;
 			SET @sql = FORMATMESSAGE('
 			INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID)
 			SELECT TOP %i %i AS ColumnProfileID, merged.pre_%s AS ColumnValue, COUNT(*) AS ValueCount, %i AS ColumnHistogramTypeID
@@ -368,11 +368,11 @@ EXEC dbo.uspGetColumnNames
 			', @column_name, @column_name, @KeyMatchSnapShotName, @column_name, @column_name, 
 			@maxDistinctCount, @KeyMatchValueMisMatchColumnProfileID, @column_name, @PreEtlKeyMatchValueMisMatchColumnHistogramTypeID, @column_name, 
 			@maxDistinctCount, @KeyMatchValueMisMatchColumnProfileID, @column_name, @PostEtlKeyMatchValueMisMatchColumnHistogramTypeID, @column_name)
-			RAISERROR(@sql, 0, 1) WITH NOWAIT;
+			--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 			EXEC(@sql);
 			
 			SET @insert_count = @@ROWCOUNT
-			RAISERROR('KeyMatchValueMisMatch %s histograms rowcount %i', 0, 1, @column_name, @insert_count) WITH NOWAIT;
+			--RAISERROR('KeyMatchValueMisMatch %s histograms rowcount %i', 0, 1, @column_name, @insert_count) WITH NOWAIT;
 
 			-- EXEC dbo.uspDNE
 			FETCH NEXT FROM columnCursor INTO @column_name;
