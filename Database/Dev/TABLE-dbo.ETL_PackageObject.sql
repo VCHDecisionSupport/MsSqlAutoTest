@@ -10,6 +10,6 @@ GO
 
 PRINT 'CREATE TABLE dbo.ETL_PackageObject'
 CREATE TABLE dbo.ETL_PackageObject (
-	PkgID int NOT NULL
+	PackageID int NOT NULL
 	,ObjectID int NOT NULL
 );

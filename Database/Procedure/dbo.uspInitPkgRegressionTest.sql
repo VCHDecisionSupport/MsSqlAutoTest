@@ -78,7 +78,7 @@ BEGIN
 	SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 	SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
 	SET @TableName = PARSENAME(@PreEtlSourceObjectFullName,1)
-	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pTableName = @TableName, @pColStr=@KeyColumns OUTPUT
+	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @TableName, @pColStr=@KeyColumns OUTPUT
 	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pKeyColumns = @KeyColumns,@pDestTableName = @PreEtlSnapShotName
 
 	UPDATE TestConfigLog SET
