@@ -51,7 +51,7 @@ BEGIN
 		,@destFullName nvarchar(500)
 		,@HashKeySql varchar(max) = ''
 		,@IdColSql varchar(max) = ''
-	RAISERROR('uspCreateQuerySnapShot(%s)',0,0,@pDestTableName);
+	RAISERROR('uspCreateQuerySnapShot(%s, @pKeyColumns=%s; @pHashKeyColumns=%s)',0,0,@pDestTableName, @pKeyColumns, @pHashKeyColumns);
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
 	
 	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
@@ -98,7 +98,7 @@ BEGIN
 
 	PRINT @sql
 	EXEC(@sql);
-
+	SET @rowcount = @@ROWCOUNT;
 
 
 	IF @pHashKeyColumns IS NOT NULL
@@ -133,6 +133,9 @@ BEGIN
 		EXEC(@sql);
 	END
 
+	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
+	RAISERROR('!dbo.uspCreateQuerySnapShot: runtime: %i seconds (rowcount: %i)', 0, 1, @runtime, @rowcount) WITH NOWAIT;
+	RETURN(@runtime);
 
 END
 GO

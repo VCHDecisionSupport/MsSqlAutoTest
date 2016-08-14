@@ -390,6 +390,8 @@ ELSE
 END	
 
 GO
+
+dbo.uspDataCompare @pTestConfigLogID=25
 -- DECLARE 
 -- 	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'
 -- 	,@pPostEtlBaseName varchar(100) = 'SM_03_DischargeFact' + 'Adhoc'

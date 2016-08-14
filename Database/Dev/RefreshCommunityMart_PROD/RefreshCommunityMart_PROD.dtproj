@@ -28,6 +28,11 @@
           <FullPath>CommunityMart SPDBDECSUP04-STDBDECSUP01.dtsx</FullPath>
           <References />
         </DtsPackage>
+        <DtsPackage FormatVersion="6">
+          <Name>CommunityMart STDBDECSUP03-STDBDECSUP01.dtsx</Name>
+          <FullPath>CommunityMart STDBDECSUP03-STDBDECSUP01.dtsx</FullPath>
+          <References />
+        </DtsPackage>
       </DTSPackages>
     </Manifest>
   </DeploymentModelSpecificContent>

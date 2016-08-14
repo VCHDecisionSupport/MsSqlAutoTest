@@ -141,7 +141,7 @@ END
 	SET @pColStr = @pColStr
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspGetKey: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	RAISERROR('!dbo.uspGetKey: runtime: %i seconds(Key Columns: %s)', 0, 1, @runtime, @pColStr) WITH NOWAIT;
 
 	RETURN(@runtime);
 END

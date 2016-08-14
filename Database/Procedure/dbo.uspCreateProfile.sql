@@ -38,18 +38,18 @@ BEGIN
 	SELECT @pSubQueryFilter = ISNULL(@pSubQueryFilter, '')
 
 	DECLARE @full_table_name varchar(200) = FORMATMESSAGE('%s.%s.%s',@pTargetDatabaseName,@pTargetSchemaName, @pTargetTableName)
-	-- RAISERROR('full_table_name: %s',0,1,@full_table_name) WITH NOWAIT;
+	 RAISERROR('full_table_name: %s',0,0,@full_table_name) WITH NOWAIT;
 
 --#region TableProfile
 	DECLARE @table_row_count int;
 	SET @sql = FORMATMESSAGE(N'SELECT @table_row_countOUT = COUNT(*) FROM %s AS tab WHERE 1=1 %s', @full_table_name, @pSubQueryFilter);
 	SET @param = '@table_row_countOUT int OUT';
-	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 	EXEC sp_executesql @sql, @param, @table_row_countOUT = @table_row_count OUT;
-	RAISERROR('      record count: %i', 0, 1, @table_row_count);
+	RAISERROR('      record count: %i', 0, 0, @table_row_count);
 	SET @sql = FORMATMESSAGE(N'INSERT INTO AutoTest.dbo.TableProfile (TestConfigLogID, RecordCount, TableProfileDate, TableProfileTypeID) VALUES(%i, %i, GETDATE(), %i)',@pTestConfigLogID, @table_row_count, @pTableProfileTypeID);
-	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	RAISERROR(@sql, 0, 0) WITH NOWAIT;
 
 	EXEC(@sql);
 	DECLARE @tableProfileID int;
@@ -83,8 +83,11 @@ BEGIN
 	SET @sql = FORMATMESSAGE('
 	INSERT INTO AutoTest.dbo.ColumnProfile (ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID FROM (SELECT %s FROM %s) sub UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt
 	', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
-	--RAISERROR(@sql, 0,0) WITH NOWAIT;
+	EXEC AutoTest.dbo.uspLog @pMessage = @sql;
+	RAISERROR(@sql, 0,0) WITH NOWAIT;
 	EXEC(@sql);
+	RAISERROR(@sql, 0,0) WITH NOWAIT;
+	PRINT @sql;
 --#endregion ColumnProfile
 
 --#region ColumnHistogram
@@ -149,18 +152,19 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
---DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
---DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
---SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
---SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
---SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
+DECLARE @PreEtlKeyMisMatchTableProfileTypeID int;
+DECLARE @PreEtlKeyMisMatchColumnProfileTypeID int;
+DECLARE @PreEtlKeyMisMatchColumnHistogramTypeID int;
+SELECT @PreEtlKeyMisMatchTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'PreEtlKeyMisMatchTableProfile'
+SELECT @PreEtlKeyMisMatchColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'PreEtlKeyMisMatchColumnProfile'
+SELECT @PreEtlKeyMisMatchColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'PreEtlKeyMisMatchColumnHistogram'
 
---DECLARE @pTestConfigLogID int = 2;
---SELECT @pTestConfigLogID=MAX(TestConfigLogID) FROM AutoTest.dbo.TestConfigLog
---DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100);
---SELECT @PreEtlKeyMisMatchSnapShotName = PreEtlKeyMisMatchSnapShotName
---FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
+DECLARE @pTestConfigLogID int = 25;
+SELECT @pTestConfigLogID=MAX(TestConfigLogID) FROM AutoTest.dbo.TestConfigLog
+SET @pTestConfigLogID = 25;
+DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100)
+SELECT @PreEtlKeyMisMatchSnapShotName = RecordMatchSnapShotName
+FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
 
 
---EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
+EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;

@@ -39,6 +39,7 @@ BEGIN
 		,@SchemaName varchar(200)
 		,@TableName varchar(200)
 
+-- setup regression test specs: copy configurations from AutoTest.dbo.TestConfig: insert into AutoTest.dbo.TestConfigLog
 INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, TestConfigID, PkgExecKey)
 SELECT 
 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
@@ -79,14 +80,14 @@ BEGIN
 	SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
 	SET @TableName = PARSENAME(@PreEtlSourceObjectFullName,1)
 	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @TableName, @pColStr=@KeyColumns OUTPUT
-	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pKeyColumns = @KeyColumns,@pDestTableName = @PreEtlSnapShotName
+	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PreEtlSnapShotName
 
 	UPDATE TestConfigLog SET
 		PreEtlSourceObjectFullName = @PreEtlSourceObjectFullName
 		,PostEtlSourceObjectFullName = @PostEtlSourceObjectFullName
 		,PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
 		-- ,SnapShotBaseName = @SnapShotBaseName
-	FROM TestConfigLog tlog
+	FROM AutoTest.dbo.TestConfigLog tlog
 	WHERE tlog.TestConfigLogID = @TestConfigLogID
 
 	FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName

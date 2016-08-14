@@ -9,6 +9,9 @@ RAISERROR('@path = $(pathvar) = %s
 
 ',0,1,@path) WITH NOWAIT
 
+:r $(pathvar)\Database\DQMF\DATABASE-AutoTest.sql
+
+
 :r $(pathvar)\Database\DATABASE-AutoTest.sql
 :r $(pathvar)\Database\SCHEMA-SnapShot.sql
 :r $(pathvar)\Database\Table\TestConfig.sql

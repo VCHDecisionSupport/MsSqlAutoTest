@@ -55,6 +55,15 @@ BEGIN
 -- JOIN DQMF.dbo.AuditPkgExecution AS pkglog
 -- ON config.PkgID = pkglog.PkgKey
 
+IF (SELECT CURSOR_STATUS('global','cur')) >= -1
+ BEGIN
+  IF (SELECT CURSOR_STATUS('global','cur')) > -1
+   BEGIN
+    CLOSE myCursor
+   END
+ DEALLOCATE myCursor
+END
+
 DECLARE cur CURSOR
 FOR
 SELECT 
@@ -77,9 +86,8 @@ BEGIN
 	SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 	SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
 	SET @TableName = PARSENAME(@PreEtlSourceObjectFullName,1)
-	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pTableName = @TableName, @pColStr=@KeyColumns OUTPUT
-	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pTableName = @TableName, @pColStr=@KeyColumns OUTPUT
-	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pDestTableName = @PostSnapShotName
+	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @TableName, @pColStr=@KeyColumns OUTPUT
+	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostSnapShotName
 
 	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID
 
@@ -99,4 +107,4 @@ END
 	RETURN(@runtime);
 END
 GO
---EXEC dbo.uspPkgRegressionTest
+EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313071
