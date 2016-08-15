@@ -7,7 +7,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspDataCompare';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 1, 1) WITH NOWAIT;
+RAISERROR(@name, 0, 0) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
@@ -117,21 +117,37 @@ BEGIN
 		,@pFmt=@pFmt
 		,@pColStr=@pColStr OUTPUT
 	--RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
-	
-	SET @sql = FORMATMESSAGE('
-	SELECT * 
+	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
+	SET @vsql = 'SELECT * 
 	FROM 
 	(
 		SELECT 
-			%s
-		FROM AutoTest.SnapShot.%s 
+			<columns>
+		FROM AutoTest.SnapShot.<PreEtlSnapShotName> 
 		INTERSECT 
 		SELECT 
-			%s
-		FROM AutoTest.SnapShot.%s
-	) gcwashere', @pColStr, @PreEtlSnapShotName, @pColStr, @PostEtlSnapShotName)
+			<columns>
+		FROM AutoTest.SnapShot.<PostEtlSnapShotName>
+	) gcwashere'
+	SET @vsql = REPLACE(@vsql, '<columns>', @pColStr)
+	SET @vsql = REPLACE(@vsql, '<PreEtlSnapShotName>', @PreEtlSnapShotName)
+	SET @vsql = REPLACE(@vsql, '<PostEtlSnapShotName>', @PostEtlSnapShotName)
 
-	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
+
+	-- SET @sql = FORMATMESSAGE('
+	-- SELECT * 
+	-- FROM 
+	-- (
+	-- 	SELECT 
+	-- 		%s
+	-- 	FROM AutoTest.SnapShot.%s 
+	-- 	INTERSECT 
+	-- 	SELECT 
+	-- 		%s
+	-- 	FROM AutoTest.SnapShot.%s
+	-- ) gcwashere', @pColStr, @PreEtlSnapShotName, @pColStr, @PostEtlSnapShotName)
+
+	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @vsql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
 	IF @RecordMatchRowCount > 0
 	BEGIN
 		SET @param = '';
@@ -161,6 +177,8 @@ EXEC dbo.uspGetColumnNames
 		SELECT __hashkey__
 		FROM AutoTest.SnapShot.%s AS post
 	)', @pColStr, @PreEtlSnapShotName, @PostEtlSnapShotName)
+	
+
 	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pKeyColumns = '__hashkey__', @pDestTableName = @PreEtlKeyMisMatchSnapShotName
 	IF @PreEtlKeyMisMatchRowCount > 0
 	BEGIN
@@ -391,7 +409,7 @@ END
 
 GO
 
-dbo.uspDataCompare @pTestConfigLogID=25
+--dbo.uspDataCompare @pTestConfigLogID=25
 -- DECLARE 
 -- 	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'
 -- 	,@pPostEtlBaseName varchar(100) = 'SM_03_DischargeFact' + 'Adhoc'

@@ -55,16 +55,18 @@ BEGIN
 -- JOIN DQMF.dbo.AuditPkgExecution AS pkglog
 -- ON config.PkgID = pkglog.PkgKey
 
-IF (SELECT CURSOR_STATUS('global','cur')) >= -1
- BEGIN
-  IF (SELECT CURSOR_STATUS('global','cur')) > -1
-   BEGIN
-    CLOSE myCursor
+IF (SELECT CURSOR_STATUS('global','reg_cur')) >= -1
+BEGIN
+	RAISERROR('reg_cur EXISTS',0,0) WITH NOWAIT
+	IF (SELECT CURSOR_STATUS('global','reg_cur')) > -1
+	BEGIN
+		RAISERROR('reg_cur is OPEN',0,0) WITH NOWAIT
+		CLOSE reg_cur
    END
- DEALLOCATE myCursor
+DEALLOCATE reg_cur
 END
 
-DECLARE cur CURSOR
+DECLARE reg_cur CURSOR
 FOR
 SELECT 
 	TestConfigLogID
@@ -74,9 +76,9 @@ SELECT
 FROM AutoTest.dbo.TestConfigLog
 WHERE PkgExecKey = @pPkgExecKey
 
-OPEN cur;
+OPEN reg_cur;
 
-FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+FETCH NEXT FROM reg_cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
@@ -97,7 +99,7 @@ BEGIN
 	FROM TestConfigLog tlog
 	WHERE tlog.TestConfigLogID = @TestConfigLogID
 
-	FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+	FETCH NEXT FROM reg_cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
 END
 
 
@@ -107,4 +109,4 @@ END
 	RETURN(@runtime);
 END
 GO
-EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313071
+--EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313071

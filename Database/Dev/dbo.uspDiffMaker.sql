@@ -1,4 +1,4 @@
-USE TestLog
+USE AutoTest
 GO
 
 
@@ -36,11 +36,27 @@ SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %
 		RAISERROR('
 	rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
 
+DECLARE @table TABLE (
+	ColumnName varchar(100)
+);
+
+DECLARE @DatabaseName varchar(100) = PARSENAME(@pTableName,3);
+DECLARE @SchemaName varchar(100) = PARSENAME(@pTableName,2);
+DECLARE @TableName varchar(100) = PARSENAME(@pTableName,1);
+DECLARE @cols varchar(max);
+
+
+EXEC dbo.uspGetColumnNames 
+	@pDatabaseName=@DatabaseName
+	,@pSchemaName=@SchemaName
+	,@pObjectName=@TableName
+	,@pColStr=@cols OUTPUT
+	,@pSkipPkHash = 1
+
 DECLARE cur CURSOR
 FOR 
-SELECT col.name AS col_name
-FROM sys.columns AS col
-WHERE OBJECT_ID(@pTableName) = col.object_id;
+SELECT item AS col_name
+FROM dbo.strSplit(@cols, ',');
 
 DECLARE @col_name varchar(100);
 
@@ -53,7 +69,7 @@ BEGIN
 	--SELECT @col_name;
 	IF @col_name LIKE '%ID'-- AND @col_name NOT LIKE 'ETLAuditID'
 	BEGIN
-		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT __hashkey__ FROM %s ORDER BY NEWID()) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.__hashkey__ = cte.__hashkey__;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
+		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s ORDER BY NEWID()) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
@@ -72,5 +88,6 @@ END
 GO
 --#endregion CREATE/ALTER PROC
 
-DECLARE @pTableName varchar(100) = '[TestLog].[SnapShot].[destTableName]';
-EXEC dbo.uspDiffMaker @pTableName=@pTableName
+--DECLARE @pTableName varchar(100) = '[TestLog].[SnapShot].[destTableName]';
+
+--EXEC AutoTest.dbo.uspDiffMaker @pTableName='CommunityMart.dbo.SchoolHistoryFact'

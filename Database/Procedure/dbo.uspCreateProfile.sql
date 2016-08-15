@@ -30,6 +30,7 @@ BEGIN
 	DECLARE @runtime int = 0;
 	RAISERROR('      uspCreateProfile: %s (@pTableProfileTypeID: %i)', 0, 1, @pTargetTableName, @pTableProfileTypeID) WITH NOWAIT;
 	
+	DECLARE @vsql varchar(max);
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	-- objectID
@@ -77,21 +78,56 @@ BEGIN
 	,@pColStr=@cols OUTPUT
 	,@pSkipPkHash = 1
 	--RAISERROR(@cols, 0,0) WITH NOWAIT;
-
+		
 	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
 
-	SET @sql = FORMATMESSAGE('
-	INSERT INTO AutoTest.dbo.ColumnProfile (ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID FROM (SELECT %s FROM %s) sub UNPIVOT (ColumnCount FOR ColumnName IN (%s)) pvt
-	', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
-	EXEC AutoTest.dbo.uspLog @pMessage = @sql;
-	RAISERROR(@sql, 0,0) WITH NOWAIT;
-	EXEC(@sql);
-	RAISERROR(@sql, 0,0) WITH NOWAIT;
-	PRINT @sql;
+	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
+	SET @vsql = '
+	INSERT INTO AutoTest.dbo.ColumnProfile 
+	(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
+	SELECT pvt.ColumnName, pvt.ColumnCount, <TableProfileID> AS TableProfileID, <ColumnProfileTypeID> AS ColumnProfileTypeID 
+	FROM (SELECT 
+		<AggregatedColumns> 
+	FROM <SnapShotName>) sub 
+	UNPIVOT (ColumnCount FOR ColumnName IN (
+		<columns>
+	)) pvt
+	'
+	SET @vsql = REPLACE(@vsql, '<TableProfileID>', @tableProfileID)
+	SET @vsql = REPLACE(@vsql, '<ColumnProfileTypeID>', @pColumnProfileTypeID)
+	SET @vsql = REPLACE(@vsql, '<AggregatedColumns>', @AggCols)
+	SET @vsql = REPLACE(@vsql, '<columns>', @cols)
+	SET @vsql = REPLACE(@vsql, '<SnapShotName>', @FullTargetTableName)
+
+	--SET @sql = FORMATMESSAGE('
+	--INSERT INTO AutoTest.dbo.ColumnProfile 
+	--(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
+	--SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID 
+	--FROM (SELECT 
+	--	%s 
+	--FROM %s) sub 
+	--UNPIVOT (ColumnCount FOR ColumnName IN (
+	--	%s
+	--)) pvt
+	--', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
+	EXEC AutoTest.dbo.uspLog @pMessage = @vsql;
+	RAISERROR(@vsql, 0,0) WITH NOWAIT;
+	EXEC(@vsql);
 --#endregion ColumnProfile
 
 --#region ColumnHistogram
-	DECLARE cur CURSOR
+IF (SELECT CURSOR_STATUS('global','pro_cur')) >= -1
+BEGIN
+	RAISERROR('pro_cur EXISTS',0,0) WITH NOWAIT
+	IF (SELECT CURSOR_STATUS('global','pro_cur')) > -1
+	BEGIN
+		RAISERROR('pro_cur is OPEN',0,0) WITH NOWAIT
+		CLOSE pro_cur
+   END
+DEALLOCATE pro_cur
+END
+
+	DECLARE pro_cur CURSOR
 	FOR
 	SELECT ColumnProfileID
 		,ColumnName
@@ -101,7 +137,7 @@ BEGIN
 	FROM AutoTest.dbo.ColumnProfile AS col_pro
 	WHERE col_pro.TableProfileID = @tableProfileID
 
-	OPEN cur;
+	OPEN pro_cur;
 
 	DECLARE
 		@ColumnProfileID int
@@ -110,7 +146,7 @@ BEGIN
 		--,@TableProfileID int
 		,@ColumnProfileTypeID int
 
-	FETCH NEXT FROM cur INTO 
+	FETCH NEXT FROM pro_cur INTO 
 		@ColumnProfileID
 		,@ColumnName
 		,@ColumnCount
@@ -134,7 +170,7 @@ BEGIN
 			-- RAISERROR('ColumnHistogram complete',0,1) WITH NOWAIT;
 
 		END
-		FETCH NEXT FROM cur INTO 
+		FETCH NEXT FROM pro_cur INTO 
 			@ColumnProfileID
 			,@ColumnName
 			,@ColumnCount
@@ -143,8 +179,8 @@ BEGIN
 	END
 
 
-	CLOSE cur;
-	DEALLOCATE cur;
+	CLOSE pro_cur;
+	DEALLOCATE pro_cur;
 --#endregion ColumnHistogram
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
@@ -167,4 +203,4 @@ SELECT @PreEtlKeyMisMatchSnapShotName = RecordMatchSnapShotName
 FROM AutoTest.dbo.TestConfigLog WHERE TestConfigLogID = @pTestConfigLogID
 
 
-EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;
+--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigLogID = @pTestConfigLogID, @pTargetTableName = @PreEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PreEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PreEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PreEtlKeyMisMatchColumnHistogramTypeID;

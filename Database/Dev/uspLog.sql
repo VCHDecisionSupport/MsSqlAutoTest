@@ -52,7 +52,9 @@ BEGIN
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspLog: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	--SELECT * FROM AutoTest.dbo.Log ORDER BY LogDate DESC;
 	RETURN(@runtime);
+
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspLog
