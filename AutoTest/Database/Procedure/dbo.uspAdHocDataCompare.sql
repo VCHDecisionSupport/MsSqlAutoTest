@@ -40,7 +40,7 @@ BEGIN
 		,@PostEtlSnapShotName varchar(200)
 		,@PreEtlSourceObjectFullName varchar(500)
 		,@PostEtlSourceObjectFullName varchar(500)
-		,@TestConfigLogID int
+		,@TestConfigID int
 		,@SnapShotBaseName varchar(500)
 		,@PreEtlSnapShotCreationElapsedSeconds int
 		,@PostEtlSnapShotCreationElapsedSeconds int
@@ -49,20 +49,20 @@ BEGIN
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
 	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
 
-	INSERT INTO TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) 
+	INSERT INTO TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) 
 	VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
 	
-	SET @TestConfigLogID = @@IDENTITY;
+	SET @TestConfigID = @@IDENTITY;
 
-	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
+	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
 	-- RAISERROR('@SnapShotBaseName=%s', 0, 1, @SnapShotBaseName) WITH NOWAIT;
 	
-	-- get SnapShot names from calculated columns in TestConfigLog
+	-- get SnapShot names from calculated columns in TestConfig
 	SELECT 
 		@PreEtlSnapShotName = PreEtlSnapShotName
 		,@PostEtlSnapShotName = PostEtlSnapShotName
-	FROM AutoTest.dbo.TestConfigLog tlog
-	WHERE tlog.TestConfigLogID = @TestConfigLogID
+	FROM AutoTest.dbo.TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
 	-- create snap shots
 	DECLARE @pPreEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s.%s.%s) ', @pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName);
@@ -70,18 +70,18 @@ BEGIN
 	DECLARE @pPostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s.%s.%s) ', @pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName);
 	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPostEtlQuery, @pKeyColumns = @pObjectPkColumns, @pHashKeyColumns = @pObjectPkColumns, @pDestTableName = @PostEtlSnapShotName
 
-	UPDATE TestConfigLog SET
+	UPDATE TestConfig SET
 		PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
 		,PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
-	FROM AutoTest.dbo.TestConfigLog tlog
-	WHERE tlog.TestConfigLogID = @TestConfigLogID
+	FROM AutoTest.dbo.TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
-	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID
+	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 
-	UPDATE TestConfigLog SET
+	UPDATE TestConfig SET
 		ComparisonRuntimeSeconds = @ComparisonRuntimeSeconds
-	FROM TestConfigLog tlog
-	WHERE tlog.TestConfigLogID = @TestConfigLogID
+	FROM TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspAdHocDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;

@@ -55,7 +55,7 @@ GO
 --#endregion CREATE/ALTER PROC dbo.uspDropSnapShot
  --EXEC AutoTest.dbo.uspDropSnapShot
 
---DELETE AutoTest.dbo.TestConfigLog;
+--DELETE AutoTest.dbo.TestConfig;
 --DELETE AutoTest.dbo.ColumnHistogram;
 --DELETE AutoTest.dbo.TableProfile;
 --DELETE AutoTest.dbo.ColumnProfile;

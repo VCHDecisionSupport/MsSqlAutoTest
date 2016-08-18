@@ -1,0 +1,1305 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="8/13/2016 7:27:32 PM"
+  DTS:CreationName="SSIS.Package.3"
+  DTS:CreatorComputerName="PC030107"
+  DTS:CreatorName="VCH\gcrowell"
+  DTS:DelayValidation="True"
+  DTS:DTSID="{0213074B-ADD9-4256-AD37-799FDCC608A3}"
+  DTS:ExecutableType="SSIS.Package.3"
+  DTS:LastModifiedProductVersion="11.0.5583.0"
+  DTS:LocaleID="4105"
+  DTS:ObjectName="CommunityMart STDBDECSUP03-STDBDECSUP01"
+  DTS:VersionBuild="3"
+  DTS:VersionGUID="{9CE467AC-40FF-4830-AFEC-862C4A495A97}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">6</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[STDBDECSUP01-CommunityMart]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{7AE23A42-6A81-4381-BB32-57A4B596A01B}"
+      DTS:ObjectName="STDBDECSUP01-CommunityMart">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=STDBDECSUP01;Initial Catalog=CommunityMart;Provider=SQLOLEDB.1;Integrated Security=SSPI;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[STDBDECSUP01.DQMF]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{76614434-1581-43AE-B879-9D822586CFAE}"
+      DTS:ObjectName="STDBDECSUP01.DQMF">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=STDBDECSUP01;Initial Catalog=DQMF;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[STDBDECSUP03-CommunityMart]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{F72546DA-723A-4F5A-84B6-9F2C2662232D}"
+      DTS:ObjectName="STDBDECSUP03-CommunityMart">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=STDBDECSUP03;Initial Catalog=CommunityMart;Provider=SQLOLEDB.1;Integrated Security=SSPI;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{5184AEDD-4F32-46E9-9DE5-4C31CCAF2300}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="BatchID">
+      <DTS:VariableValue
+        DTS:DataType="3">0</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Create DQMF Extract ID"
+      DTS:CreationName="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{77f5ebf5-0aa7-4269-b057-9988d78cb6ed}"
+      DTS:ExecutableType="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Create DQMF Extract ID"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{76614434-1581-43AE-B879-9D822586CFAE}"
+          SQLTask:SqlStatementSource="[dbo].[SetAuditExtractFile]&#xA;            @pPkgExecKey  = ?&#xA;           ,@pExtractFileKey = null&#xA;           ,@pExtractFilePhysicalLocation = ?&#xA;           ,@pIsProcessStart  = 1&#xA;           ,@pExtractFileCreatedDT  =  null&#xA;           ,@pIsProcessSuccess  = 0&#xA;           ,@pExtractFileKeyOut = null"
+          SQLTask:ResultType="ResultSetType_SingleRow" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ResultBinding
+            SQLTask:ResultName="ExtractFileKey"
+            SQLTask:DtsVariableName="User::ExtractFileKeyID" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="User::BatchID"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="1"
+            SQLTask:DtsVariableName="System::PackageName"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="129"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\SchoolHistoryFact"
+      DTS:CreationName="SSIS.Pipeline.3"
+      DTS:DelayValidation="True"
+      DTS:DTSID="{DEE0920F-A186-4DE8-AF05-2B9F84EF4982}"
+      DTS:ExecutableType="SSIS.Pipeline.3"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="SchoolHistoryFact"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) 2007 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact"
+              componentClassID="{4ADA7EAA-136C-4215-8098-D7A7C27FC0D1}"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="dst - STDBDECSUP01 dbo SchoolHistoryFact"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[SchoolHistoryFact]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[STDBDECSUP01-CommunityMart]"
+                  connectionManagerRefId="Package.ConnectionManagers[STDBDECSUP01-CommunityMart]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceSystemClientID]"
+                      cachedDataType="i4"
+                      cachedName="SourceSystemClientID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystemClientID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSystemClientID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceSchoolDtlID]"
+                      cachedDataType="i4"
+                      cachedName="SourceSchoolDtlID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolDtlID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolDtlID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[IsSchoolYrActive]"
+                      cachedDataType="bool"
+                      cachedName="IsSchoolYrActive"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrActive]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrActive]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[IsSchoolYrHolding]"
+                      cachedDataType="bool"
+                      cachedName="IsSchoolYrHolding"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrHolding]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrHolding]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[IsSchoolYrGraduation]"
+                      cachedDataType="bool"
+                      cachedName="IsSchoolYrGraduation"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrGraduation]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrGraduation]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceSchoolID]"
+                      cachedDataType="i4"
+                      cachedName="SourceSchoolID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceOrgSchoolID]"
+                      cachedDataType="i4"
+                      cachedName="SourceOrgSchoolID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceOrgSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceOrgSchoolID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceSchoolYrID]"
+                      cachedDataType="i4"
+                      cachedName="SourceSchoolYrID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolYrID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolYrID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceRegClassID]"
+                      cachedDataType="i4"
+                      cachedName="SourceRegClassID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceRegClassID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceRegClassID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceCreateDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SourceCreateDate"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceCreateDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceCreateDate]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceAmendedDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SourceAmendedDate"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceAmendedDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceAmendedDate]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SourceUpdateDate]"
+                      cachedDataType="dbTimeStamp"
+                      cachedName="SourceUpdateDate"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceUpdateDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceUpdateDate]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[deplicatedSchoolID]"
+                      cachedDataType="i4"
+                      cachedName="deplicatedSchoolID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[deplicatedSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[deplicatedSchoolID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolStartDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolStartDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolStartDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolEndDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolEndDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolEndDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolDtlStartDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolDtlStartDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolDtlStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlStartDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolDtlEndDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolDtlEndDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolDtlEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlEndDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolYrStartDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolYrStartDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrStartDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolYrEndDateID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolYrEndDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrEndDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[ClassStartDateID]"
+                      cachedDataType="i4"
+                      cachedName="ClassStartDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassStartDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[ClassEndDateID]"
+                      cachedDataType="i4"
+                      cachedName="ClassEndDateID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassEndDateID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolLeavingReasonLkupID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolLeavingReasonLkupID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolLeavingReasonLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolLeavingReasonLkupID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[OrgSchoolCategoryLkupID]"
+                      cachedDataType="i4"
+                      cachedName="OrgSchoolCategoryLkupID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[OrgSchoolCategoryLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[OrgSchoolCategoryLkupID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[SchoolYrLkupID]"
+                      cachedDataType="i4"
+                      cachedName="SchoolYrLkupID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrLkupID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[ClassNameLkupID]"
+                      cachedDataType="i4"
+                      cachedName="ClassNameLkupID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassNameLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassNameLkupID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[ClassTypeLkupID]"
+                      cachedDataType="i4"
+                      cachedName="ClassTypeLkupID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassTypeLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassTypeLkupID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[IsInvalid]"
+                      cachedDataType="bool"
+                      cachedName="IsInvalid"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsInvalid]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsInvalid]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[ETLAuditID]"
+                      cachedDataType="i8"
+                      cachedName="ETLAuditID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ETLAuditID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ETLAuditID]" />
+                    <inputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].Columns[CommunityServiceLocationID]"
+                      cachedDataType="i4"
+                      cachedName="CommunityServiceLocationID"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[CommunityServiceLocationID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[CommunityServiceLocationID]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystemClientID]"
+                      dataType="i4"
+                      name="SourceSystemClientID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolDtlID]"
+                      dataType="i4"
+                      name="SourceSchoolDtlID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrActive]"
+                      dataType="bool"
+                      name="IsSchoolYrActive" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrHolding]"
+                      dataType="bool"
+                      name="IsSchoolYrHolding" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsSchoolYrGraduation]"
+                      dataType="bool"
+                      name="IsSchoolYrGraduation" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolID]"
+                      dataType="i4"
+                      name="SourceSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceOrgSchoolID]"
+                      dataType="i4"
+                      name="SourceOrgSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceSchoolYrID]"
+                      dataType="i4"
+                      name="SourceSchoolYrID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceRegClassID]"
+                      dataType="i4"
+                      name="SourceRegClassID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceCreateDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceCreateDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceAmendedDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceAmendedDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SourceUpdateDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceUpdateDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[deplicatedSchoolID]"
+                      dataType="i4"
+                      name="deplicatedSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolStartDateID]"
+                      dataType="i4"
+                      name="SchoolStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolEndDateID]"
+                      dataType="i4"
+                      name="SchoolEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolDtlStartDateID]"
+                      dataType="i4"
+                      name="SchoolDtlStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolDtlEndDateID]"
+                      dataType="i4"
+                      name="SchoolDtlEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrStartDateID]"
+                      dataType="i4"
+                      name="SchoolYrStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrEndDateID]"
+                      dataType="i4"
+                      name="SchoolYrEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassStartDateID]"
+                      dataType="i4"
+                      name="ClassStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassEndDateID]"
+                      dataType="i4"
+                      name="ClassEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolLeavingReasonLkupID]"
+                      dataType="i4"
+                      name="SchoolLeavingReasonLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[OrgSchoolCategoryLkupID]"
+                      dataType="i4"
+                      name="OrgSchoolCategoryLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[SchoolYrLkupID]"
+                      dataType="i4"
+                      name="SchoolYrLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassNameLkupID]"
+                      dataType="i4"
+                      name="ClassNameLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ClassTypeLkupID]"
+                      dataType="i4"
+                      name="ClassTypeLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[IsInvalid]"
+                      dataType="bool"
+                      name="IsInvalid" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[ETLAuditID]"
+                      dataType="i8"
+                      name="ETLAuditID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input].ExternalColumns[CommunityServiceLocationID]"
+                      dataType="i4"
+                      name="CommunityServiceLocationID" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact"
+              componentClassID="{165A526D-D5DE-47FF-96A6-F8274C19826B}"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="src STDBDECSUP03 dbo SchoolHistoryFact"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT * FROM [dbo].[SchoolHistoryFact];</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[STDBDECSUP03-CommunityMart]"
+                  connectionManagerRefId="Package.ConnectionManagers[STDBDECSUP03-CommunityMart]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSystemClientID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSystemClientID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSystemClientID]"
+                      name="SourceSystemClientID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolDtlID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolDtlID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolDtlID]"
+                      name="SourceSchoolDtlID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrActive]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrActive]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrActive]"
+                      name="IsSchoolYrActive"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrHolding]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrHolding]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrHolding]"
+                      name="IsSchoolYrHolding"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrGraduation]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrGraduation]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsSchoolYrGraduation]"
+                      name="IsSchoolYrGraduation"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolID]"
+                      name="SourceSchoolID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceOrgSchoolID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceOrgSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceOrgSchoolID]"
+                      name="SourceOrgSchoolID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolYrID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolYrID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceSchoolYrID]"
+                      name="SourceSchoolYrID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceRegClassID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceRegClassID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceRegClassID]"
+                      name="SourceRegClassID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceCreateDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceCreateDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceCreateDate]"
+                      name="SourceCreateDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceAmendedDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceAmendedDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceAmendedDate]"
+                      name="SourceAmendedDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceUpdateDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceUpdateDate]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SourceUpdateDate]"
+                      name="SourceUpdateDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[deplicatedSchoolID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[deplicatedSchoolID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[deplicatedSchoolID]"
+                      name="deplicatedSchoolID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolStartDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolStartDateID]"
+                      name="SchoolStartDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolEndDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolEndDateID]"
+                      name="SchoolEndDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlStartDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolDtlStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlStartDateID]"
+                      name="SchoolDtlStartDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlEndDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolDtlEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolDtlEndDateID]"
+                      name="SchoolDtlEndDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrStartDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrStartDateID]"
+                      name="SchoolYrStartDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrEndDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrEndDateID]"
+                      name="SchoolYrEndDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassStartDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassStartDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassStartDateID]"
+                      name="ClassStartDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassEndDateID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassEndDateID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassEndDateID]"
+                      name="ClassEndDateID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolLeavingReasonLkupID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolLeavingReasonLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolLeavingReasonLkupID]"
+                      name="SchoolLeavingReasonLkupID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[OrgSchoolCategoryLkupID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[OrgSchoolCategoryLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[OrgSchoolCategoryLkupID]"
+                      name="OrgSchoolCategoryLkupID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrLkupID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[SchoolYrLkupID]"
+                      name="SchoolYrLkupID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassNameLkupID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassNameLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassNameLkupID]"
+                      name="ClassNameLkupID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassTypeLkupID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassTypeLkupID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ClassTypeLkupID]"
+                      name="ClassTypeLkupID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsInvalid]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsInvalid]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[IsInvalid]"
+                      name="IsInvalid"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ETLAuditID]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ETLAuditID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[ETLAuditID]"
+                      name="ETLAuditID"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[CommunityServiceLocationID]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[CommunityServiceLocationID]"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].Columns[CommunityServiceLocationID]"
+                      name="CommunityServiceLocationID"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSystemClientID]"
+                      dataType="i4"
+                      name="SourceSystemClientID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolDtlID]"
+                      dataType="i4"
+                      name="SourceSchoolDtlID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrActive]"
+                      dataType="bool"
+                      name="IsSchoolYrActive" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrHolding]"
+                      dataType="bool"
+                      name="IsSchoolYrHolding" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsSchoolYrGraduation]"
+                      dataType="bool"
+                      name="IsSchoolYrGraduation" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolID]"
+                      dataType="i4"
+                      name="SourceSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceOrgSchoolID]"
+                      dataType="i4"
+                      name="SourceOrgSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceSchoolYrID]"
+                      dataType="i4"
+                      name="SourceSchoolYrID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceRegClassID]"
+                      dataType="i4"
+                      name="SourceRegClassID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceCreateDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceCreateDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceAmendedDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceAmendedDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SourceUpdateDate]"
+                      dataType="dbTimeStamp"
+                      name="SourceUpdateDate" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[deplicatedSchoolID]"
+                      dataType="i4"
+                      name="deplicatedSchoolID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolStartDateID]"
+                      dataType="i4"
+                      name="SchoolStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolEndDateID]"
+                      dataType="i4"
+                      name="SchoolEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolDtlStartDateID]"
+                      dataType="i4"
+                      name="SchoolDtlStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolDtlEndDateID]"
+                      dataType="i4"
+                      name="SchoolDtlEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrStartDateID]"
+                      dataType="i4"
+                      name="SchoolYrStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrEndDateID]"
+                      dataType="i4"
+                      name="SchoolYrEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassStartDateID]"
+                      dataType="i4"
+                      name="ClassStartDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassEndDateID]"
+                      dataType="i4"
+                      name="ClassEndDateID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolLeavingReasonLkupID]"
+                      dataType="i4"
+                      name="SchoolLeavingReasonLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[OrgSchoolCategoryLkupID]"
+                      dataType="i4"
+                      name="OrgSchoolCategoryLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[SchoolYrLkupID]"
+                      dataType="i4"
+                      name="SchoolYrLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassNameLkupID]"
+                      dataType="i4"
+                      name="ClassNameLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ClassTypeLkupID]"
+                      dataType="i4"
+                      name="ClassTypeLkupID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[IsInvalid]"
+                      dataType="bool"
+                      name="IsInvalid" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[ETLAuditID]"
+                      dataType="i8"
+                      name="ETLAuditID" />
+                    <externalMetadataColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output].ExternalColumns[CommunityServiceLocationID]"
+                      dataType="i4"
+                      name="CommunityServiceLocationID" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSystemClientID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSystemClientID]"
+                      name="SourceSystemClientID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolDtlID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolDtlID]"
+                      name="SourceSchoolDtlID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrActive]"
+                      dataType="bool"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrActive]"
+                      name="IsSchoolYrActive" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrHolding]"
+                      dataType="bool"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrHolding]"
+                      name="IsSchoolYrHolding" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrGraduation]"
+                      dataType="bool"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsSchoolYrGraduation]"
+                      name="IsSchoolYrGraduation" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolID]"
+                      name="SourceSchoolID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceOrgSchoolID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceOrgSchoolID]"
+                      name="SourceOrgSchoolID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolYrID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceSchoolYrID]"
+                      name="SourceSchoolYrID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceRegClassID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceRegClassID]"
+                      name="SourceRegClassID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceCreateDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceCreateDate]"
+                      name="SourceCreateDate" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceAmendedDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceAmendedDate]"
+                      name="SourceAmendedDate" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceUpdateDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SourceUpdateDate]"
+                      name="SourceUpdateDate" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[deplicatedSchoolID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[deplicatedSchoolID]"
+                      name="deplicatedSchoolID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolStartDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolStartDateID]"
+                      name="SchoolStartDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolEndDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolEndDateID]"
+                      name="SchoolEndDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolDtlStartDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolDtlStartDateID]"
+                      name="SchoolDtlStartDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolDtlEndDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolDtlEndDateID]"
+                      name="SchoolDtlEndDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrStartDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrStartDateID]"
+                      name="SchoolYrStartDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrEndDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrEndDateID]"
+                      name="SchoolYrEndDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassStartDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassStartDateID]"
+                      name="ClassStartDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassEndDateID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassEndDateID]"
+                      name="ClassEndDateID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolLeavingReasonLkupID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolLeavingReasonLkupID]"
+                      name="SchoolLeavingReasonLkupID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[OrgSchoolCategoryLkupID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[OrgSchoolCategoryLkupID]"
+                      name="OrgSchoolCategoryLkupID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrLkupID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[SchoolYrLkupID]"
+                      name="SchoolYrLkupID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassNameLkupID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassNameLkupID]"
+                      name="ClassNameLkupID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassTypeLkupID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ClassTypeLkupID]"
+                      name="ClassTypeLkupID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsInvalid]"
+                      dataType="bool"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[IsInvalid]"
+                      name="IsInvalid" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ETLAuditID]"
+                      dataType="i8"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ETLAuditID]"
+                      name="ETLAuditID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[CommunityServiceLocationID]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[CommunityServiceLocationID]"
+                      name="CommunityServiceLocationID" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\SchoolHistoryFact.Paths[OLE DB Source Output]"
+              endId="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Set DQMF Batch End Success"
+      DTS:CreationName="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{43132541-caa2-44d0-bb52-c5687f5763b2}"
+      DTS:ExecutableType="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Set DQMF Batch End Success"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{76614434-1581-43AE-B879-9D822586CFAE}"
+          SQLTask:SqlStatementSource="[SetAuditPkgExecution]&#xA;            @pPkgExecKey = ?&#xA;           ,@pParentPkgExecKey = null&#xA;           ,@pPkgVersionMajor = null&#xA;           ,@pPkgVersionMinor  = null&#xA;           ,@pPkgName = null&#xA;           ,@pIsProcessStart  = 0&#xA;           ,@pIsPackageSuccessful  = 1&#xA;           ,@pPkgExecKeyout  = null&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="User::BatchID"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Set DQMF Batch End Success 1"
+      DTS:CreationName="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{b6515882-ac32-4340-83db-e13b45c8786e}"
+      DTS:ExecutableType="Microsoft.SqlServer.Dts.Tasks.ExecuteSQLTask.ExecuteSQLTask, Microsoft.SqlServer.SQLTask, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Set DQMF Batch End Success 1"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{76614434-1581-43AE-B879-9D822586CFAE}"
+          SQLTask:SqlStatementSource="[SetAuditPkgExecution]&#xA;            @pPkgExecKey = ?&#xA;           ,@pParentPkgExecKey = null&#xA;           ,@pPkgVersionMajor = null&#xA;           ,@pPkgVersionMinor  = null&#xA;           ,@pPkgName = null&#xA;           ,@pIsProcessStart  = 0&#xA;           ,@pIsPackageSuccessful  = 1&#xA;           ,@pPkgExecKeyout  = null&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ParameterBinding
+            SQLTask:ParameterName="0"
+            SQLTask:DtsVariableName="User::BatchID"
+            SQLTask:ParameterDirection="Input"
+            SQLTask:DataType="3"
+            SQLTask:ParameterSize="-1" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{58AE8C83-D70A-4E8B-8CD9-2D1BA8E07758}"
+      DTS:From="Package\Create DQMF Extract ID"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\SchoolHistoryFact" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
+      DTS:CreationName=""
+      DTS:DTSID="{FEC10977-6D01-4CBC-901A-017B7592BE6A}"
+      DTS:From="Package\SchoolHistoryFact"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 1"
+      DTS:To="Package\Set DQMF Batch End Success" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="sql11">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="164,42"
+          Id="Package\SchoolHistoryFact"
+          TopLeft="311.5,133.5" />
+        <NodeLayout
+          Size="194,42"
+          Id="Package\Create DQMF Extract ID"
+          TopLeft="293.5,49.5" />
+        <NodeLayout
+          Size="219,42"
+          Id="Package\Set DQMF Batch End Success"
+          TopLeft="276.5,222.5" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="392,91.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,42"
+              Start="0,0"
+              End="0,34.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,34.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="389.75,175.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,47"
+              Start="0,0"
+              End="0,39.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,39.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <NodeLayout
+          Size="219,42"
+          Id="Package\Set DQMF Batch End Success 1"
+          TopLeft="276.5,324.5" />
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\SchoolHistoryFact">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="289,42"
+          Id="Package\SchoolHistoryFact\dst - STDBDECSUP01 dbo SchoolHistoryFact"
+          TopLeft="5.50000000000003,107.5" />
+        <NodeLayout
+          Size="281,42"
+          Id="Package\SchoolHistoryFact\src STDBDECSUP03 dbo SchoolHistoryFact"
+          TopLeft="9.5,5.5" />
+        <EdgeLayout
+          Id="Package\SchoolHistoryFact.Paths[OLE DB Source Output]"
+          TopLeft="150,47.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,60"
+              Start="0,0"
+              End="0,52.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,52.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

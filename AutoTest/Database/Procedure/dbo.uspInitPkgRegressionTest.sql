@@ -18,17 +18,21 @@ ALTER PROC dbo.uspInitPkgRegression
 	@pPkgExecKey int
 AS
 BEGIN
+	SELECT @pPkgExecKey AS PkgExecKey
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
+	DECLARE @rowcount int;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspInitPkgRegression'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	SELECT @fmt='dbo.uspInitPkgRegression(PkgExecKey=%i)'
+	RAISERROR(@fmt, 0, 1, @pPkgExecKey) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 
-	DECLARE @TestConfigLogID int
+	DECLARE 
+		@TableCount int = 0
+		,@TestConfigID int
 		,@PreEtlSourceObjectFullName varchar(200)
 		,@PostEtlSourceObjectFullName varchar(200)
 		,@SnapShotBaseName varchar(200)
@@ -39,41 +43,48 @@ BEGIN
 		,@SchemaName varchar(200)
 		,@TableName varchar(200)
 
--- setup regression test specs: copy configurations from AutoTest.dbo.TestConfig: insert into AutoTest.dbo.TestConfigLog
-INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, TestConfigID, PkgExecKey)
+-- setup regression test specs: copy configurations from AutoTest.dbo.TestConfig: insert into AutoTest.dbo.TestConfig
+INSERT INTO AutoTest.dbo.TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, PkgExecKey)
 SELECT 
 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
 	,db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PostEtlSourceObjectFullName
 	,GETDATE()
 	,obj.ObjectID
-	,config.TestConfigID
 	,pkglog.PkgExecKey
-FROM AutoTest.dbo.TestConfig AS config
+FROM DQMF.dbo.ETL_PackageObject AS pgkobj
 JOIN DQMF.dbo.MD_Object AS obj
-ON config.ObjectID = obj.ObjectID
+ON pgkobj.ObjectID = obj.ObjectID
 JOIN DQMF.dbo.MD_Database AS db
 ON obj.DatabaseId = db.DatabaseId
 JOIN DQMF.dbo.AuditPkgExecution AS pkglog
-ON config.PkgID = pkglog.PkgKey
+ON pgkobj.PackageID = pkglog.PkgKey
+WHERE 1=1
+AND obj.IsActive = 1
+AND obj.IsObjectInDB = 1
+AND obj.ObjectPurpose = 'Fact'
+AND pkglog.PkgExecKey = @pPkgExecKey
+
+SET @TableCount = @@ROWCOUNT;
+SET @TestConfigID = @@IDENTITY;
 
 DECLARE cur CURSOR
 FOR
 SELECT 
-	TestConfigLogID
+	TestConfigID
 	,PreEtlSourceObjectFullName
 	,PostEtlSourceObjectFullName
 	,SnapShotBaseName
 	,PreEtlSnapShotName
-FROM AutoTest.dbo.TestConfigLog
+FROM AutoTest.dbo.TestConfig
 WHERE PkgExecKey = @pPkgExecKey
 
 OPEN cur;
 
-FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
+FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
+	-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
 	-- SELECT @PreEtlSnapShotName = 'PreEtl_'+@SnapShotBaseName
 	DECLARE @PreEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PreEtlSourceObjectFullName);
 	SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
@@ -82,20 +93,23 @@ BEGIN
 	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @TableName, @pColStr=@KeyColumns OUTPUT
 	EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PreEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PreEtlSnapShotName
 
-	UPDATE TestConfigLog SET
+	UPDATE TestConfig SET
 		PreEtlSourceObjectFullName = @PreEtlSourceObjectFullName
 		,PostEtlSourceObjectFullName = @PostEtlSourceObjectFullName
 		,PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
 		-- ,SnapShotBaseName = @SnapShotBaseName
-	FROM AutoTest.dbo.TestConfigLog tlog
-	WHERE tlog.TestConfigLogID = @TestConfigLogID
+	FROM AutoTest.dbo.TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
-	FETCH NEXT FROM cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
+	FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
+	SET @TableCount = @TableCount + 1;
 END
 
+CLOSE cur;
+DEALLOCATE cur;
+
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i will configured for testing)', 0, 1, @runtime, @TableCount) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
-EXEC dbo.uspInitPkgRegression  @pPkgExecKey = 313071

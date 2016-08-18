@@ -12,4 +12,5 @@ PRINT 'CREATE TABLE dbo.ETL_PackageObject'
 CREATE TABLE dbo.ETL_PackageObject (
 	PackageID int NOT NULL
 	,ObjectID int NOT NULL
+	,TestTypeID int NULL
 );

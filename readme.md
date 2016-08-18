@@ -3,7 +3,7 @@
 ## `dbo.uspCreateProfile`
 __Parameters:__
 
-    @pTestConfigLogID int,
+    @pTestConfigID int,
     @pTargetDatabaseName nvarchar(200) = 'AutoTest',
     @pTargetSchemaName nvarchar(200) = 'SnapShot',
     @pTargetTableName nvarchar(200),
@@ -30,14 +30,14 @@ __Parameters:__
 ## If `@IsProcessStart=1` 
 call `AutoTest.dbo.uspInitPkgRegressionTest` with parameter `@PkgExecKey` 
 
-1. populate `AutoTest.dbo.TestConfigLog` from `AutoTest.dbo.TestConfig`
+1. populate `AutoTest.dbo.TestConfig` from `AutoTest.dbo.TestConfig`
 2. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
     - call `uspCreateSnapShot` to _PreEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema 
 
 ## If `@IsProcessStart=0` 
 call `uspPkgRegressionTest` with parameter `@PkgExecKey` 
 
-1. populate `AutoTest.dbo.TestConfigLog` from `AutoTest.dbo.TestConfig`
+1. populate `AutoTest.dbo.TestConfig` from `AutoTest.dbo.TestConfig`
 2. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
     - call `uspCreateSnapShot` to _PostEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema
     - call `uspDataCompare`

@@ -8,7 +8,7 @@ IF OBJECT_ID('dbo.TableProfile') IS NOT NULL
 	DROP TABLE dbo.TableProfile;
 GO
 CREATE TABLE dbo.TableProfile (TableProfileID INT IDENTITY(1, 1) NOT NULL
-	,TestConfigLogID INT NOT NULL
+	,TestConfigID INT NOT NULL
 	,RecordCount INT NOT NULL
 	,TableProfileDate DATETIME NOT NULL
 	,TableProfileTypeID INT NOT NULL

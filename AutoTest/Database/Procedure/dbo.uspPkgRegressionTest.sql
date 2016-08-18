@@ -28,7 +28,7 @@ BEGIN
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 
-	DECLARE @TestConfigLogID int
+	DECLARE @TestConfigID int
 		,@PreEtlSourceObjectFullName varchar(200)
 		,@PostEtlSourceObjectFullName varchar(200)
 		,@SnapShotBaseName varchar(200)
@@ -40,7 +40,7 @@ BEGIN
 		,@SchemaName varchar(200)
 		,@TableName varchar(200)
 
--- INSERT INTO AutoTest.dbo.TestConfigLog (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
+-- INSERT INTO AutoTest.dbo.TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
 -- SELECT 
 -- 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
 -- 	,db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PostEtlSourceObjectFullName
@@ -69,20 +69,20 @@ END
 DECLARE reg_cur CURSOR
 FOR
 SELECT 
-	TestConfigLogID
+	TestConfigID
 	,PreEtlSourceObjectFullName
 	,PostEtlSourceObjectFullName
 	,SnapShotBaseName
-FROM AutoTest.dbo.TestConfigLog
+FROM AutoTest.dbo.TestConfig
 WHERE PkgExecKey = @pPkgExecKey
 
 OPEN reg_cur;
 
-FETCH NEXT FROM reg_cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+FETCH NEXT FROM reg_cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigLogID%i',@TestConfigLogID);
+	SET @SnapShotBaseName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
 	SELECT @PostSnapShotName = 'PostEtl_'+@SnapShotBaseName
 	DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 	SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
@@ -91,15 +91,15 @@ BEGIN
 	EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @TableName, @pColStr=@KeyColumns OUTPUT
 	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostSnapShotName
 
-	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigLogID = @TestConfigLogID
+	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 
-	UPDATE TestConfigLog SET
+	UPDATE TestConfig SET
 		PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
 		,ComparisonRuntimeSeconds = @ComparisonRuntimeSeconds
-	FROM TestConfigLog tlog
-	WHERE tlog.TestConfigLogID = @TestConfigLogID
+	FROM TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
-	FETCH NEXT FROM reg_cur INTO @TestConfigLogID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
+	FETCH NEXT FROM reg_cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName
 END
 
 
