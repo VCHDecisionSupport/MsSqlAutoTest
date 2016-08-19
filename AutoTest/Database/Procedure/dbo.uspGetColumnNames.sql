@@ -138,7 +138,7 @@ FOR XML PATH('''')),1,10000)
 	IF CHARINDEX(',',REVERSE(@pColStr),1) = 1
 		SET @pColStr = SUBSTRING(@pColStr, 1, LEN(@pColStr)-1)
 	SET @pColStr = @pColStr
-
+	PRINT @pColStr  
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	--RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);

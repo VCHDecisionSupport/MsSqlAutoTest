@@ -9,6 +9,7 @@ IF OBJECT_ID('dbo.TestConfig') IS NOT NULL
 GO
 CREATE TABLE dbo.TestConfig (
 	TestConfigID INT IDENTITY(1, 1) NOT NULL
+	,TestTypeID INT NOT NULL
 	,PreEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view
 	,PostEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view same as above if Etl Regression Test (ie not AdHoc)
 	,TestDate datetime NOT NULL

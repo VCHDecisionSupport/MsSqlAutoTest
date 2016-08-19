@@ -1,5 +1,31 @@
 # AutoTest
 
+## Requirements:
+
+### Comparison Key
+All fact tables have comparison/business key column meta data available from:
+    1. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` - or
+    2. `DQMF.dbo.MD_Object.PKField` - or
+    3. physical primary key column
+Key column must include source system columns whose values that only change when business attribute(s) change
+
+### Attachment Point
+#### Package Level: `SetAuditPackageExecution`
+- All packages (including child packages) call `SetAuditPackageExecution`
+    + this implies requirement that all packages exist in `DQMF.dbo.ETL_Package` (in all instances)
+
+Other attachment point options:
+
+- As automatic DQMF stage?
+    + pre/post processing?
+- As job step
+    + 1 step added at start and end
+    + be done automattically/in-bulk with `sp_jobaddstep`
+
+
+### Mapping from attachment point to testable data objects (fact views/tables)
+- All `DQMF_BizRule` rows include 
+
 ## `dbo.uspCreateProfile`
 __Parameters:__
 

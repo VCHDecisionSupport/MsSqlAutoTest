@@ -8,6 +8,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+DECLARE @name nvarchar(max);
+DECLARE @sql nvarchar(max);
+
+SET @name = 'dbo.SetAuditPkgExecution';
+RAISERROR(@name, 0, 0) WITH NOWAIT;
+GO
 
 ALTER PROCEDURE  [dbo].[SetAuditPkgExecution]
             @pPkgExecKey bigint = null
@@ -73,7 +79,7 @@ BEGIN
 	 EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKey;
 END
 
-SELECT @pPkgExecKeyOut PkgExecKey
+-- SELECT @pPkgExecKeyOut PkgExecKey
 
 /*
 DEClaRE @pPkgExecKeyout  bigint

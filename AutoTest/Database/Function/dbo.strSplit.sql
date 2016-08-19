@@ -15,7 +15,7 @@ AS BEGIN DECLARE @return nvarchar(max) RETURN END;',@name);
 RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 
-IF OBJECT_ID(@name,'FN') IS NULL
+IF OBJECT_ID(@name,'TF') IS NULL
 BEGIN
 	EXEC(@sql);
 END
@@ -64,7 +64,7 @@ BEGIN
 		FROM recursiveCTE R
 		WHERE LEN(R.list) > 0
 	) INSERT @tblTmp (item) SELECT item FROM recursiveCTE 
-
+	option (maxrecursion 0)
 	INSERT INTO @tblReturn (item) 
 	SELECT item FROM @tblTmp WHERE rowid < (SELECT MAX(Rowid) FROM @tblTmp )
 

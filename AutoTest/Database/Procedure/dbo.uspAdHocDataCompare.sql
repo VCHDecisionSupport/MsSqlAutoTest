@@ -45,12 +45,15 @@ BEGIN
 		,@PreEtlSnapShotCreationElapsedSeconds int
 		,@PostEtlSnapShotCreationElapsedSeconds int
 		,@ComparisonRuntimeSeconds int
+		,@TestTypeID int
 	
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
 	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
 
-	INSERT INTO TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) 
-	VALUES(@PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
+	SELECT @TestTypeID = TestTypeID FROM AutoTest.dbo.TestType WHERE TestTypeDesc = 'AdHocComparison'
+
+	INSERT INTO TestConfig (TestTypeID, PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate) 
+	VALUES(@TestTypeID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, GETDATE());
 	
 	SET @TestConfigID = @@IDENTITY;
 

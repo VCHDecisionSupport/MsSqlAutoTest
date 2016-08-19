@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <DataSet Name="">
+    <Query>
+      <DataSourceReference>AutoTest</DataSourceReference>
+      <CommandText>SELECT DISTINCT Pkg.PkgId, db.DatabaseName, obj.ObjectPhysicalName
+FROM DQMF.dbo.ETL_PackageObject AS map
+JOIN DQMF.dbo.MD_Object obj
+ON obj.ObjectID = map.OBjectID
+JOIN DQMF.dbo.MD_Database db
+ON obj.Databaseid = db.DatabaseId
+JOIN DQMF.dbo.ETL_Package AS pkg
+ON pkg.PkgId = map.PackageID</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="DatabaseName">
+        <DataField>DatabaseName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PkgId">
+        <DataField>PkgId</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="ObjectPhysicalName">
+        <DataField>ObjectPhysicalName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

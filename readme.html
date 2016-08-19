@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#autotest">AutoTest</a><ul>
+<li><a href="#requirements">Requirements:</a><ul>
+<li><a href="#comparison-key">Comparison Key</a></li>
+<li><a href="#attachment-point">Attachment Point</a></li>
+<li><a href="#mapping-from-attachment-point-to-testable-data-objects-fact-viewstables">Mapping from attachment point to testable data objects (fact views/tables)</a></li>
+</ul></li>
+<li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
+<li><a href="#dbo.uspdatacompare"><code>dbo.uspDataCompare</code></a></li>
+</ul></li>
+<li><a href="#regression-testing-package-at-package-runtime">Regression Testing Package At Package Runtime</a><ul>
+<li><a href="#if-isprocessstart1">If <code>@IsProcessStart=1</code></a></li>
+<li><a href="#if-isprocessstart0">If <code>@IsProcessStart=0</code></a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="autotest">AutoTest</h1>
+<h2 id="requirements">Requirements:</h2>
+<h3 id="comparison-key">Comparison Key</h3>
+<p>All fact tables have comparison/business key column meta data available from: 1. <code>DQMF.dbo.MD_ObjectAttribute.IsBusinessKey</code> - or 2. <code>DQMF.dbo.MD_Object.PKField</code> - or 3. physical primary key column Key column must include source system columns whose values that only change when business attribute(s) change</p>
+<h3 id="attachment-point">Attachment Point</h3>
+<h4 id="package-level-setauditpackageexecution">Package Level: <code>SetAuditPackageExecution</code></h4>
+<ul>
+<li>All packages (including child packages) call <code>SetAuditPackageExecution</code>
+<ul>
+<li>this implies requirement that all packages exist in <code>DQMF.dbo.ETL_Package</code> (in all instances)</li>
+</ul></li>
+</ul>
+<p>Other attachment point options:</p>
+<ul>
+<li>As automatic DQMF stage?
+<ul>
+<li>pre/post processing?</li>
+</ul></li>
+<li>As job step
+<ul>
+<li>1 step added at start and end</li>
+<li>be done automattically/in-bulk with <code>sp_jobaddstep</code></li>
+</ul></li>
+</ul>
+<h3 id="mapping-from-attachment-point-to-testable-data-objects-fact-viewstables">Mapping from attachment point to testable data objects (fact views/tables)</h3>
+<ul>
+<li>All <code>DQMF_BizRule</code> rows include</li>
+</ul>
+<h2 id="dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></h2>
+<p><strong>Parameters:</strong></p>
+<pre><code>@pTestConfigID int,
+@pTargetDatabaseName nvarchar(200) = &#39;AutoTest&#39;,
+@pTargetSchemaName nvarchar(200) = &#39;SnapShot&#39;,
+@pTargetTableName nvarchar(200),
+@pTableProfileTypeID int,
+@pColumnProfileTypeID int,
+@pColumnHistogramTypeID int</code></pre>
+<ol style="list-style-type: decimal">
+<li>get row count and <code>INSERT INTO dbo.TableProfile</code></li>
+<li>get distinct count of each column, <code>UNPIVOT</code>, then <code>INSERT INTO dbo.ColumnProfile</code></li>
+<li>cursor on <code>dbo.ColumnProfile</code>
+<ol style="list-style-type: lower-alpha">
+<li>call <code>dbo.uspInsColumnHistogram</code> to <code>INSERT INTO dbo.ColumnHistogram</code></li>
+</ol></li>
+</ol>
+<h2 id="dbo.uspdatacompare"><code>dbo.uspDataCompare</code></h2>
+<ol style="list-style-type: decimal">
+<li>create snap shot of tables' intersection: <em>RecordMatch</em>
+<ul>
+<li>call <code>dbo.uspCreateProfile</code> with name of <em>RecordMatch</em> snap shot as parameter</li>
+</ul></li>
+<li>create snap shot of tables' set difference: on <code>__pkhash__</code>: <em>PreEtl</em>
+<ul>
+<li>call <code>dbo.uspCreateProfile</code> with name of <em>PreEtl</em> snap shot as parameter</li>
+</ul></li>
+</ol>
+<h1 id="regression-testing-package-at-package-runtime">Regression Testing Package At Package Runtime</h1>
+<p><code>DQMF.dbo.SetAuditPackageExecution</code> is called at start/end of package</p>
+<h2 id="if-isprocessstart1">If <code>@IsProcessStart=1</code></h2>
+<p>call <code>AutoTest.dbo.uspInitPkgRegressionTest</code> with parameter <code>@PkgExecKey</code></p>
+<ol style="list-style-type: decimal">
+<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>AutoTest.dbo.TestConfig</code></li>
+<li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
+<ul>
+<li>call <code>uspCreateSnapShot</code> to <em>PreEtl</em> create snap shot of table with new column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
+</ul></li>
+</ol>
+<h2 id="if-isprocessstart0">If <code>@IsProcessStart=0</code></h2>
+<p>call <code>uspPkgRegressionTest</code> with parameter <code>@PkgExecKey</code></p>
+<ol style="list-style-type: decimal">
+<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>AutoTest.dbo.TestConfig</code></li>
+<li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
+<ul>
+<li>call <code>uspCreateSnapShot</code> to <em>PostEtl</em> create snap shot of table with new column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
+<li>call <code>uspDataCompare</code></li>
+</ul></li>
+</ol>
+<!-- 
+
+
+        call `uspGetKey` to get key columns: look in:
+            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` sdfs
+            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` as
+            b. 1;lkj
+        2. dsaf
+    B. sdfs 
+
+
+
+ -->
+</body>
+</html>

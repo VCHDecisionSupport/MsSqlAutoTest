@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+  <Description />
+  <DataSet Name="TestConfig">
+    <Query>
+      <DataSourceReference>AutoTest</DataSourceReference>
+      <CommandText>select *
+from aUTOtest.dbo.TestConfig</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="TestConfigID">
+        <DataField>TestConfigID</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PreEtlSourceObjectFullName">
+        <DataField>PreEtlSourceObjectFullName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="TestTypeID">
+        <DataField>TestTypeID</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PostEtlSourceObjectFullName">
+        <DataField>PostEtlSourceObjectFullName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="TestDate">
+        <DataField>TestDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
+      </Field>
+      <Field Name="SnapShotBaseName">
+        <DataField>SnapShotBaseName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PreEtlSnapShotName">
+        <DataField>PreEtlSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PostEtlSnapShotName">
+        <DataField>PostEtlSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="RecordMatchSnapShotName">
+        <DataField>RecordMatchSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PreEtlKeyMisMatchSnapShotName">
+        <DataField>PreEtlKeyMisMatchSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="PostEtlKeyMisMatchSnapShotName">
+        <DataField>PostEtlKeyMisMatchSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="KeyMatchSnapShotName">
+        <DataField>KeyMatchSnapShotName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="ObjectID">
+        <DataField>ObjectID</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PkgExecKey">
+        <DataField>PkgExecKey</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PreEtlSnapShotCreationElapsedSeconds">
+        <DataField>PreEtlSnapShotCreationElapsedSeconds</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="PostEtlSnapShotCreationElapsedSeconds">
+        <DataField>PostEtlSnapShotCreationElapsedSeconds</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="ComparisonRuntimeSeconds">
+        <DataField>ComparisonRuntimeSeconds</DataField>
+        <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

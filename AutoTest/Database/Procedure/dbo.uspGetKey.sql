@@ -69,11 +69,11 @@ EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaName
 
 IF @pColStr IS NULL
 BEGIN
-	RAISERROR('No BizKey set in DQMF.dbo.MD_ObjectAttribute.IsBusinessKey',1,1)
+	RAISERROR('No BizKey set in DQMF.dbo.MD_ObjectAttribute.IsBusinessKey',0,1)
 
 SET @sql = FORMATMESSAGE('
 ;WITH DQMF_PkField AS (
-SELECT obj.ObjectPKField
+SELECT DISTINCT obj.ObjectPKField
 FROM DQMF.dbo.MD_Database AS db
 JOIN DQMF.dbo.MD_Object AS obj
 ON db.DatabaseId = db.DatabaseId
@@ -96,7 +96,7 @@ END
 
 IF @pColStr IS NULL
 BEGIN
-	RAISERROR('No ObjectPKField set in DQMF.dbo.MD_Object',1,1)
+	RAISERROR('No ObjectPKField set in DQMF.dbo.MD_Object',0,1)
 	SET @param = '
 	@pObjectNameIN varchar(200)
 	,@pSchemaNameIN varchar(200)
@@ -130,7 +130,7 @@ END
 
 IF @pColStr IS NULL
 BEGIN
-	RAISERROR('No PK is sys views',1,1)
+	RAISERROR('No PK is sys views',0,1)
 END
 
 	SET @pColStr = LTRIM(RTRIM(@pColStr))

@@ -1,9 +1,6 @@
 PRINT '
 	executing sqlcmd_deployment.sql with variable pathvar $(pathvar)'
 
-USE master
-GO
-
 DECLARE @path varchar(500) = '$(pathvar)'
 RAISERROR('@path = $(pathvar) = %s
 
@@ -13,7 +10,7 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\DQMF\Database\Table\ALTER-dbo.MD_ObjectAttribute.sql
 :r $(pathvar)\DQMF\Database\Procedure\ALTER-dbo.SetAuditPackageExecution.sql
 
-:r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
+--:r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
 :r $(pathvar)\AutoTest\Database\SCHEMA-SnapShot.sql
 
 :r $(pathvar)\AutoTest\Database\Table\TestConfig.sql
