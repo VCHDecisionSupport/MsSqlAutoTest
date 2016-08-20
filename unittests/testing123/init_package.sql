@@ -20,18 +20,17 @@ SELECT @DatabaseID = DatabaseId
 FROM DQMF.dbo.MD_Database
 WHERE DatabaseName = @DatabaseName
 
-SELECT ObjectID, *
-FROM DQMF.dbo.MD_Object
-WHERE 1=1
-AND databaseid != @DatabaseID
-AND ObjectPurpose = 'Fact'
-AND ObjectPKField NOT LIKE 'ETLAuditId'
-AND ObjectPKField != ''
+--SELECT ObjectID, *
+--FROM DQMF.dbo.MD_Object
+--WHERE 1=1
+--AND databaseid != @DatabaseID
+--AND ObjectPurpose = 'Fact'
+--AND ObjectPKField NOT LIKE 'ETLAuditId'
+--AND ObjectPKField != ''
 --AND ObjectPhysicalName = 'SchoolHistoryFact'
 -- 53085
 
-SELECT *
-FROM AutoTest.dbo.TestType;
+--SELECT * FROM AutoTest.dbo.TestType;
 -- 3
 
 --INSERT INTO DQMF.dbo.ETL_PackageObject (PackageID, ObjectID, TestTypeID) VALUES (@PackageID, @ObjectID, @TestTypeID)
@@ -48,6 +47,7 @@ AND PackageID = @PackageID
 	WHERE obj.databaseid = @DatabaseID
 	AND obj.ObjectPurpose = 'Fact'
 	AND obj.ObjectPKField NOT LIKE 'ETLAuditId'
+	AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
 	AND obj.ObjectID IN (
 		SELECT ObjectID
 		FROM DQMF.dbo.MD_ObjectAttribute attr

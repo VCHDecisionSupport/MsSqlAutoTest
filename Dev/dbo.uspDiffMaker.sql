@@ -17,7 +17,9 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspDiffMaker
-	@pTableName varchar(100)
+	@pDatabaseName nvarchar(200) = 'AutoTest',
+	@pSchemaName nvarchar(200) = 'SnapShot',
+	@pObjectName nvarchar(200)
 	,@pPercentError int = NULL
 AS
 BEGIN
@@ -26,61 +28,66 @@ BEGIN
 	DECLARE @runtime int = 0;
 	SET @pPercentError = ISNULL(@pPercentError, 1);
 	RAISERROR('
-uspDiffMaker: TableName: %s (diff percent per column: %i%%)', 0, 1, @pTableName, @pPercentError) WITH NOWAIT;
+uspDiffMaker: TableName: %s (diff percent per column: %i%%)', 0, 1, @pObjectName, @pPercentError) WITH NOWAIT;
 	DECLARE @sql varchar(max);
 	DECLARE @rowcount int;
-SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s ORDER BY NEWID()) DELETE %s FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @pTableName);
+	DECLARE @pTableName varchar(500) = @pDatabaseName +'.'+ @pSchemaName +'.'+ @pObjectName
+SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) DELETE %s FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
 		RAISERROR('
-	rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
+	delete rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
 
 DECLARE @table TABLE (
 	ColumnName varchar(100)
 );
 
-DECLARE @DatabaseName varchar(100) = PARSENAME(@pTableName,3);
-DECLARE @SchemaName varchar(100) = PARSENAME(@pTableName,2);
-DECLARE @TableName varchar(100) = PARSENAME(@pTableName,1);
 DECLARE @cols varchar(max);
 
 
 EXEC dbo.uspGetColumnNames 
-	@pDatabaseName=@DatabaseName
-	,@pSchemaName=@SchemaName
-	,@pObjectName=@TableName
+	@pDatabaseName=@pDatabaseName
+	,@pSchemaName=@pSchemaName
+	,@pObjectName=@pObjectName
 	,@pColStr=@cols OUTPUT
 	,@pSkipPkHash = 1
 
-DECLARE cur CURSOR
+		RAISERROR('
+	@pColStr: %s', 0, 1, @cols) WITH NOWAIT;
+
+
+DECLARE columnCursor CURSOR
 FOR 
-SELECT item AS col_name
-FROM dbo.strSplit(@cols, ',');
+SELECT item
+FROM dbo.strSplit(@cols, ',')
+--ORDER BY NEWID()
+
+RAISERROR('im not here', 0, 1) WITH NOWAIT;
 
 DECLARE @col_name varchar(100);
 
-OPEN cur;
+OPEN columnCursor;
 
-FETCH NEXT FROM cur INTO @col_name;
+FETCH NEXT FROM columnCursor INTO @col_name;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	--SELECT @col_name;
+	SELECT @col_name;
 	IF @col_name LIKE '%ID'-- AND @col_name NOT LIKE 'ETLAuditID'
 	BEGIN
-		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s ORDER BY NEWID()) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
+		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
-		RAISERROR('rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
+		RAISERROR('update %s rowcount: %i', 0, 1, @col_name, @rowcount) WITH NOWAIT;
 	END
 
-	FETCH NEXT FROM cur INTO @col_name;
+	FETCH NEXT FROM columnCursor INTO @col_name;
 END
 
-CLOSE cur;
-DEALLOCATE cur;
+CLOSE columnCursor;
+DEALLOCATE columnCursor;
 SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 RAISERROR('!uspDiffMaker: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 RETURN(@runtime);
@@ -88,6 +95,20 @@ END
 GO
 --#endregion CREATE/ALTER PROC
 
---DECLARE @pTableName varchar(100) = '[TestLog].[SnapShot].[destTableName]';
+--USE [AutoTest]
+--GO
 
---EXEC AutoTest.dbo.uspDiffMaker @pTableName='CommunityMart.dbo.SchoolHistoryFact'
+--DECLARE @pDatabaseName nvarchar(200) = 'CommunityMart'
+--DECLARE @pSchemaName nvarchar(200) = 'dbo'
+--DECLARE @pObjectName nvarchar(200) = 'ImmAdverseEventFact'
+--DECLARE @pPercentError int
+
+---- TODO: Set parameter values here.
+
+--EXECUTE [dbo].[uspDiffMaker] 
+--   @pDatabaseName
+--  ,@pSchemaName
+--  ,@pObjectName
+--  ,@pPercentError
+--GO
+

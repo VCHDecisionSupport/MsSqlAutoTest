@@ -7,7 +7,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspCreateQuerySnapShot';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 1, 1) WITH NOWAIT;
+RAISERROR(@name, 0, 1) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
@@ -47,7 +47,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @rowcount int;
-	DECLARE @sql nvarchar(max)
+	DECLARE @sql nvarchar(max) = ''
 		,@destFullName nvarchar(500)
 		,@HashKeySql varchar(max) = ''
 		,@IdColSql varchar(max) = ''
@@ -75,7 +75,6 @@ BEGIN
 			SET @HashKeySql  = SUBSTRING(@HashKeySql , 1, LEN(@HashKeySql )-1)
 		SET @HashKeySql = FORMATMESSAGE('HASHBYTES(''MD5'', %s) AS __hashkey__,',@HashKeySql)
 	END
-
 	IF @pKeyColumns IS NULL
 	BEGIN
 		SET @IdColSql = '__idkey__ = IDENTITY(int, 1,1),'
@@ -83,39 +82,45 @@ BEGIN
 
 	IF OBJECT_ID(@destFullName,'U') IS NOT NULL
 	BEGIN
-		SET @sql = FORMATMESSAGE('		DROP TABLE %s;', @destFullName)
-		RAISERROR(@sql,1,1) WITH NOWAIT;
+		SET @sql = 'DROP TABLE '+@destFullName;
+		--RAISERROR(@sql,0,1) WITH NOWAIT;
 		EXEC(@sql)
 	END
-
-	SET @sql = FORMATMESSAGE('
-		SELECT %s %s * 
-		INTO %s 
+	
+	SET @sql = ''
+	SET @sql = @sql+'
+		SELECT '+@IdColSql+' '+@HashKeySql+' * 
+		INTO '+@destFullName+' 
 		FROM (
-		%s
+		'+@pQuery+'
 		) sub
-	',@IdColSql, @HashKeySql, @destFullName, @pQuery)
-
+	'
 	PRINT @sql
-	EXEC(@sql);
+
+	EXEC sp_executesql @stmt = @sql
 	SET @rowcount = @@ROWCOUNT;
+
+	IF OBJECT_ID(@pDestTableName,'U') IS NULL
+	BEGIN
+		RAISERROR('ERROR: %s not created',0,1,@pDestTableName) WITH NOWAIT;
+	END
 
 
 	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
 		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKeyHash_%s ON %s(__hashkey__);',@pDestTableName,@destFullName);
-		PRINT @sql
+		--PRINT @sql
 		EXEC(@sql);
 		IF @pKeyColumns IS NOT NULL
 		BEGIN
 			SET @sql = FORMATMESSAGE('CREATE NONCLUSTERED INDEX IxNonClustKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
-			PRINT @sql
+			--PRINT @sql
 			EXEC(@sql);
 		END
 		ELSE 
 		BEGIN
 			SET @sql = FORMATMESSAGE('CREATE NONCLUSTERED INDEX IxNonClustKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pHashKeyColumns);
-			PRINT @sql
+			--PRINT @sql
 			EXEC(@sql);
 		END
 
@@ -123,13 +128,13 @@ BEGIN
 	ELSE IF @pKeyColumns IS NOT NULL
 	BEGIN
 		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
-		PRINT @sql
+		--PRINT @sql
 		EXEC(@sql);
 	END
 	ELSE
 	BEGIN
 		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxId_%s ON %s (__idkey__);',@pDestTableName,@destFullName);
-		PRINT @sql
+		--PRINT @sql
 		EXEC(@sql);
 	END
 
@@ -139,21 +144,21 @@ BEGIN
 
 END
 GO
--- DECLARE 
--- 	@pPreEtlDatabaseName varchar(100) = 'Lien'
--- 	,@pPreEtlSchemaName varchar(100) = 'Adtc'
--- 	,@pPreEtlTableName varchar(100) = 'SM_02_DischargeFact'
--- 	,@pPostEtlDatabaseName varchar(100) = 'Lien'
--- 	,@pPostEtlSchemaName varchar(100) = 'Adtc'
--- 	,@pPostEtlTableName varchar(100) = 'SM_03_DischargeFact'
--- 	,@pObjectPkColumns varchar(100) = 'PatientID, AccountNum'
--- DECLARE @pQuery varchar(max),
--- 	@pKeyColumns varchar(max) = @pObjectPkColumns,
--- 	@pHashKeyColumns varchar(max) = @pObjectPkColumns,
--- 	@pDestDatabaseName varchar(100) = 'AutoTest',
--- 	@pDestSchemaName varchar(100) = 'SnapShot',
--- 	@pDestTableName varchar(100) = 'waldo'
+ DECLARE 
+ 	@pPreEtlDatabaseName varchar(100) = 'Lien'
+ 	,@pPreEtlSchemaName varchar(100) = 'Adtc'
+ 	,@pPreEtlTableName varchar(100) = 'SM_02_DischargeFact'
+ 	,@pPostEtlDatabaseName varchar(100) = 'Lien'
+ 	,@pPostEtlSchemaName varchar(100) = 'Adtc'
+ 	,@pPostEtlTableName varchar(100) = 'SM_03_DischargeFact'
+ 	,@pObjectPkColumns varchar(100) = 'PatientID, AccountNum'
+ DECLARE @pQuery varchar(max),
+ 	@pKeyColumns varchar(max) = @pObjectPkColumns,
+ 	@pHashKeyColumns varchar(max) = @pObjectPkColumns,
+ 	@pDestDatabaseName varchar(100) = 'AutoTest',
+ 	@pDestSchemaName varchar(100) = 'SnapShot',
+ 	@pDestTableName varchar(100) = 'waldo'
 
--- SET @pQuery = FORMATMESSAGE('SELECT * FROM %s.%s.%s', @pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
+ SET @pQuery = FORMATMESSAGE('SELECT * FROM %s.%s.%s', @pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
 
--- EXEC dbo.uspCreateQuerySnapShot @pQuery=@pQuery, @pKeyColumns=@pKeyColumns, @pHashKeyColumns=@pHashKeyColumns, @pDestDatabaseName=@pDestDatabaseName,@pDestSchemaName=@pDestSchemaName,@pDestTableName=@pDestTableName
+ EXEC dbo.uspCreateQuerySnapShot @pQuery=@pQuery, @pKeyColumns=@pKeyColumns, @pHashKeyColumns=@pHashKeyColumns, @pDestDatabaseName=@pDestDatabaseName,@pDestSchemaName=@pDestSchemaName,@pDestTableName=@pDestTableName

@@ -14,9 +14,12 @@ BEGIN
 	EXEC(@sql);
 END
 GO
-ALTER PROC dbo.uspDataCompare
-	@pTestConfigID int
-AS
+DECLARE @pTestConfigID int = 82; 
+--GO
+
+--ALTER PROC dbo.uspDataCompare
+--	@pTestConfigID int
+--AS
 BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
@@ -80,6 +83,20 @@ BEGIN
 		,@SnapShotSchemaName varchar(100) = 'SnapShot'
 		,@pFmt varchar(max) = '%s,'
 		,@pColStr varchar(max)
+	--SET @pFmt = '
+	--%s
+	--%s
+	--%s
+	--%s
+	--%s
+	--%s
+	--'
+	SELECT @PreEtlSnapShotName
+	 	,@PostEtlSnapShotName
+	 	,@RecordMatchSnapShotName
+	 	,@PreEtlKeyMisMatchSnapShotName
+	 	,@PostEtlKeyMisMatchSnapShotName
+	 	,@KeyMatchSnapShotName
 	-- RAISERROR(@fmt, 0, 1,@PreEtlSnapShotName
 	-- 	,@PostEtlSnapShotName
 	-- 	,@RecordMatchSnapShotName
@@ -118,40 +135,29 @@ BEGIN
 		,@pColStr=@pColStr OUTPUT
 	--RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
-	SET @vsql = 'SELECT * 
+	SET @vsql = CAST('' AS nvarchar(max))
+	SET @vsql = @vsql+'SELECT * 
 	FROM 
 	(
 		SELECT 
-			<columns>
-		FROM AutoTest.SnapShot.<PreEtlSnapShotName> 
+			'+@pColStr+'
+		FROM AutoTest.SnapShot.'+@PreEtlSnapShotName+'
 		INTERSECT 
 		SELECT 
-			<columns>
-		FROM AutoTest.SnapShot.<PostEtlSnapShotName>
+			'+@pColStr+'
+		FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+'
 	) gcwashere'
-	SET @vsql = REPLACE(@vsql, '<columns>', @pColStr)
-	SET @vsql = REPLACE(@vsql, '<PreEtlSnapShotName>', @PreEtlSnapShotName)
-	SET @vsql = REPLACE(@vsql, '<PostEtlSnapShotName>', @PostEtlSnapShotName)
-
-
-	-- SET @sql = FORMATMESSAGE('
-	-- SELECT * 
-	-- FROM 
-	-- (
-	-- 	SELECT 
-	-- 		%s
-	-- 	FROM AutoTest.SnapShot.%s 
-	-- 	INTERSECT 
-	-- 	SELECT 
-	-- 		%s
-	-- 	FROM AutoTest.SnapShot.%s
-	-- ) gcwashere', @pColStr, @PreEtlSnapShotName, @pColStr, @PostEtlSnapShotName)
-
+	--SET @vsql = REPLACE(@vsql, '<columns>', @pColStr)
+	--SET @vsql = REPLACE(@vsql, '<PreEtlSnapShotName>', @PreEtlSnapShotName)
+	--SET @vsql = REPLACE(@vsql, '<PostEtlSnapShotName>', @PostEtlSnapShotName)
+	--PRINT @vsql
+	--RAISERROR(@vsql,0,1) WITH NOWAIT;
+	PRINT DATALENGTH(@vsql)
 	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @vsql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
 	IF @RecordMatchRowCount > 0
 	BEGIN
 		SET @param = '';
-		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigID = @pTestConfigID, @pTargetTableName = @RecordMatchSnapShotName, @pTableProfileTypeID = @RecordMatchTableProfileTypeID, @pColumnProfileTypeID = @RecordMatchColumnProfileTypeID, @pColumnHistogramTypeID = @RecordMatchColumnHistogramTypeID;
+		--EXEC AutoTest.dbo.uspCreateProfile @pTestConfigID = @pTestConfigID, @pTargetTableName = @RecordMatchSnapShotName, @pTableProfileTypeID = @RecordMatchTableProfileTypeID, @pColumnProfileTypeID = @RecordMatchColumnProfileTypeID, @pColumnHistogramTypeID = @RecordMatchColumnHistogramTypeID;
 	END
 	ELSE 
 		RAISERROR('      RecordMatchSnapShotName profile skipped',0,1) WITH NOWAIT;
@@ -168,15 +174,16 @@ EXEC dbo.uspGetColumnNames
 	,@pFmt=@pFmt
 	,@pColStr=@pColStr OUTPUT
 
-	SET @sql = FORMATMESSAGE('
+	SET @sql = ''
+	SET @sql = '
 	SELECT 
-		%s
-	FROM AutoTest.SnapShot.%s AS pre
+		'+@pColStr+'
+	FROM AutoTest.SnapShot.'+@PreEtlSnapShotName+' AS pre
 	WHERE 1=1
 	AND pre.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.%s AS post
-	)', @pColStr, @PreEtlSnapShotName, @PostEtlSnapShotName)
+		FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+' AS post
+	)'
 	
 
 	EXEC @PreEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pKeyColumns = '__hashkey__', @pDestTableName = @PreEtlKeyMisMatchSnapShotName
@@ -199,20 +206,22 @@ EXEC dbo.uspGetColumnNames
 	,@pIntersectingObjectName=@PostEtlSnapShotName
 	,@pFmt=@pFmt
 	,@pColStr=@pColStr OUTPUT
-SET @sql = FORMATMESSAGE('
+
+	SET @sql = ''
+	SET @sql = '
 	SELECT 
-		%s 
-	FROM AutoTest.SnapShot.%s AS post
+		'+@pColStr+'
+	FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+' AS pre
 	WHERE 1=1
-	AND post.__hashkey__ NOT IN (
+	AND pre.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.%s AS pre
-	)', @pColStr, @PostEtlSnapShotName, @PreEtlSnapShotName)
+		FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+' AS post
+	)'
 	EXEC @PostEtlKeyMisMatchRowCount= AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@sql, @pKeyColumns = '__hashkey__', @pDestTableName = @PostEtlKeyMisMatchSnapShotName
 	IF @PostEtlKeyMisMatchRowCount > 0
 	BEGIN
 		SET @param = '';
-		EXEC AutoTest.dbo.uspCreateProfile @pTestConfigID = @pTestConfigID, @pTargetTableName = @PostEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PostEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PostEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PostEtlKeyMisMatchColumnHistogramTypeID;
+		-- EXEC AutoTest.dbo.uspCreateProfile @pTestConfigID = @pTestConfigID, @pTargetTableName = @PostEtlKeyMisMatchSnapShotName, @pTableProfileTypeID = @PostEtlKeyMisMatchTableProfileTypeID, @pColumnProfileTypeID = @PostEtlKeyMisMatchColumnProfileTypeID, @pColumnHistogramTypeID = @PostEtlKeyMisMatchColumnHistogramTypeID;
 	END
 	ELSE 
 		RAISERROR('      PostEtlKeyMisMatchName profile skipped',0,1) WITH NOWAIT;
@@ -229,36 +238,37 @@ EXEC dbo.uspGetColumnNames
 	,@pFmt=@pFmt
 	,@pColStr=@pColStr OUTPUT
 	,@pSkipPkHash = 1
-
---SET @pColStr = FORMATMESSAGE('%s',@pColStr)
+	SELECT DATALENGTH(@pColStr) AS ColumnStringLength
 IF OBJECT_ID('AutoTest.SnapShot.'+@KeyMatchSnapShotName,'U') IS NOT NULL
 	BEGIN
 		SET @sql = FORMATMESSAGE('DROP TABLE %s;', 'AutoTest.SnapShot.'+@KeyMatchSnapShotName)
 		RAISERROR(@sql,0,1) WITH NOWAIT;
 		EXEC(@sql)
 	END
-SET @vsql = REPLACE('
+	RAISERROR(@KeyMatchSnapShotName,0,1) WITH NOWAIT;
+--PRINT @KeyMatchSnapShotName
+SET @sql = CAST(N'' AS NVARCHAR(MAX))
+SET @sql = @sql + '
 	SELECT 
-		<col> 
-	INTO AutoTest.SnapShot.<merged>
-	FROM AutoTest.SnapShot.<post> AS post
-	INNER JOIN AutoTest.SnapShot.<pre> AS pre
+		' + @pColStr +'
+	INTO AutoTest.SnapShot.'+@KeyMatchSnapShotName+'
+	FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+' AS post
+	INNER JOIN AutoTest.SnapShot.'+@PreEtlSnapShotName+' AS pre
 	ON pre.__hashkey__=post.__hashkey__
 	WHERE 1=1
 	AND pre.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.<rm> AS rm
-	)
+		FROM AutoTest.SnapShot.'+@RecordMatchSnapShotName+' AS rm
+	)`
 	AND post.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.<rm> AS rm
-	)', '<col>', @pColStr)
-	SET @vsql = REPLACE(@vsql, '<merged>', CAST(@KeyMatchSnapShotName AS varchar(500)))
-	SET @vsql = REPLACE(@vsql, '<post>', CAST(@PostEtlSnapShotName AS varchar(500)))
-	SET @vsql = REPLACE(@vsql, '<pre>', CAST(@PreEtlSnapShotName AS varchar(500)))
-	SET @vsql = REPLACE(@vsql, '<rm>', CAST(@RecordMatchSnapShotName AS varchar(500)))
-	RAISERROR(@vsql,0,1) WITH NOWAIT;
-	EXEC(@vsql)
+		FROM AutoTest.SnapShot.'+@RecordMatchSnapShotName+' AS rm
+	)'
+	SELECT DATALENGTH(@sql) AS LEN_OF_QUERY
+	EXEC sp_executesql @stmt = @sql
+	PRINT 'hello'
+	select @SQL as [processing-instruction(x)] FOR XML PATH 
+	-- EXEC(@sql)
 	SET @KeyMatchRowCount = @@ROWCOUNT
 	RAISERROR('    uspDataCompare->KeyMatch snap shot created (%i rows)',0,0,@KeyMatchRowCount);
 
@@ -404,20 +414,20 @@ ELSE
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
-	RETURN(@runtime);
+	--RETURN(@runtime);
 END	
 
 GO
 
 --dbo.uspDataCompare @pTestConfigID=25
--- DECLARE 
--- 	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'
--- 	,@pPostEtlBaseName varchar(100) = 'SM_03_DischargeFact' + 'Adhoc'
--- 	,@pTestConfigID int = 123
+DECLARE 
+	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'
+	,@pPostEtlBaseName varchar(100) = 'SM_03_DischargeFact' + 'Adhoc'
+	,@pTestConfigID int = 123
 
--- SET @pPreEtlBaseName = 'FactResellerSales' + 'Adhoc'
--- SET @pPostEtlBaseName = 'FactResellerSales' + 'Adhoc'
--- SET @pTestConfigID = 11
+SET @pPreEtlBaseName = 'FactResellerSales' + 'Adhoc'
+SET @pPostEtlBaseName = 'FactResellerSales' + 'Adhoc'
+SET @pTestConfigID = 313200
 
--- EXEC dbo.uspDataCompare 
--- 	@pTestConfigID = @pTestConfigID
+--EXEC dbo.uspDataCompare 
+--	@pTestConfigID = @pTestConfigID

@@ -39,19 +39,19 @@ EXECUTE DQMF.[dbo].[SetAuditPkgExecution]
 
 --EXEC AutoTest.dbo.uspInitPkgRegression @pPkgExecKey = @pPkgExecKeyOut
 
---SET @pPkgExecKeyOut = 313160
-----EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut
+--SET @pPkgExecKeyOut = 313200
+EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut
 declare @pColStr varchar(max);
-EXEC AutoTest.dbo.uspGetKey 
-@pDatabaseName = 'HCRSMart'
-,@pSchemaName = 'HCRS'
-,@pObjectName = 'Admission'
-,@pFmt = null
-,@pColStr=@pColStr output
+--EXEC AutoTest.dbo.uspGetKey 
+--@pDatabaseName = 'HCRSMart'
+--,@pSchemaName = 'HCRS'
+--,@pObjectName = 'Admission'
+--,@pFmt = null
+--,@pColStr=@pColStr output
 
-print @pcolstr
+--print @pcolstr
 
-SELECT *
-FROM MD_Object 
-where objectphysicalname = 'Admission'
-and objectschemaname = 'HCRS'
+--SELECT *
+--FROM MD_Object 
+--where objectphysicalname = 'Admission'
+--and objectschemaname = 'HCRS'

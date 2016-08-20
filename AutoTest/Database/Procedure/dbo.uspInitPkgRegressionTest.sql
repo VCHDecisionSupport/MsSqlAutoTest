@@ -105,12 +105,13 @@ BEGIN
 	FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
 	SET @TableCount = @TableCount + 1;
 END
+SET @TableCount = @TableCount - 1;
 
 CLOSE cur;
 DEALLOCATE cur;
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i will configured for testing)', 0, 1, @runtime, @TableCount) WITH NOWAIT;
+	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i table/view is prepared for testing)', 0, 1, @runtime, @TableCount) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO

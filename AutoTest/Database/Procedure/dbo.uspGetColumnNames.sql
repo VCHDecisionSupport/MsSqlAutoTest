@@ -22,7 +22,7 @@ ALTER PROC dbo.uspGetColumnNames
 	,@pIntersectingSchemaName varchar(100) = NULL
 	,@pIntersectingObjectName varchar(100) = NULL
 	,@pFmt varchar(max) = ',%s'
-	,@pColStr varchar(max) OUTPUT
+	,@pColStr nvarchar(max) OUTPUT
 	,@pSkipPkHash bit = 0
 AS
 BEGIN
@@ -30,8 +30,8 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='        dbo.uspGetColumnNames(%s.%s.%s)'
-	--RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
+	SELECT @fmt='        dbo.uspGetColumnNames @pDatabaseName=''%s'', @pSchemaName=''%s'', @pObjectName=''%s'', @pFmt=''%s'', @pColStr=@pColStr OUT'
+	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName, @pFmt) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -121,7 +121,7 @@ FROM db_obj
 WHERE (db_obj.column_name LIKE ''__hashkey__'' AND @pSkipPkHashIN = 0)
 OR db_obj.column_name NOT LIKE ''__hashkey__''
 ORDER BY db_obj.column_name
-FOR XML PATH('''')),1,10000)
+FOR XML PATH('''')),1,1000000)
 '
 ,@pDatabaseName, @pDatabaseName, @pDatabaseName, @pDatabaseName, @pDatabaseName, @pDatabaseName
 ,@pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName
@@ -138,22 +138,21 @@ FOR XML PATH('''')),1,10000)
 	IF CHARINDEX(',',REVERSE(@pColStr),1) = 1
 		SET @pColStr = SUBSTRING(@pColStr, 1, LEN(@pColStr)-1)
 	SET @pColStr = @pColStr
-	PRINT @pColStr  
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	--RAISERROR('!dbo.uspGetColumnNames: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspGetColumnNames
---DECLARE 
---	@pDatabaseName varchar(100) = 'Lien'
---	,@pSchemaName varchar(100) = 'Adtc'
---	,@pObjectName varchar(100) = 'SM_02_DischargeFact'
---	,@pIntersectingDatabaseName varchar(100) = 'Lien'
---	,@pIntersectingSchemaName varchar(100) = 'Adtc'
---	,@pIntersectingObjectName varchar(100) = 'SM_02_DischargeFact'
---	,@pFmt varchar(max) = 'pre.%s,'
---	,@pColStr varchar(max)
+DECLARE 
+	@pDatabaseName varchar(100) = 'Lien'
+	,@pSchemaName varchar(100) = 'Adtc'
+	,@pObjectName varchar(100) = 'SM_02_DischargeFact'
+	,@pIntersectingDatabaseName varchar(100) = 'Lien'
+	,@pIntersectingSchemaName varchar(100) = 'Adtc'
+	,@pIntersectingObjectName varchar(100) = 'SM_02_DischargeFact'
+	,@pFmt varchar(max) = 'pre.%s,'
+	,@pColStr varchar(max)
 --SET @pFmt = ',pre_%s=pre.%s,post_%s=post.%s'
 --EXEC dbo.uspGetColumnNames 
 --	@pDatabaseName
@@ -163,3 +162,7 @@ GO
 --	,@pColStr = @pColStr OUTPUT
 
 --PRINT @pColStr
+
+EXEC dbo.uspGetColumnNames @pDatabaseName='AutoTest', @pSchemaName='SnapShot', @pObjectName='PreEtl_TestConfigID82', @pFmt='%s,', @pColStr=@pColStr OUT
+
+--PRINT @pcolstr + @pcolstr
