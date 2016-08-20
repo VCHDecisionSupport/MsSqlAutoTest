@@ -14,6 +14,7 @@ BEGIN
 	EXEC(@sql);
 END
 GO
+--DECLARE @pPkgExecKey int = 123;
 ALTER PROC dbo.uspPkgRegressionTest
 	@pPkgExecKey int
 AS
@@ -36,12 +37,11 @@ BEGIN
 		,@SnapShotBaseName varchar(200)
 		,@KeyColumns varchar(500)
 		,@PostEtlSnapShotCreationElapsedSeconds int
-		-- ,@PostSnapShotName varchar(200)
 		,@ComparisonRuntimeSeconds int
 		,@DatabaseName varchar(200)
 		,@SchemaName varchar(200)
-		,@PreEtlTableName varchar(200)
-		,@PostEtlTableName varchar(200)
+		,@PreEtlSnapShotName varchar(200)
+		,@PostEtlSnapShotName varchar(200)
 
 -- INSERT INTO AutoTest.dbo.TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
 -- SELECT 
@@ -95,13 +95,13 @@ BEGIN
 		DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
-		SET @PreEtlTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
-		SET @PostEtlTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
+		SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
+		SET @PostEtlSnapShotName = PARSENAME(@PostEtlSourceObjectFullName,1)
 	END
-	IF @TestTypeDesc IN ('RuntimeRegressionTest', )
+	IF @TestTypeDesc IN ('RuntimeRegressionTest')
 	BEGIN
-		EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @PreEtlTableName, @pColStr=@KeyColumns OUTPUT
-		EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostEtlTableName
+		EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @PreEtlSnapShotName, @pColStr=@KeyColumns OUTPUT
+		EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostEtlSnapShotName
 		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 	END
 	ELSE IF @TestTypeDesc IN ('StandAloneProfile')
@@ -112,7 +112,7 @@ BEGIN
 		SELECT @StandAloneTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'StandAloneTableProfile'
 		SELECT @StandAloneColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
 		SELECT @StandAloneColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
-		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspCreateProfile @pTestConfigID = @pTestConfigID, @pTargetTableName = @PostEtlTableName, @pTableProfileTypeID = @StandAloneTableProfileTypeID, @pColumnProfileTypeID = @StandAloneColumnProfileTypeID, @pColumnHistogramTypeID = @StandAloneColumnHistogramTypeID;
+		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspCreateProfile @pTestConfigID = @TestConfigID, @pTargetTableName = @PostEtlSnapShotName, @pTableProfileTypeID = @StandAloneTableProfileTypeID, @pColumnProfileTypeID = @StandAloneColumnProfileTypeID, @pColumnHistogramTypeID = @StandAloneColumnHistogramTypeID;
 	END
 	UPDATE TestConfig SET
 		PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
@@ -123,6 +123,8 @@ BEGIN
 	FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @PostEtlSnapShotName
 END
 
+CLOSE reg_cur;
+DEALLOCATE reg_cur;
 
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());

@@ -65,6 +65,8 @@ BEGIN
 	ON obj.DatabaseId = db.DatabaseId
 	JOIN DQMF.dbo.AuditPkgExecution AS pkglog
 	ON pgkobj.PackageID = pkglog.PkgKey
+	JOIN AutoTest.dbo.TestType AS tt
+	ON pgkobj.TestTypeID = tt.TestTypeID
 	WHERE 1=1
 	AND obj.IsActive = 1
 	AND obj.IsObjectInDB = 1
@@ -72,7 +74,6 @@ BEGIN
 	AND pkglog.PkgExecKey = @pPkgExecKey
 
 	SET @RegressionTableCount = @@ROWCOUNT;
-	,@ProfileTableCount int = 0
 
 	DECLARE cur CURSOR
 	FOR
@@ -107,11 +108,10 @@ BEGIN
 		WHERE tlog.TestConfigID = @TestConfigID
 
 		FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
-		SET @RegressionTableCount = @RegressionTableCount + 1;
-		,@ProfileTableCount int = 0
+		SET @RegressionTableCount = @RegressionTableCount + 1
 	END
-	SET @RegressionTableCount = @RegressionTableCount - 1;
-	,@ProfileTableCount int = 0
+	SET @RegressionTableCount = @RegressionTableCount - 1
+	SET @ProfileTableCount = 0
 
 	CLOSE cur;
 	DEALLOCATE cur;
@@ -126,7 +126,6 @@ BEGIN
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;
-	,@ProfileTableCount int = 0
 	RETURN(@runtime);
 
 END

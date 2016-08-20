@@ -10,7 +10,7 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\DQMF\Database\Table\ALTER-dbo.MD_ObjectAttribute.sql
 :r $(pathvar)\DQMF\Database\Procedure\ALTER-dbo.SetAuditPackageExecution.sql
 
---:r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
+:r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
 :r $(pathvar)\AutoTest\Database\SCHEMA-SnapShot.sql
 
 :r $(pathvar)\AutoTest\Database\Table\TestConfig.sql
