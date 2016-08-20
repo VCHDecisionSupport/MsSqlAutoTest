@@ -1,4 +1,6 @@
-DECLARE @PkgName varchar(500) = 'AutoTestTesting3'
+DELETE DQMF.dbo.ETL_PackageObject;
+
+DECLARE @PkgName varchar(500) = 'AutoTestTesting2'
 DECLARE @DatabaseName varchar(500) = 'HCRSMart'
 DECLARE @PackageID int = 333;
 DECLARE @DatabaseID int = 25;
@@ -20,34 +22,20 @@ SELECT @DatabaseID = DatabaseId
 FROM DQMF.dbo.MD_Database
 WHERE DatabaseName = @DatabaseName
 
---SELECT ObjectID, *
---FROM DQMF.dbo.MD_Object
---WHERE 1=1
---AND databaseid != @DatabaseID
---AND ObjectPurpose = 'Fact'
---AND ObjectPKField NOT LIKE 'ETLAuditId'
---AND ObjectPKField != ''
---AND ObjectPhysicalName = 'SchoolHistoryFact'
--- 53085
-
---SELECT * FROM AutoTest.dbo.TestType;
--- 3
-
---INSERT INTO DQMF.dbo.ETL_PackageObject (PackageID, ObjectID, TestTypeID) VALUES (@PackageID, @ObjectID, @TestTypeID)
-
 DELETE DQMF.dbo.ETL_PackageObject
 WHERE 1=1
 AND PackageID = @PackageID
---AND ObjectID IN (53895,53913,53896)
 
 
 ;WITH src AS (
 	SELECT TOP 10 *
 	FROM DQMF.dbo.MD_Object AS obj
-	WHERE obj.databaseid = @DatabaseID
+	WHERE 1=1
+	AND obj.databaseid = @DatabaseID
+	--AND obj.databaseid = 25
 	AND obj.ObjectPurpose = 'Fact'
 	AND obj.ObjectPKField NOT LIKE 'ETLAuditId'
-	AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
+	--AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
 	AND obj.ObjectID IN (
 		SELECT ObjectID
 		FROM DQMF.dbo.MD_ObjectAttribute attr
@@ -60,11 +48,10 @@ ON src.ObjectID = dest.ObjectID
 WHEN NOT MATCHED THEN INSERT 
 VALUES (@PackageID, src.ObjectID, @TestTypeID);
 
---DELETE DQMF.dbo.ETL_PackageObject
---WHERE 1=1
---AND PackageID = @PackageID
---AND ObjectID IN (53895,53913,53896)
---OR ObjectID != 53894
+DELETE DQMF.dbo.ETL_PackageObject
+WHERE 1=1
+AND PackageID = @PackageID
+AND ObjectID NOT IN (1261,1262)
 
 SELECT *
 FROM DQMF.dbo.ETL_PackageObject map
@@ -72,6 +59,7 @@ JOIN DQMF.dbo.MD_Object obj
 ON obj.ObjectID = map.OBjectID
 JOIN DQMF.dbo.ETL_PAckage pkg
 ON map.PackageID = pkg.Pkgid
+WHERE PackageID = @PackageID
 
 --#region diff maker loop
 DECLARE diffCursor CURSOR

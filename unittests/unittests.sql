@@ -1,3 +1,7 @@
+-- get last PkgExecKey
+DECLARE @PkgExecKey int;
+SELECT @PkgExecKey=MAX(PkgExecKey) FROM AUtoTest.dbo.TestConfig
+
 -- uspCreateQuerySnapShot
 DECLARE 
 	@pPreEtlDatabaseName varchar(100) = 'Lien'
@@ -41,3 +45,22 @@ DECLARE
 -- EXEC dbo.uspGetColumnNames @pDatabaseName='AutoTest', @pSchemaName='SnapShot', @pObjectName='PreEtl_TestConfigID82', @pFmt='%s,', @pColStr=@pColStr OUT
 
 --PRINT @pcolstr + @pcolstr
+
+
+-- uspPkgRegressionTest
+GO
+DECLARE @PkgExecKey int;
+SELECT @PkgExecKey=MAX(PkgExecKey) FROM AUtoTest.dbo.TestConfig
+SELECT * FROM AUtoTest.dbo.TestConfig
+EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313210
+
+-- uspRegressionTest
+EXEC AutoTest.dbo.uspDataCompare @pTestConfigID = 1
+
+GO
+DECLARE @pColStr varchar(max) = ''
+EXEC dbo.uspGetColumnNames @pDatabaseName='AutoTest', @pSchemaName='SnapShot', @pObjectName='PreEtl_TestConfigID1', @pFmt='%s,', @pColStr=@pColStr OUT
+PRINT @pColStr
+GO
+
+EXEC dbo.uspInitPkgRegression @pPkgExecKey = 313210

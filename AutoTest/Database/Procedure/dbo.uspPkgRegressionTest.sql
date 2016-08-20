@@ -26,14 +26,16 @@ BEGIN
 	SELECT @fmt='dbo.uspPkgRegressionTest'
 	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
 	
-	DECLARE @sql nvarchar(max);
-	DECLARE @param nvarchar(max);
+	DECLARE @sql nvarchar(max) = ''
+	DECLARE @param nvarchar(max) = ''
 
 	DECLARE @TestConfigID int
 		,@TestTypeID int
 		,@TestTypeDesc varchar(200)
 		,@PreEtlSourceObjectFullName varchar(200)
 		,@PostEtlSourceObjectFullName varchar(200)
+		,@PreEtlSourceObjectTableName varchar(200)
+		,@PostEtlSourceObjectTableName varchar(200)
 		,@SnapShotBaseName varchar(200)
 		,@KeyColumns varchar(500)
 		,@PostEtlSnapShotCreationElapsedSeconds int
@@ -95,8 +97,9 @@ BEGIN
 		DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
-		SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
-		SET @PostEtlSnapShotName = PARSENAME(@PostEtlSourceObjectFullName,1)
+		-- SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
+		SET @PostEtlSourceObjectTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
+		SET @PreEtlSourceObjectTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
 	END
 	IF @TestTypeDesc IN ('RuntimeRegressionTest')
 	BEGIN

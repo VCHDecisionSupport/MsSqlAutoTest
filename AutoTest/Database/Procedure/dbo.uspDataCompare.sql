@@ -28,9 +28,9 @@ BEGIN
 	SELECT @fmt='dbo.uspDataCompare (TestConfigID %i)'
 	RAISERROR(@fmt, 0, 1, @pTestConfigID) WITH NOWAIT;
 	
-	DECLARE @sql varchar(max);
-	DECLARE @vsql varchar(max);
-	DECLARE @param nvarchar(max);
+	DECLARE @sql varchar(max) = ''
+	DECLARE @vsql varchar(max) = ''
+	DECLARE @param nvarchar(max) = ''
 	
 	-- set snap shot names
 	DECLARE @RecordMatchRowCount int = 0;
@@ -44,10 +44,6 @@ BEGIN
 		,@PostEtlKeyMisMatchSnapShotName VARCHAR(100)
 		,@KeyMatchSnapShotName VARCHAR(100)
 	-- DECLARE @SnapShotBaseName varchar(100)
-
-	-- SELECT @SnapShotBaseName = SnapShotBaseName
-	-- FROM AutoTest.dbo.TestConfig
-	-- WHERE TestConfigID = @pTestConfigID
 
 	DECLARE @maxDistinctCount int = 500;
 
@@ -78,6 +74,7 @@ BEGIN
 	WHERE tlog.TestConfigID = @pTestConfigID
 
 
+
 	DECLARE 
 		@SnapShotDatabaseName varchar(100) = 'AutoTest'
 		,@SnapShotSchemaName varchar(100) = 'SnapShot'
@@ -103,6 +100,7 @@ BEGIN
 	-- 	,@PreEtlKeyMisMatchSnapShotName
 	-- 	,@PostEtlKeyMisMatchSnapShotName
 	-- 	,@KeyMatchSnapShotName) WITH NOWAIT;
+
 
 	DECLARE @RecordMatchTableProfileTypeID int;
 	DECLARE @RecordMatchColumnProfileTypeID int;
@@ -133,7 +131,8 @@ BEGIN
 		,@pIntersectingObjectName=@PostEtlSnapShotName
 		,@pFmt=@pFmt
 		,@pColStr=@pColStr OUTPUT
-	--RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
+
+	RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
 	SET @vsql = CAST('' AS nvarchar(max))
 	SET @vsql = @vsql+'SELECT * 
