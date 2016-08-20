@@ -82,34 +82,18 @@ BEGIN
 	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
 
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
+	SET @vsql = ''
 	SET @vsql = '
 	INSERT INTO AutoTest.dbo.ColumnProfile 
 	(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
-	SELECT pvt.ColumnName, pvt.ColumnCount, <TableProfileID> AS TableProfileID, <ColumnProfileTypeID> AS ColumnProfileTypeID 
+	SELECT pvt.ColumnName, pvt.ColumnCount, '+@tableProfileID+' AS TableProfileID, '+@pColumnProfileTypeID+' AS ColumnProfileTypeID 
 	FROM (SELECT 
-		<AggregatedColumns> 
-	FROM <SnapShotName>) sub 
+		'+@AggCols+' 
+	FROM '+@FullTargetTableName+') sub 
 	UNPIVOT (ColumnCount FOR ColumnName IN (
-		<columns>
+		'+@cols+'
 	)) pvt
 	'
-	SET @vsql = REPLACE(@vsql, '<TableProfileID>', @tableProfileID)
-	SET @vsql = REPLACE(@vsql, '<ColumnProfileTypeID>', @pColumnProfileTypeID)
-	SET @vsql = REPLACE(@vsql, '<AggregatedColumns>', @AggCols)
-	SET @vsql = REPLACE(@vsql, '<columns>', @cols)
-	SET @vsql = REPLACE(@vsql, '<SnapShotName>', @FullTargetTableName)
-
-	--SET @sql = FORMATMESSAGE('
-	--INSERT INTO AutoTest.dbo.ColumnProfile 
-	--(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
-	--SELECT pvt.ColumnName, pvt.ColumnCount, %i AS TableProfileID, %i AS ColumnProfileTypeID 
-	--FROM (SELECT 
-	--	%s 
-	--FROM %s) sub 
-	--UNPIVOT (ColumnCount FOR ColumnName IN (
-	--	%s
-	--)) pvt
-	--', @tableProfileID, @pColumnProfileTypeID,@AggCols, @FullTargetTableName,@cols);
 	RAISERROR(@vsql, 0,0) WITH NOWAIT;
 	EXEC(@vsql);
 --#endregion ColumnProfile
