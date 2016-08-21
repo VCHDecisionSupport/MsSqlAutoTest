@@ -14,12 +14,10 @@ BEGIN
 	EXEC(@sql);
 END
 GO
-DECLARE @pTestConfigID int = 82; 
-GO
-DECLARE @pTestConfigID int = 21
---ALTER PROC dbo.uspDataCompare
---	@pTestConfigID int
---AS
+
+ALTER PROC dbo.uspDataCompare
+	@pTestConfigID int
+AS
 BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();

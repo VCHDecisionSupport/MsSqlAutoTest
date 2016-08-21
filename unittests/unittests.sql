@@ -3,6 +3,10 @@ GO
 
 --#region get last PkgExecKey
 SELECT TOP 20 PkgExecKey, TestConfigID, * FROM AutoTest.dbo.TestConfig
+SELECT TOP 20 * 
+FROM DQMF.dbo.ETL_PackageObject AS pkgobj
+JOIN DQMF.dbo.ETL_Package AS pkg
+ON pkgobj.PackageID = pkg.PkgID
 --#endregion get last PkgExecKey
 
 --#region SetAuditPkgExecution
@@ -12,7 +16,7 @@ DECLARE @pPkgExecKeyout varchar(max);
 EXEC DQMF.dbo.[SetAuditPkgExecution]
             @pPkgExecKey = null
            ,@pParentPkgExecKey = null
-           ,@pPkgName = 'AutoTestTesting'
+           ,@pPkgName = 'AutoTestTesting3'
            ,@pPkgVersionMajor = 1
            ,@pPkgVersionMinor  = 1
            ,@pIsProcessStart  = 1
@@ -128,7 +132,7 @@ GO
 --#region clean 
 IF 1=2
 BEGIN
-	EXEC dbo.uspDropSnapShot @pMaxSchemaSizeMB=0
+	EXEC AutoTest.dbo.uspDropSnapShot @pMaxSchemaSizeMB=0
 	DELETE AutoTest.dbo.TestConfig
 	DELETE AutoTest.dbo.TableProfile
 	DELETE AutoTest.dbo.ColumnProfile
