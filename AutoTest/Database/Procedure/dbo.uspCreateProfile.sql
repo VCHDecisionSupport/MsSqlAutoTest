@@ -86,7 +86,7 @@ BEGIN
 	SET @vsql = '
 	INSERT INTO AutoTest.dbo.ColumnProfile 
 	(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
-	SELECT pvt.ColumnName, pvt.ColumnCount, '+@tableProfileID+' AS TableProfileID, '+@pColumnProfileTypeID+' AS ColumnProfileTypeID 
+	SELECT pvt.ColumnName, pvt.ColumnCount, '+CAST(@tableProfileID AS varchar)+' AS TableProfileID, '+CAST(@pColumnProfileTypeID AS varchar)+' AS ColumnProfileTypeID 
 	FROM (SELECT 
 		'+@AggCols+' 
 	FROM '+@FullTargetTableName+') sub 

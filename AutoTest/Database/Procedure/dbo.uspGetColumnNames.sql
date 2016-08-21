@@ -127,7 +127,7 @@ FOR XML PATH('''')),1,1000000)
 ,@pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName, @pIntersectingDatabaseName
 ,@pFmt,'%s')
 
-	RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 	--EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName, @pIntersectingSchemaNameIN = @pIntersectingSchemaName, @pIntersectingObjectNameIN = @pIntersectingObjectName, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 
 	EXEC sp_executesql @sql, @param, @pObject_IDIN = @Object_ID, @pIntersectingObject_IDIN = @Intersecting_Object_ID, @pSkipPkHashIN = @pSkipPkHash, @pColStrOUT = @pColStr OUTPUT 

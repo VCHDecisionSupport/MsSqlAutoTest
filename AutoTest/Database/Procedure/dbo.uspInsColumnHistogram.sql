@@ -40,7 +40,7 @@ BEGIN
 	FOR
 	SELECT rn, ColumnValue
 	FROM (
-	SELECT COUNT(*) AS rn, ISNULL(CAST(%s AS varchar), ''NULL'') AS ColumnValue
+	SELECT COUNT(*) AS rn, ISNULL(CAST([%s] AS varchar), ''NULL'') AS ColumnValue
 	FROM %s
 	WHERE 1=1 %s
 	GROUP BY %s) sub
@@ -58,7 +58,7 @@ BEGIN
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID) VALUES (%i, ''%s'', %i, %i)',@pColumnProfileID, CAST(@columnValue AS varchar(200)), @valueCount, @pColumnHistogramTypeID)
+		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, [ColumnValue], ValueCount, ColumnHistogramTypeID) VALUES (%i, ''%s'', %i, %i)',@pColumnProfileID, CAST(@columnValue AS varchar(200)), @valueCount, @pColumnHistogramTypeID)
 		 --RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql);
 		FETCH NEXT FROM valueCursor INTO @valueCount, @columnValue;

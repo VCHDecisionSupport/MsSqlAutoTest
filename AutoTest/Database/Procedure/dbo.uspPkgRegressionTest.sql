@@ -78,6 +78,7 @@ SELECT
 	,tt.TestTypeDesc
 	,PreEtlSourceObjectFullName
 	,PostEtlSourceObjectFullName
+	,PreEtlSnapShotName
 	,PostEtlSnapShotName
 FROM AutoTest.dbo.TestConfig AS config
 JOIN AutoTest.dbo.TestType AS tt
@@ -86,24 +87,28 @@ WHERE PkgExecKey = @pPkgExecKey
 
 OPEN reg_cur;
 
-FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @PostEtlSnapShotName
+FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @PreEtlSnapShotName, @PostEtlSnapShotName
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
 	IF @TestTypeDesc IN ('RuntimeRegressionTest', 'StandAloneProfile')
 	BEGIN
+		SET @PostEtlSourceObjectTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
+		SET @PreEtlSourceObjectTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
+		RAISERROR('Initializing Post Etl Testing (%s on %s for TestConfigID %i)',0,1,@TestTypeDesc,@PreEtlSourceObjectTableName, @TestConfigID);
 		-- SET @PostEtlSnapShotName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
 		-- SELECT @PostSnapShotName = 'PostEtl_'+@PostEtlSnapShotName
 		DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
 		-- SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
-		SET @PostEtlSourceObjectTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
-		SET @PreEtlSourceObjectTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
+
 	END
 	IF @TestTypeDesc IN ('RuntimeRegressionTest')
 	BEGIN
-		EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @PreEtlSnapShotName, @pColStr=@KeyColumns OUTPUT
+		RAISERROR('Starting Post Etl Testing.',0,1,@TestTypeDesc);
+		EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @PostEtlSourceObjectTableName, @pColStr=@KeyColumns OUTPUT
+		PRINT @KeyColumns;
 		EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostEtlSnapShotName
 		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 	END
@@ -123,7 +128,7 @@ BEGIN
 	FROM TestConfig tlog
 	WHERE tlog.TestConfigID = @TestConfigID
 
-	FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @PostEtlSnapShotName
+	FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @PreEtlSnapShotName, @PostEtlSnapShotName
 END
 
 CLOSE reg_cur;

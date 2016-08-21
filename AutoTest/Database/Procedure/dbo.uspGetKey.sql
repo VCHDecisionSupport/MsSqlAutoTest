@@ -105,22 +105,26 @@ BEGIN
 
 	SET @sql = FORMATMESSAGE('
 	;WITH db_obj AS (
-	SELECT col.name AS column_name
-	FROM %s.sys.index_columns AS ind_col
-	JOIN %s.sys.columns AS col
-	ON ind_col.object_id = col.object_id
-	AND ind_col.column_id = col.column_id
+		SELECT col.name AS column_name
+		FROM %s.sys.indexes AS clu_idx
+		JOIN %s.sys.index_columns AS ind_col
+		ON clu_idx.index_id = ind_col.index_id
+		AND clu_idx.object_id = ind_col.object_id
+		JOIN %s.sys.columns AS col
+		ON ind_col.object_id = col.object_id
+		AND ind_col.column_id = col.column_id
 		WHERE 1=1
 		AND OBJECT_NAME(ind_col.object_id) = @pObjectNameIN
 		AND OBJECT_SCHEMA_NAME(ind_col.object_id) = @pSchemaNameIN
-) 
-SELECT @pColStrOUT = SUBSTRING((
-SELECT REPLACE(''%s'', ''%s'',db_obj.column_name)
-FROM db_obj
-ORDER BY db_obj.column_name
-FOR XML PATH('''')),1,10000)
+		AND clu_idx.type_desc = ''CLUSTERED''
+	) 
+	SELECT @pColStrOUT = SUBSTRING((
+	SELECT REPLACE(''%s'', ''%s'',db_obj.column_name)
+	FROM db_obj
+	ORDER BY db_obj.column_name
+	FOR XML PATH('''')),1,10000)
 '
-,@pDatabaseName, @pDatabaseName
+,@pDatabaseName, @pDatabaseName, @pDatabaseName
 ,@pFmt,'%s')
 
 	--RAISERROR(@sql, 0, 1) WITH NOWAIT;

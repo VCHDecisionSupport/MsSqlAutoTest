@@ -36,35 +36,6 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspPkgRegressionTest.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDataCompare.sql
 
+:r $(pathvar)\dev\dbo.uspDiffMaker.sql
+
 :r $(pathvar)\msdb\scripts\CREATE-Job.sql
-
--- DQMF:
--- 	\DQMF\ALTER-dbo.MD_ObjectAttribute.sql
--- 	\DQMF\ALTER-dbo.SetAuditPackageExecution.sql
--- 	\DQMF\TABLE-dbo.ETL_PackageObject.sql
-
--- Database:
--- 	\Database\DATABASE-AutoTest.sql
--- 	\Database\SCHEMA-SnapShot.sql
--- 	\Database\Table\TestConfig.sql
--- 	\Database\Table\TestType.sql
--- 	\Database\Table\TestConfigSource.sql
--- 	\Database\Table\TestConfig.sql
--- 	\Database\Table\TableProfile.sql
--- 	\Database\Table\TableProfileType.sql
--- 	\Database\Table\ColumnProfile.sql
--- 	\Database\Table\ColumnProfileType.sql
--- 	\Database\Table\ColumnHistogram.sql
--- 	\Database\Table\ColumnHistogramType.sql
--- 	\Database\Function\dbo.ufnGetSnapShotName.sql
--- 	\Database\Function\dbo.strSplit.sql
--- 	\Database\Procedure\dbo.uspGetKey.sql
--- 	\Database\Procedure\dbo.uspCreateQuerySnapShot.sql
--- 	\Database\Procedure\dbo.uspDropSnapShot.sql
--- 	\Database\Procedure\dbo.uspGetColumnNames.sql
--- 	\Database\Procedure\dbo.uspInsColumnHistogram.sql
--- 	\Database\Procedure\dbo.uspCreateProfile.sql
--- 	\Database\Procedure\dbo.uspDataCompare.sql
--- 	\Database\Procedure\dbo.uspInitPkgRegressionTest.sql
--- 	\Database\Procedure\dbo.uspPkgRegressionTest.sql
--- 	\Database\Procedure\dbo.uspAdHocDataCompare.sql

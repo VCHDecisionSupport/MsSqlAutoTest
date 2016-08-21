@@ -63,7 +63,7 @@ BEGIN
 		IF OBJECT_SCHEMA_NAME(OBJECT_ID(''?'')) = ''%s'' AND ''?'' LIKE ''%s''
 		BEGIN 
 			PRINT ''?''+'' dropped (by TestConfigID)'';
-			--DROP TABLE %s.?;  
+			DROP TABLE %s.?;  
 		END',@SchemaName, '%'+@pTestConfigID+'%', @DatabaseName)
 		--PRINT @sql
 		EXEC sp_MSforeachtable @command1 = @sql
@@ -75,7 +75,7 @@ BEGIN
 		IF OBJECT_SCHEMA_NAME(OBJECT_ID(''?'')) = ''%s'' AND ''?'' NOT LIKE ''%s''
 		BEGIN 
 			PRINT ''?''+'' dropped (derived snap shot)'';
-			--DROP TABLE %s.?;  
+			DROP TABLE %s.?;  
 		END',@SchemaName, '%Etl_TestConfigID%', @DatabaseName)
 		--PRINT @sql
 		EXEC sp_MSforeachtable @command1 = @sql

@@ -53,7 +53,7 @@ BEGIN
 		,@IdColSql varchar(max) = ''
 	RAISERROR('uspCreateQuerySnapShot(%s, @pKeyColumns=%s; @pHashKeyColumns=%s)',0,0,@pDestTableName, @pKeyColumns, @pHashKeyColumns);
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
-	
+	SELECT CAST('<root><![CDATA[' + @pQuery + ']]></root>' AS XML)
 	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
 
 	IF @pHashKeyColumns IS NOT NULL
@@ -95,12 +95,13 @@ BEGIN
 		'+@pQuery+'
 		) sub
 	'
-	PRINT @sql
+	--PRINT @sql
+	SELECT CAST('<root><![CDATA[' + @sql + ']]></root>' AS XML) AS SnapShotQuery
 
 	EXEC sp_executesql @stmt = @sql
 	SET @rowcount = @@ROWCOUNT;
 
-	IF OBJECT_ID(@pDestTableName,'U') IS NULL
+	IF OBJECT_ID(@pDestTableName,'U') IS NULL AND @rowcount = 0
 	BEGIN
 		RAISERROR('ERROR: %s not created',0,1,@pDestTableName) WITH NOWAIT;
 	END
@@ -108,7 +109,8 @@ BEGIN
 
 	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
-		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKeyHash_%s ON %s(__hashkey__);',@pDestTableName,@destFullName);
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxAutoTestHash_%s ON %s(__hashkey__);',@pDestTableName,@destFullName);
+		-- SET @sql = FORMATMESSAGE('ALTER TABLE %s ADD CONSTRAINT IxAutoTestHash_%s PRIMARY KEY CLUSTERED (__hashkey__);',@pDestTableName,@destFullName);
 		--PRINT @sql
 		EXEC(@sql);
 		IF @pKeyColumns IS NOT NULL
@@ -127,13 +129,15 @@ BEGIN
 	END
 	ELSE IF @pKeyColumns IS NOT NULL
 	BEGIN
-		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxKey_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxAutoTest_%s ON %s(%s);',@pDestTableName,@destFullName,@pKeyColumns);
+		-- SET @sql = FORMATMESSAGE('ALTER TABLE %s ADD CONSTRAINT IxAutoTestHash_%s PRIMARY KEY CLUSTERED (%s);',@destFullName,@pDestTableName,@pKeyColumns);
 		--PRINT @sql
 		EXEC(@sql);
 	END
 	ELSE
 	BEGIN
-		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxId_%s ON %s (__idkey__);',@pDestTableName,@destFullName);
+		SET @sql = FORMATMESSAGE('CREATE CLUSTERED INDEX IxAutoTestHash_%s ON %s (__idkey__);',@pDestTableName,@destFullName);
+		-- SET @sql = FORMATMESSAGE('ALTER TABLE %s ADD CONSTRAINT IxAutoTestHash_%s PRIMARY KEY CLUSTERED (__idkey__);',@destFullName,@pDestTableName);
 		--PRINT @sql
 		EXEC(@sql);
 	END
