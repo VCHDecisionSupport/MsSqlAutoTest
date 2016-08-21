@@ -1,5 +1,20 @@
 # AutoTest
 
+Automated regression testing of the tables/views affected by an ETL execution.
+
+SQL database consisting of procedures, functions, temporary snap shot tables, and logging tables.  
+
+Procedures are automatically executed  during normal ETL package/job execution [see attachment points section](###attachment-point)
+Configuration mostly automated by seperate SSI job that parses packages deployed to `msdb`
+
+
+
+## Implemenation
+
+Prior to ETL execution snap shots of views/tables are copied to `AutoTest.SnapShot` schema
+
+
+
 ## Requirements:
 
 ### Comparison Key
@@ -20,10 +35,15 @@ Other attachment point options:
     + pre/post processing?
 - As job step
     + 1 step added at start and end
-    + be done automattically/in-bulk with `sp_jobaddstep`
+    + can be done automattically/in-bulk with [`sp_add_job`](https://msdn.microsoft.com/en-us/library/ms182079.aspx) and [`sp_add_jobstep`](https://msdn.microsoft.com/en-ca/library/ms187358.aspx)
 
 
-### Mapping from attachment point to testable data objects (fact views/tables)
+### Mapping from ETL to affected data sets
+
+see new table `DQMF.dbo.ETL_PackageObject`
+For each package/job a list of tables/views to be tested is required.  This mapping from attachment point to data object is specified by `DQMF.dbo.ETL_PackageObject`.  This table is also populated by a `C#` executable that walks the `msdb` folders and loads each package into memory using [the SSIS object model](https://msdn.microsoft.com/en-us/library/ms136025.aspx) to extract the destination tables of the data flow tasks contained in each package.  A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.
+
+
 - All `DQMF_BizRule` rows include 
 
 ## `dbo.uspCreateProfile`
@@ -68,16 +88,10 @@ call `uspPkgRegressionTest` with parameter `@PkgExecKey`
     - call `uspCreateSnapShot` to _PostEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema
     - call `uspDataCompare`
 
-<!-- 
+# References
 
+[Case Study Regression Testing](https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE)
 
-        call `uspGetKey` to get key columns: look in:
-            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` sdfs
-            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` as
-            b. 1;lkj
-        2. dsaf
-    B. sdfs 
+[Regression Test Relational Database](http://www.agiledata.org/essays/databaseTesting.html)
 
-
-
- -->
+[Wikipedia: Regression Testing](https://en.wikipedia.org/wiki/Regression_testing)
