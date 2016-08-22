@@ -36,6 +36,7 @@ AND PackageID = @PackageID
 	AND obj.ObjectPurpose = 'Fact'
 	AND obj.ObjectPKField NOT LIKE 'ETLAuditId'
 	--AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
+	--AND ObjectID NOT IN (1261,1262)
 	AND obj.ObjectID IN (
 		SELECT ObjectID
 		FROM DQMF.dbo.MD_ObjectAttribute attr
@@ -48,12 +49,6 @@ ON src.ObjectID = dest.ObjectID
 WHEN NOT MATCHED THEN INSERT 
 VALUES (@PackageID, src.ObjectID, @TestTypeID);
 
-DELETE DQMF.dbo.ETL_PackageObject
-WHERE 1=1
-AND PackageID = @PackageID
-AND ObjectID NOT IN (1261,1262)
---OR ObjectID NOT IN (1261)
-
 SELECT *
 FROM DQMF.dbo.ETL_PackageObject map
 JOIN DQMF.dbo.MD_Object obj
@@ -61,44 +56,4 @@ ON obj.ObjectID = map.OBjectID
 JOIN DQMF.dbo.ETL_PAckage pkg
 ON map.PackageID = pkg.Pkgid
 WHERE PackageID = @PackageID
-
---#region diff maker loop
-DECLARE diffCursor CURSOR
-FOR
-SELECT db.databasename, obj.ObjectSchemaName, obj.ObjectPhysicalName
-FROM DQMF.dbo.ETL_PackageObject AS pkg
-JOIN DQMF.dbo.MD_Object obj
-ON obj.ObjectID = pkg.OBjectID
-JOIN DQMF.dbo.MD_Database db
-ON obj.Databaseid = db.DatabaseId
-
-OPEN diffCursor;
-
-DECLARE @RC int
-DECLARE @pDatabaseName nvarchar(200) = 'CommunityMart'
-DECLARE @pSchemaName nvarchar(200) = 'dbo'
-DECLARE @pObjectName nvarchar(200) = 'SchoolHistoryFact'
-DECLARE @pPercentError int
-
-FETCH NEXT FROM diffCursor INTO @pDatabaseName, @pSchemaName, @pObjectName
-
--- TODO: Set parameter values here.
-WHILE @@FETCH_STATUS = 0
-BEGIN
-	PRINT @pDatabaseName;
-	PRINT @pSchemaName;
-	PRINT @pObjectName;
-
-	--EXECUTE @RC = AutoTest.[dbo].[uspDiffMaker] 
-	--   @pDatabaseName
-	--  ,@pSchemaName
-	--  ,@pObjectName
-	--  ,@pPercentError
-	FETCH NEXT FROM diffCursor INTO @pDatabaseName, @pSchemaName, @pObjectName
-
-END
-
-CLOSE diffCursor
-DEALLOCATE diffCursor;
---#endregion diff maker loop
 

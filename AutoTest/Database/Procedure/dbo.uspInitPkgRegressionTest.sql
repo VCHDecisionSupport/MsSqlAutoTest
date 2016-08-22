@@ -44,13 +44,15 @@ BEGIN
 		,@SchemaName varchar(200)
 		,@TableName varchar(200)
 
-	-- setup regression test specs: copy configurations from AutoTest.dbo.TestConfig: insert into AutoTest.dbo.TestConfig
+	-- setup regression test specs: copy configurations from DQMF.dbo.ETL_PackageObject insert into AutoTest.dbo.TestConfig
 	INSERT INTO AutoTest.dbo.TestConfig (TestTypeID, PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, TestDate, ObjectID, PkgExecKey)
 	SELECT 
 		pgkobj.TestTypeID
 		,CASE 
-			-- Non-Comparison/Regression testing doesn't need a pre etl snap shot
+			-- RuntimeRegressionTest tables require snap shots:  PreEtlSourceObjectFullName stores fully qualified name of table to be snap shot
 			WHEN tt.TestTypeDesc = 'RuntimeRegressionTest' THEN db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName 
+			-- StandAloneProfile do not need snap shots
+			WHEN tt.TestTypeDesc = 'StandAloneProfile' THEN NULL
 			ELSE NULL
 		END
 		AS PreEtlSourceObjectFullName
@@ -70,12 +72,13 @@ BEGIN
 	WHERE 1=1
 	AND obj.IsActive = 1
 	AND obj.IsObjectInDB = 1
-	AND obj.ObjectPurpose = 'Fact'
+	--let DQMF.dbo.ETL_PackageObject control which tables are tested
+	--AND obj.ObjectPurpose = 'Fact'
 	AND pkglog.PkgExecKey = @pPkgExecKey
 
-	SET @RegressionTableCount = @@ROWCOUNT;
-
-	DECLARE cur CURSOR
+	
+--#region create pre-etl snap shots
+DECLARE cur CURSOR
 	FOR
 	SELECT 
 		TestConfigID
@@ -91,10 +94,9 @@ BEGIN
 
 	FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
 
+	-- copy snap shots of tests to be regression tested
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		-- SET @SnapShotBaseName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
-		-- SELECT @PreEtlSnapShotName = 'PreEtl_'+@SnapShotBaseName
 		DECLARE @PreEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PreEtlSourceObjectFullName);
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
@@ -108,21 +110,27 @@ BEGIN
 		WHERE tlog.TestConfigID = @TestConfigID
 
 		FETCH NEXT FROM cur INTO @TestConfigID, @PreEtlSourceObjectFullName, @PostEtlSourceObjectFullName, @SnapShotBaseName, @PreEtlSnapShotName
-		SET @RegressionTableCount = @RegressionTableCount + 1
 	END
-	SET @RegressionTableCount = @RegressionTableCount - 1
-	SET @ProfileTableCount = 0
 
 	CLOSE cur;
 	DEALLOCATE cur;
+--#endregion create pre-etl snap shots
 
-	UPDATE AutoTest.dbo.TestConfig
-		SET PreEtlSnapShotCreationElapsedSeconds = 0
-	FROM AutoTest.dbo.TestConfig
-	WHERE PkgExecKey = @pPkgExecKey
-	AND PreEtlSourceObjectFullName IS NULL
+	SELECT @RegressionTableCount = COUNT(*)
+	FROM AutoTest.dbo.TestConfig tconfig
+	JOIN AutoTest.dbo.TestType AS tt
+	ON tconfig.TestTypeID = tt.TestTypeID
+	WHERE 1=1
+	AND tconfig.PkgExecKey = @pPkgExecKey	
+	AND tt.TestTypeDesc = 'RuntimeRegressionTest'
 
-	SET @ProfileTableCount = @@ROWCOUNT
+	SELECT @ProfileTableCount = COUNT(*)
+	FROM AutoTest.dbo.TestConfig tconfig
+	JOIN AutoTest.dbo.TestType AS tt
+	ON tconfig.TestTypeID = tt.TestTypeID
+	WHERE 1=1
+	AND tconfig.PkgExecKey = @pPkgExecKey	
+	AND tt.TestTypeDesc = 'StandAloneProfile'
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;

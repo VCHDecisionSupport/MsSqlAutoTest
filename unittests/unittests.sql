@@ -2,15 +2,16 @@ USE AutoTest
 GO
 
 --#region get last PkgExecKey
-SELECT TOP 20 PkgExecKey, TestConfigID, * FROM AutoTest.dbo.TestConfig
-SELECT TOP 20 * 
+SELECT TOP 20 
+	pkg.PkgName
+	,*
 FROM DQMF.dbo.ETL_PackageObject AS pkgobj
 JOIN DQMF.dbo.ETL_Package AS pkg
 ON pkgobj.PackageID = pkg.PkgID
 --#endregion get last PkgExecKey
 
 --#region SetAuditPkgExecution
-IF 1=2
+IF 1=1
 BEGIN
 DECLARE @pPkgExecKeyout varchar(max);
 EXEC DQMF.dbo.[SetAuditPkgExecution]
@@ -25,7 +26,7 @@ EXEC DQMF.dbo.[SetAuditPkgExecution]
 SELECT @pPkgExecKeyout AS PkgExecKey
 END
 GO
---#endregion clean
+--#endregion SetAuditPkgExecution
 
 --#region uspInitPkgRegression
 IF 1=2
@@ -34,11 +35,11 @@ EXEC dbo.uspInitPkgRegression @pPkgExecKey = 313235
 DEClaRE @pPkgExecKeyout  bigint
 END
 GO
---#endregion clean
+--#endregion uspInitPkgRegression
 
 
 
-
+--EXEC xp_ReadErrorLog 0, 1, N'this', N'is', '20160701', NULL, 'DESC'
 
 
 --#region uspPkgRegressionTest
@@ -50,16 +51,16 @@ SELECT PkgExecKey, * FROM AUtoTest.dbo.TestConfig;
 EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313235
 END
 GO
---#endregion clean
+--#endregion uspPkgRegressionTest
 
 
 --#region uspDataCompare
-IF 1=1
+IF 1=2
 BEGIN
 EXEC AutoTest.dbo.uspDataCompare @pTestConfigID = 21;
 END
 GO
---#endregion clean
+--#endregion uspDataCompare
 
 --#region uspCreateQuerySnapShot
 IF 1=2
@@ -83,7 +84,7 @@ SET @pQuery = FORMATMESSAGE('SELECT * FROM %s.%s.%s', @pPreEtlDatabaseName, @pPr
 EXEC AutoTest.dbo.uspCreateQuerySnapShot @pQuery=@pQuery, @pKeyColumns=@pKeyColumns, @pHashKeyColumns=@pHashKeyColumns, @pDestDatabaseName=@pDestDatabaseName,@pDestSchemaName=@pDestSchemaName,@pDestTableName=@pDestTableName
 END
 GO
---#endregion clean
+--#endregion uspCreateQuerySnapShot
 
 
 
@@ -110,9 +111,31 @@ EXEC dbo.uspGetColumnNames
 PRINT @pColStr
 END
 GO
---#endregion clean
+--#endregion uspGetColumnNames
+
+--#region Stand Alone Profile
+IF 1=2
+BEGIN
+DECLARE @TestTypeID int;
+DECLARE @TableProfileTypeID int;
+DECLARE @ColumnProfileTypeID int;
+DECLARE @ColumnHistogramTypeID int;
+SELECT @TestTypeID = TestTypeID FROM AutoTest.dbo.TestType WHERE TestTypeDesc = 'StandAloneTableProfile'
+SELECT @TableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'StandAloneTableProfile'
+SELECT @ColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
+SELECT @ColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
 
 
+
+DECLARE @pTestConfigID int = 25;
+SELECT @pTestConfigID=MAX(TestConfigID) FROM AutoTest.dbo.TestConfig
+SET @pTestConfigID = 25;
+DECLARE @PreEtlKeyMisMatchSnapShotName varchar(100)
+SELECT @PreEtlKeyMisMatchSnapShotName = RecordMatchSnapShotName
+FROM AutoTest.dbo.TestConfig WHERE TestConfigID = @pTestConfigID
+END
+GO
+--#endregion Stand Alone Profile
 
 --#region uspGetKey
 IF 1=2
@@ -127,7 +150,7 @@ EXEC AutoTest.dbo.uspGetKey
 PRINT @KeyColumns;
 END
 GO
---#endregion clean
+--#endregion uspGetKey
 
 --#region clean 
 IF 1=2

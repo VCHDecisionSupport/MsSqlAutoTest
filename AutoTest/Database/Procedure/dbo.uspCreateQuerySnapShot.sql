@@ -53,9 +53,11 @@ BEGIN
 		,@IdColSql varchar(max) = ''
 	RAISERROR('uspCreateQuerySnapShot(%s, @pKeyColumns=%s; @pHashKeyColumns=%s)',0,0,@pDestTableName, @pKeyColumns, @pHashKeyColumns);
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
-	SELECT CAST('<root><![CDATA[' + @pQuery + ']]></root>' AS XML)
-	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
+	
+	
+--#region create __hashkey__ column snippet
 
+	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
 	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
 		SELECT @HashKeySql=
@@ -75,6 +77,8 @@ BEGIN
 			SET @HashKeySql  = SUBSTRING(@HashKeySql , 1, LEN(@HashKeySql )-1)
 		SET @HashKeySql = FORMATMESSAGE('HASHBYTES(''MD5'', %s) AS __hashkey__,',@HashKeySql)
 	END
+--#endregion create __hashkey__ column snippet
+	
 	IF @pKeyColumns IS NULL
 	BEGIN
 		SET @IdColSql = '__idkey__ = IDENTITY(int, 1,1),'
@@ -95,8 +99,7 @@ BEGIN
 		'+@pQuery+'
 		) sub
 	'
-	--PRINT @sql
-	SELECT CAST('<root><![CDATA[' + @sql + ']]></root>' AS XML) AS SnapShotQuery
+	-- SELECT CAST('<root><![CDATA[' + @sql + ']]></root>' AS XML) AS SnapShotQuery
 
 	EXEC sp_executesql @stmt = @sql
 	SET @rowcount = @@ROWCOUNT;
