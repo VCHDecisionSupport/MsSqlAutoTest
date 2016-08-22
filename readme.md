@@ -64,7 +64,7 @@ __Parameters:__
 1. get row count and `INSERT INTO dbo.TableProfile`
 2. get distinct count of each column, `UNPIVOT`, then `INSERT INTO dbo.ColumnProfile`
 3. cursor on `dbo.ColumnProfile`
-    a. call `dbo.uspInsColumnHistogram` to `INSERT INTO dbo.ColumnHistogram`
+    - call `dbo.uspInsColumnHistogram` to `INSERT INTO dbo.ColumnHistogram`
 
 ## `dbo.uspDataCompare`
 
