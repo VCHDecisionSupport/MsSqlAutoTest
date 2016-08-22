@@ -12,6 +12,21 @@ FROM AutoTest.SnapShot.PreEtlKeyMisMatch_TestConfigID3
 SELECT COUNT(*) AS PostEtlKeyMisMatch
 FROM AutoTest.SnapShot.PostEtlKeyMisMatch_TestConfigID3
 
+
+
+SELECT *
+	FROM AutoTest.SnapShot.PostEtl_TestConfigID3 AS post
+	INNER JOIN AutoTest.SnapShot.PreEtl_TestConfigID3 AS pre
+	ON pre.__hashkey__=post.__hashkey__
+	WHERE 1=1
+	AND pre.__hashkey__ NOT IN (
+		SELECT __hashkey__
+		FROM AutoTest.SnapShot.RecordMatch_TestConfigID3 AS recordMatch
+	)
+	AND post.__hashkey__ NOT IN (
+		SELECT __hashkey__
+		FROM AutoTest.SnapShot.RecordMatch_TestConfigID3 AS recordMatch
+	)
 SELECT PreEtlSourceObjectFullName
 ,tprot.TableProfileTypeDesc
 ,RecordCount

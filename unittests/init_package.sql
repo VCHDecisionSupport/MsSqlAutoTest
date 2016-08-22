@@ -1,6 +1,6 @@
 DELETE DQMF.dbo.ETL_PackageObject;
 
-DECLARE @PkgName varchar(500) = 'AutoTestTesting'
+DECLARE @PkgName varchar(500) = 'AutoTestTesting3'
 DECLARE @DatabaseName varchar(500) = 'HCRSMart'
 DECLARE @PackageID int = 333;
 DECLARE @DatabaseID int = 25;
@@ -28,7 +28,7 @@ AND PackageID = @PackageID
 
 
 ;WITH src AS (
-	SELECT TOP 2 *
+	SELECT TOP 5 *
 	FROM DQMF.dbo.MD_Object AS obj
 	WHERE 1=1
 	--AND obj.databaseid = @DatabaseID

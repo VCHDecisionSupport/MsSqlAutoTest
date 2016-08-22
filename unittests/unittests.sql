@@ -11,22 +11,39 @@ ON pkgobj.PackageID = pkg.PkgID
 --#endregion get last PkgExecKey
 
 --#region SetAuditPkgExecution
-IF 1=1
+IF 1=2
 BEGIN
 DECLARE @pPkgExecKeyout varchar(max);
 EXEC DQMF.dbo.[SetAuditPkgExecution]
             @pPkgExecKey = null
            ,@pParentPkgExecKey = null
-           ,@pPkgName = 'AutoTestTesting3'
+           ,@pPkgName = 'AutoTestTesting'
            ,@pPkgVersionMajor = 1
            ,@pPkgVersionMinor  = 1
            ,@pIsProcessStart  = 1
-           ,@pIsPackageSuccessful  = 0
+           ,@pIsPackageSuccessful  = 1
            ,@pPkgExecKeyout  = @pPkgExecKeyout   output
-SELECT @pPkgExecKeyout AS PkgExecKey
 END
 GO
 --#endregion SetAuditPkgExecution
+
+--#region SetAuditPkgExecution end
+IF 1=1
+BEGIN
+DECLARE @pPkgExecKeyout varchar(max);
+EXEC DQMF.dbo.[SetAuditPkgExecution]
+            @pPkgExecKey = 313260
+           ,@pParentPkgExecKey = null
+           ,@pPkgName = 'AutoTestTesting'
+           ,@pPkgVersionMajor = 1
+           ,@pPkgVersionMinor  = 1
+           ,@pIsProcessStart  = 0
+           ,@pIsPackageSuccessful  = 1
+           ,@pPkgExecKeyout  = NULL
+SELECT 313260 AS PkgExecKey
+END
+GO
+--#endregion SetAuditPkgExecution end
 
 --#region uspInitPkgRegression
 IF 1=2
