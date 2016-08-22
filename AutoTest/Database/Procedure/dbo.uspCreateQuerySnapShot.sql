@@ -24,6 +24,16 @@ ALTER PROC dbo.uspCreateQuerySnapShot
 	@pDestTableName varchar(100)
 AS 
 BEGIN
+-- utility proc that creates a snap shot of the query
+-- executes SELECT <given query> INTO <given destination table>
+-- merges @pHashKeyColumns into single HASHBYTES column
+-- drop destination table if it already exists
+-- creates indexes on @pKeyColumns and @pHashKeyColumns
+
+-- @pQuery simple query; alias allowed; 'WITH', 'GO', ';', etc not allowed
+-- @pKeyColumns,@pHashKeyColumns comma delimited list of column names
+-- @pDestDatabaseName.@pDestSchemaName.@pDestTableName is snap shot table
+
 -- if @pHashKeyColumns is not null AND @pKeyColumns is not null
 -- 	- make __keyhash__ column using HASHBYTES
 -- 	- put CLUTERED index on __keyhash__ column
@@ -51,12 +61,11 @@ BEGIN
 		,@destFullName nvarchar(500)
 		,@HashKeySql varchar(max) = ''
 		,@IdColSql varchar(max) = ''
-	RAISERROR('uspCreateQuerySnapShot(%s, @pKeyColumns=%s; @pHashKeyColumns=%s)',0,0,@pDestTableName, @pKeyColumns, @pHashKeyColumns);
+	RAISERROR('uspCreateQuerySnapShot(%s, @pKeyColumns=%s; @pHashKeyColumns=%s)',0,0,@pDestTableName, @pKeyColumns, @pHashKeyColumns) WITH NOWAIT, LOG
 	SELECT @destFullName = @pDestDatabaseName+'.'+@pDestSchemaName+'.'+@pDestTableName;
 	
 	
 --#region create __hashkey__ column snippet
-
 	DECLARE @pFmt nvarchar(max) = '+ISNULL(CAST(#column_name# AS VARCHAR),''__null__'')'
 	IF @pHashKeyColumns IS NOT NULL
 	BEGIN
@@ -99,7 +108,6 @@ BEGIN
 		'+@pQuery+'
 		) sub
 	'
-	-- SELECT CAST('<root><![CDATA[' + @sql + ']]></root>' AS XML) AS SnapShotQuery
 
 	EXEC sp_executesql @stmt = @sql
 	SET @rowcount = @@ROWCOUNT;
@@ -108,7 +116,6 @@ BEGIN
 	BEGIN
 		RAISERROR('ERROR: %s not created',0,1,@pDestTableName) WITH NOWAIT;
 	END
-
 
 	IF @pHashKeyColumns IS NOT NULL
 	BEGIN

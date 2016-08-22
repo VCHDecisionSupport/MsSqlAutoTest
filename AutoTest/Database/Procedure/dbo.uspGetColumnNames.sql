@@ -26,6 +26,10 @@ ALTER PROC dbo.uspGetColumnNames
 	,@pSkipPkHash bit = 0
 AS
 BEGIN
+	-- sets @pColStr to a comma delimited string of column names formatted by @pFmt
+	-- Intersecting parameters restrict the returned columns to columns that exist in @pObjectName and @pIntersectingObjectName
+	-- if @pSkipPkHash is not null then the __hashkey__ column is not included in @pColStr 
+
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
