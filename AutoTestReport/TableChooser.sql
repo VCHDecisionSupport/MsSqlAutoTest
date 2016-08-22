@@ -1,6 +1,8 @@
-DECLARE @PkgExecKey int = 313261;
+DECLARE @PkgExecKey int = 313267;
 
-
+SELECT *
+	,CAST((1.*PostEtl_RecordCount/sub.PreEtl_RecordCount-1) AS decimal(10,8)) AS PercentChange
+FROM (
 SELECT 
 	piv.TestDate
 	,piv.PkgName 
@@ -22,7 +24,7 @@ SELECT
 FROM (
 SELECT tlog.PkgExecKey, pkg.PkgName ,tlog.TestConfigID, tlog.PreEtlSourceObjectFullName, db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, tlog.ObjectID, tpro.RecordCount, tlog.TestDate, 
 CASE 
-WHEN DATEDIFF(hour, tlog.TestDate, GETDATE()) = 1
+WHEN DATEDIFF(hour, tlog.TestDate, GETDATE()) = 0
 	THEN FORMATMESSAGE('%i minutes', DATEDIFF(minute, tlog.TestDate, GETDATE()))
 WHEN DATEDIFF(day, tlog.TestDate, GETDATE()) = 0
 	THEN FORMATMESSAGE('%i hours', DATEDIFF(hour, tlog.TestDate, GETDATE()))
@@ -53,5 +55,5 @@ PIVOT
 	SUM(RecordCount) FOR TableProfileTypeDesc IN ([RecordMatchTableProfile], [KeyMatchTableProfile], [PreEtlKeyMisMatchTableProfile], [PostEtlKeyMisMatchTableProfile])
 ) AS piv
 WHERE 1=1
-AND piv.PkgExecKey= @PkgExecKey
-ORDER BY piv.PkgExecKey DESC, TestConfigID DESC
+AND piv.PkgExecKey= @PkgExecKey) sub
+ORDER BY sub.PkgExecKey DESC, sub.TestConfigID DESC

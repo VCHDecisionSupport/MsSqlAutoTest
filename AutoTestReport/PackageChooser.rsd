@@ -4,7 +4,18 @@
     <Query>
       <DataSourceReference>AutoTest</DataSourceReference>
       <CommandText>
-SELECT pkg.PkgName AS PackageName, map.PackageID,  DATEDIFF(day, MAX(tlog.TestDate), GETDATE()) AS RegressionAgeDays, MAX(tlog.PkgExecKey) PkgExecKey, COUNT(DISTINCT tlog.ObjectID) AS TablesTested
+SELECT pkg.PkgName AS PackageName, map.PackageID
+,CASE 
+WHEN DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()) = 1
+	THEN FORMATMESSAGE('%i minutes', DATEDIFF(minute, MAX(tlog.TestDate), GETDATE()))
+WHEN DATEDIFF(day, MAX(tlog.TestDate), GETDATE()) = 0
+	THEN FORMATMESSAGE('%i hours', DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()))
+ELSE FORMATMESSAGE('%i days', DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()))
+END
+ AS RegressionTestAge
+
+,MAX(tlog.PkgExecKey) PkgExecKey, COUNT(DISTINCT tlog.ObjectID) AS TablesTested
+,MAX(tlog.TestDate) AS TestDate
 FROM DQMF.dbo.ETL_PackageObject AS map
 JOIN DQMF.dbo.MD_Object obj
 ON obj.ObjectID = map.OBjectID
@@ -28,9 +39,9 @@ ORDER BY MAX(tlog.TestDate) DESC</CommandText>
         <DataField>PackageID</DataField>
         <rd:TypeName>System.Int32</rd:TypeName>
       </Field>
-      <Field Name="RegressionAgeDays">
-        <DataField>RegressionAgeDays</DataField>
-        <rd:TypeName>System.Int32</rd:TypeName>
+      <Field Name="RegressionTestAge">
+        <DataField>RegressionTestAge</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
       </Field>
       <Field Name="PkgExecKey">
         <DataField>PkgExecKey</DataField>
@@ -39,6 +50,10 @@ ORDER BY MAX(tlog.TestDate) DESC</CommandText>
       <Field Name="TablesTested">
         <DataField>TablesTested</DataField>
         <rd:TypeName>System.Int32</rd:TypeName>
+      </Field>
+      <Field Name="TestDate">
+        <DataField>TestDate</DataField>
+        <rd:TypeName>System.DateTime</rd:TypeName>
       </Field>
     </Fields>
   </DataSet>

@@ -9,8 +9,8 @@
   </DataSources>
   <DataSets>
     <ProjectItem>
-      <Name>Package.rsd</Name>
-      <FullPath>Package.rsd</FullPath>
+      <Name>PackageChooser.rsd</Name>
+      <FullPath>PackageChooser.rsd</FullPath>
     </ProjectItem>
     <ProjectItem>
       <Name>PackageObject.rsd</Name>
@@ -25,6 +25,10 @@
       <FullPath>TableProfileType.rsd</FullPath>
     </ProjectItem>
     <ProjectItem>
+      <Name>TableSummary.rsd</Name>
+      <FullPath>TableSummary.rsd</FullPath>
+    </ProjectItem>
+    <ProjectItem>
       <Name>TestConfig.rsd</Name>
       <FullPath>TestConfig.rsd</FullPath>
     </ProjectItem>
@@ -33,8 +37,12 @@
       <FullPath>TestType.rsd</FullPath>
     </ProjectItem>
     <ProjectItem>
-      <Name>TableSummary.rsd</Name>
-      <FullPath>TableSummary.rsd</FullPath>
+      <Name>TableChooser.rsd</Name>
+      <FullPath>TableChooser.rsd</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>ColumnChooser.rsd</Name>
+      <FullPath>ColumnChooser.rsd</FullPath>
     </ProjectItem>
   </DataSets>
   <Reports>
@@ -49,6 +57,10 @@
     <ProjectItem>
       <Name>TableChooser.rdl</Name>
       <FullPath>TableChooser.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>ColumnChooser.rdl</Name>
+      <FullPath>ColumnChooser.rdl</FullPath>
     </ProjectItem>
   </Reports>
   <Configurations>

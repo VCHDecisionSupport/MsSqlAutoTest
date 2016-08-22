@@ -4,7 +4,7 @@
   <DataSets>
     <DataSet Name="Package">
       <SharedDataSet>
-        <SharedDataSetReference>Package</SharedDataSetReference>
+        <SharedDataSetReference>PackageChooser</SharedDataSetReference>
       </SharedDataSet>
       <Fields>
         <Field Name="PackageName">
@@ -15,9 +15,9 @@
           <DataField>PackageID</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
-        <Field Name="RegressionAgeDays">
-          <DataField>RegressionAgeDays</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
+        <Field Name="RegressionTestAge">
+          <DataField>RegressionTestAge</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="PkgExecKey">
           <DataField>PkgExecKey</DataField>
@@ -26,6 +26,10 @@
         <Field Name="TablesTested">
           <DataField>TablesTested</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="TestDate">
+          <DataField>TestDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -90,7 +94,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Regression Age Days</Value>
+                                  <Value>Regression Test Age</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -192,21 +196,21 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="RegressionAgeDays">
+                        <Textbox Name="RegressionTestAge">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!RegressionAgeDays.Value</Value>
+                                  <Value>=Fields!RegressionTestAge.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>RegressionAgeDays</rd:DefaultName>
+                          <rd:DefaultName>RegressionTestAge</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
