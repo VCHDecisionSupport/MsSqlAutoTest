@@ -22,12 +22,9 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspDataCompare (TestConfigID %i)'
-	RAISERROR(@fmt, 0, 1, @pTestConfigID) WITH NOWAIT;
+	RAISERROR('dbo.uspDataCompare (TestConfigID %i)', 0, 1, @pTestConfigID) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max) = ''
-	DECLARE @vsql varchar(max) = ''
 	DECLARE @param nvarchar(max) = ''
 	
 	-- set snap shot names
@@ -119,8 +116,8 @@ BEGIN
 
 	RAISERROR('cols: %s',0,1,@pColStr) WITH NOWAIT;
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
-	SET @vsql = CAST('' AS nvarchar(max))
-	SET @vsql = @vsql+'SELECT * 
+	SET @sql = CAST('' AS nvarchar(max))
+	SET @sql = @sql+'SELECT * 
 	FROM 
 	(
 		SELECT 
@@ -131,10 +128,10 @@ BEGIN
 			'+@pColStr+'
 		FROM AutoTest.SnapShot.'+@PostEtlSnapShotName+'
 	) gcwashere'
-	--PRINT @vsql
-	--RAISERROR(@vsql,0,1) WITH NOWAIT;
+	--PRINT @sql
+	--RAISERROR(@sql,0,1) WITH NOWAIT;
 	
-	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @vsql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
+	EXEC @RecordMatchRowCount=AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @sql, @pKeyColumns = '__hashkey__', @pDestTableName = @RecordMatchSnapShotName
 	IF @RecordMatchRowCount > 0
 	BEGIN
 		SET @param = '';

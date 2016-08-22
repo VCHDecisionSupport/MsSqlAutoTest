@@ -28,9 +28,8 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	RAISERROR('      uspCreateProfile: %s (@pTableProfileTypeID: %i)', 0, 1, @pTargetTableName, @pTableProfileTypeID) WITH NOWAIT;
+	RAISERROR('uspCreateProfile: %s (@pTableProfileTypeID: %i)', 0, 1, @pTargetTableName, @pTableProfileTypeID) WITH NOWAIT;
 	
-	DECLARE @vsql varchar(max);
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	-- objectID
@@ -82,8 +81,8 @@ BEGIN
 	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
 
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
-	SET @vsql = ''
-	SET @vsql = '
+	SET @sql = ''
+	SET @sql = '
 	INSERT INTO AutoTest.dbo.ColumnProfile 
 	(ColumnName, ColumnCount, TableProfileID, ColumnProfileTypeID)  
 	SELECT pvt.ColumnName, pvt.ColumnCount, '+CAST(@tableProfileID AS varchar)+' AS TableProfileID, '+CAST(@pColumnProfileTypeID AS varchar)+' AS ColumnProfileTypeID 
@@ -94,8 +93,8 @@ BEGIN
 		'+@cols+'
 	)) pvt
 	'
-	RAISERROR(@vsql, 0,0) WITH NOWAIT;
-	EXEC(@vsql);
+	RAISERROR(@sql, 0,0) WITH NOWAIT;
+	EXEC(@sql);
 --#endregion ColumnProfile
 
 --#region ColumnHistogram
