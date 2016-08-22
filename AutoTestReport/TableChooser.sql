@@ -4,7 +4,7 @@ DECLARE @PkgExecKey int = 313261;
 SELECT 
 	piv.TestDate
 	,piv.PkgName 
-	,piv.RegressionAgeDays 
+	,piv.RegressionTestAge 
 	,piv.PreEtlSourceObjectFullName
 	,piv.DatabaseName
 	,piv.ObjectSchemaName 
