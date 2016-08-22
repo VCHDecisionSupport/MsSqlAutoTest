@@ -63,7 +63,7 @@ BEGIN
 	RAISERROR( 'DQMF SetAuditPkgExecution (uspInitPkgRegression): The package name "%s" will be tested', 0, 1, @pPkgName )
     PRINT '' -- sometimes needed due to ssis bug
 	 -- gcwashere AutoTest...
-	 EXEC AutoTest.dbo.uspInitPkgRegression @pPkgExecKey = @pPkgExecKeyOut;
+	EXEC AutoTest.dbo.uspInitPkgRegression @pPkgExecKey = @pPkgExecKeyOut;
 END
 
 IF @pIsProcessStart = 0
@@ -74,9 +74,9 @@ BEGIN
            ,IsPackageSuccessful = @pIsPackageSuccessful
      WHERE PkgExecKey = @pPkgExecKey
 	 -- gcwashere AutoTest...
-	 RAISERROR( 'DQMF SetAuditPkgExecution (uspPkgRegressionTest): The package name "%s" will be tested', 0, 1, @pPkgName )
+	 RAISERROR('DQMF SetAuditPkgExecution (uspPkgRegressionTest): The package name "%s" will be tested', 0, 1, @pPkgName)
     PRINT '' -- sometimes needed due to ssis bug
-	 EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKey;
+	EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKey;
 END
 
 -- SELECT @pPkgExecKeyOut PkgExecKey

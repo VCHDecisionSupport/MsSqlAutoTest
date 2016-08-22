@@ -5,14 +5,14 @@
   DTS:CreationName="SSIS.Package.3"
   DTS:CreatorComputerName="PC030107"
   DTS:CreatorName="VCH\gcrowell"
-  DTS:DTSID="{649DBB61-7204-45D0-A813-4BBDEA7292D8}"
+  DTS:DTSID="{F86A1AEA-2711-4669-B681-D4A796212C75}"
   DTS:ExecutableType="SSIS.Package.3"
   DTS:LastModifiedProductVersion="11.0.5583.0"
   DTS:LocaleID="4105"
-  DTS:ObjectName="AutoTestTesting3"
+  DTS:ObjectName="AutoTestTesting"
   DTS:PackageType="5"
-  DTS:VersionBuild="37"
-  DTS:VersionGUID="{598B03C8-CC89-46EC-98BE-A8C3DFE429DF}">
+  DTS:VersionBuild="38"
+  DTS:VersionGUID="{70B2B60A-CF4F-42E6-A338-5E1D499B7E4A}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">6</DTS:Property>
   <DTS:ConnectionManagers>

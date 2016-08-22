@@ -28,7 +28,7 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	RAISERROR('uspCreateProfile: %s (@pTableProfileTypeID: %i)', 0, 1, @pTargetTableName, @pTableProfileTypeID) WITH NOWAIT;
+	RAISERROR('uspCreateProfile: %s (@pTableProfileTypeID: %i)', 0, 1, @pTargetTableName, @pTableProfileTypeID) WITH NOWAIT,LOG;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);

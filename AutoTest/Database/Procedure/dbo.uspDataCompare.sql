@@ -22,7 +22,7 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	RAISERROR('dbo.uspDataCompare (TestConfigID %i)', 0, 1, @pTestConfigID) WITH NOWAIT;
+	RAISERROR('uspDataCompare (TestConfigID %i)', 0, 1, @pTestConfigID) WITH NOWAIT,LOG;
 	
 	DECLARE @sql nvarchar(max) = ''
 	DECLARE @param nvarchar(max) = ''
@@ -243,17 +243,17 @@ SET @sql = @sql + '
 	WHERE 1=1
 	AND pre.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.'+@PreEtlKeyMisMatchSnapShotName+' AS rm
+		FROM AutoTest.SnapShot.'+@RecordMatchSnapShotName+' AS recordMatch
 	)
 	AND post.__hashkey__ NOT IN (
 		SELECT __hashkey__
-		FROM AutoTest.SnapShot.'+@PostEtlKeyMisMatchSnapShotName+' AS rm
+		FROM AutoTest.SnapShot.'+@RecordMatchSnapShotName+' AS recordMatch
 	)'
 	SELECT DATALENGTH(@sql) AS LEN_OF_KEY_MATCH_QUERY
 	SELECT @SQL AS [processing-instruction(x)] FOR XML PATH 
 	EXEC sp_executesql @stmt = @sql
 	SET @KeyMatchRowCount = @@ROWCOUNT
-	RAISERROR('    uspDataCompare->KeyMatch snap shot created (%i rows)',0,0,@KeyMatchRowCount);
+	RAISERROR('uspDataCompare->KeyMatch snap shot created (%i rows)',0,0,@KeyMatchRowCount);
 
 --#endregion SnapShot: Key Match
 

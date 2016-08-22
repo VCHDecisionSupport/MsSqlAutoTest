@@ -30,10 +30,7 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspDropSnapShot
-'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	RAISERROR('uspDropSnapShot', 0, 1) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);

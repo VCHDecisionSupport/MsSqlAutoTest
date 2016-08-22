@@ -34,7 +34,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='        dbo.uspGetColumnNames @pDatabaseName=''%s'', @pSchemaName=''%s'', @pObjectName=''%s'', @pFmt=''%s'', @pColStr=@pColStr OUT'
+	SELECT @fmt='dbo.uspGetColumnNames @pDatabaseName=''%s'', @pSchemaName=''%s'', @pObjectName=''%s'', @pFmt=''%s'', @pColStr=@pColStr OUT'
 	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName, @pFmt) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);

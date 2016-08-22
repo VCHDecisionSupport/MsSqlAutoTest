@@ -9,7 +9,7 @@ SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name)
 
 RAISERROR(@name, 0, 0) WITH NOWAIT;
 
-IF OBJECT_ID(@name,'P') IS NULL
+IF OBJECT_ID(@sql,'P') IS NULL
 BEGIN
 	EXEC(@sql);
 END
@@ -22,9 +22,7 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspPkgRegressionTest'
-	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+	RAISERROR('uspPkgRegressionTest(PkgExecKey %i)', 0, 1) WITH NOWAIT,LOG;
 	
 	DECLARE @sql nvarchar(max) = ''
 	DECLARE @param nvarchar(max) = ''

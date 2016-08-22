@@ -23,9 +23,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @rowcount int;
-	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspInitPkgRegression(PkgExecKey=%i)'
-	RAISERROR(@fmt, 0, 1, @pPkgExecKey) WITH NOWAIT;
+	RAISERROR('uspInitPkgRegression(PkgExecKey=%i)', 0, 1, @pPkgExecKey) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -89,6 +87,7 @@ DECLARE cur CURSOR
 	FROM AutoTest.dbo.TestConfig
 	WHERE PkgExecKey = @pPkgExecKey
 	AND PreEtlSourceObjectFullName IS NOT NULL
+	ORDER BY TestConfigID ASC
 
 	OPEN cur;
 
