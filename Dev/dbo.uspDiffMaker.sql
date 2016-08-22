@@ -12,7 +12,7 @@ SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name)
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
-	RAISERROR(@sql, 0, 0) WITH NOWAIT;
+	RAISERROR(@name, 0, 0) WITH NOWAIT;
 	EXEC(@sql);
 END
 GO
@@ -31,11 +31,16 @@ BEGIN
 uspDiffMaker: TableName: %s (diff percent per column: %i%%)', 0, 1, @pObjectName, @pPercentError) WITH NOWAIT;
 	DECLARE @sql varchar(max);
 	DECLARE @rowcount int;
-	DECLARE @pTableName varchar(500) = @pDatabaseName +'.'+ @pSchemaName +'.'+ @pObjectName
-SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) DELETE %s FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @pTableName);
+	DECLARE @pTableName varchar(500) = @pDatabaseName +'.'+ @pSchemaName +'.'+ @pObjectName;
+
+
+
+	SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) DELETE %s FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
+
+		EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName='rows deleted',@PercentAffected = @pPercentError, @RowAffected = @rowcount;
 		RAISERROR('
 	delete rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
 
@@ -56,14 +61,21 @@ EXEC dbo.uspGetColumnNames
 		RAISERROR('
 	@pColStr: %s', 0, 1, @cols) WITH NOWAIT;
 
-
 DECLARE columnCursor CURSOR
 FOR 
 SELECT item
-FROM dbo.strSplit(@cols, ',')
---ORDER BY NEWID()
+FROM dbo.strSplit(@cols, ',') AS csv;
 
-RAISERROR('im not here', 0, 1) WITH NOWAIT;
+SELECT TOP 10 item, typ.name
+FROM dbo.strSplit(@cols, ',') AS csv
+JOIN sys.columns AS col
+ON csv.Item = col.name
+JOIN sys.tables AS tab
+ON col.object_id = tab.object_id
+AND tab.name = @pObjectName
+JOIN sys.types AS typ
+ON typ.system_type_id = col.system_type_id
+ORDER BY NEWID()
 
 DECLARE @col_name varchar(100);
 
@@ -74,13 +86,15 @@ FETCH NEXT FROM columnCursor INTO @col_name;
 WHILE @@FETCH_STATUS = 0
 BEGIN
 	SELECT @col_name;
-	IF @col_name LIKE '%ID'-- AND @col_name NOT LIKE 'ETLAuditID'
+	IF @col_name LIKE '%ID' OR @col_name LIKE '%Key'
 	BEGIN
+		SET @pPercentError = FLOOR(RAND(123)*10)
 		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
-		RAISERROR('update %s rowcount: %i', 0, 1, @col_name, @rowcount) WITH NOWAIT;
+		EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName=@col_name,@PercentAffected = @pPercentError, @RowAffected = @rowcount;
+		RAISERROR('update %s rowcount: %i (%i)', 0, 1, @col_name, @rowcount, @pPercentError) WITH NOWAIT;
 	END
 
 	FETCH NEXT FROM columnCursor INTO @col_name;
@@ -95,20 +109,23 @@ END
 GO
 --#endregion CREATE/ALTER PROC
 
---USE [AutoTest]
+USE [AUTOTEST]
+GO
+
+
+DECLARE @pDatabaseName nvarchar(200) = 'Prod'
+DECLARE @pSchemaName nvarchar(200) = 'dbo'
+DECLARE @pObjectName nvarchar(200) = 'FactResellerSalesXL_CCI'
+DECLARE @pPercentError int
+
+-- TODO: Set parameter values here.
+
+EXECUTE [dbo].[uspDiffMaker] 
+  @pDatabaseName
+ ,@pSchemaName
+ ,@pObjectName
+ ,@pPercentError
+GO
 --GO
-
---DECLARE @pDatabaseName nvarchar(200) = 'CommunityMart'
---DECLARE @pSchemaName nvarchar(200) = 'dbo'
---DECLARE @pObjectName nvarchar(200) = 'ImmAdverseEventFact'
---DECLARE @pPercentError int
-
----- TODO: Set parameter values here.
-
---EXECUTE [dbo].[uspDiffMaker] 
---   @pDatabaseName
---  ,@pSchemaName
---  ,@pObjectName
---  ,@pPercentError
---GO
-
+--ALTER TABLE Prod.dbo.FactResellerSalesXL_CCI
+--ADD ETLAuditID int identity(1,1)

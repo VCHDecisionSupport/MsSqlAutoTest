@@ -1,18 +1,23 @@
+--CREATE DATABASE gcDev;
+
 USE AutoTest
 GO
 
 
-IF OBJECT_ID('dbo.Log') IS NOT NULL
+IF OBJECT_ID('dbo.LogDataDiff') IS NOT NULL
 BEGIN
-	PRINT 'DROP dbo.Log'
-	DROP TABLE dbo.Log
+	PRINT 'DROP dbo.LogDataDiff'
+	DROP TABLE dbo.LogDataDiff
 END
 GO
 
-PRINT 'CREATE TABLE dbo.Log'
-CREATE TABLE dbo.Log (
-	Message varchar(max)
-	,LogDate datetime
+PRINT 'CREATE TABLE dbo.LogDataDiff'
+CREATE TABLE dbo.LogDataDiff (
+	PkgExecKey int NULL
+	,TargetTableFullName varchar(500)
+	,TargetColumnName varchar(500) NULL
+	,PercentAffected int
+	,RowsAffected int
 );
 
 
@@ -35,7 +40,11 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspLog
-	@pMessage varchar(max)
+	@PkgExecKey int
+	,@TargetTableFullName varchar(500)
+	,@TargetColumnName varchar(500)
+	,@PercentAffected int
+	,@RowAffected int
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -48,14 +57,16 @@ BEGIN
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	
-	INSERT INTO AutoTest.dbo.Log VALUES(@pMessage,GETDATE());
+	INSERT INTO AutoTest.dbo.LogDataDiff (PkgExecKey, TargetTableFullName, TargetColumnName, PercentAffected,RowsAffected) VALUES(@PkgExecKey, @TargetTableFullName, @TargetColumnName, @PercentAffected,@RowAffected);
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspLog: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
-	--SELECT * FROM AutoTest.dbo.Log ORDER BY LogDate DESC;
+	--SELECT * FROM gcDev.dbo.LogDataDiff ORDER BY LogDate DESC;
 	RETURN(@runtime);
 
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspLog
 --EXEC dbo.uspLog @pMessage = 'testing123'
+SELECT *
+FROM LogDataDiff
