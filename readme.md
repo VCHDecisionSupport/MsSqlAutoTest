@@ -1,11 +1,14 @@
 # AutoTest
 
-Automated regression testing of the tables/views affected by an ETL execution.
+Automated regression testing for the tables/views affected by an ETL execution.
 
-SQL database consisting of procedures, functions, temporary snap shot tables, and logging tables.  
+Automate detection of expected and unexpected changes to content of tables and views by 
 
-Procedures are automatically executed  during normal ETL package/job execution [see attachment points section](###attachment-point)
-Configuration mostly automated by seperate SSI job that parses packages deployed to `msdb`
+- implemented with `AutoTest` database, procedures, functions, temporary snap shot tables, and logging tables [see AutoTest schema](www.nhl.com)
+- automatically executed during normal ETL package/job execution [see attachment points section](#attachment-point)
+- results summarized by SSRS reports [see Results section](#Results)
+- minimal change to existing warehouse structures [see Requirements section](#Requirements)
+- configuration mostly automated by seperate SSIS job that parses packages deployed to `msdb` [see Mapping Packages to Tables/Views](#mapping-packages-to-tablesviews)
 
 
 
@@ -15,7 +18,7 @@ Prior to ETL execution snap shots of views/tables are copied to `AutoTest.SnapSh
 
 
 
-## Requirements:
+## Requirements
 
 ### Comparison Key
 All fact tables have comparison/business key column meta data available from:
@@ -38,7 +41,7 @@ Other attachment point options:
     + can be done automattically/in-bulk with [`sp_add_job`](https://msdn.microsoft.com/en-us/library/ms182079.aspx) and [`sp_add_jobstep`](https://msdn.microsoft.com/en-ca/library/ms187358.aspx)
 
 
-### Mapping from ETL to affected data sets
+### Mapping Packages to Tables/Views
 
 see new table `DQMF.dbo.ETL_PackageObject`
 For each package/job a list of tables/views to be tested is required.  This mapping from attachment point to data object is specified by `DQMF.dbo.ETL_PackageObject`.  This table is also populated by a `C#` executable that walks the `msdb` folders and loads each package into memory using [the SSIS object model](https://msdn.microsoft.com/en-us/library/ms136025.aspx) to extract the destination tables of the data flow tasks contained in each package.  A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.

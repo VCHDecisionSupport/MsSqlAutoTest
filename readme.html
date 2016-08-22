@@ -11,10 +11,11 @@
 <div id="TOC">
 <ul>
 <li><a href="#autotest">AutoTest</a><ul>
-<li><a href="#requirements">Requirements:</a><ul>
+<li><a href="#implemenation">Implemenation</a></li>
+<li><a href="#requirements">Requirements</a><ul>
 <li><a href="#comparison-key">Comparison Key</a></li>
 <li><a href="#attachment-point">Attachment Point</a></li>
-<li><a href="#mapping-from-attachment-point-to-testable-data-objects-fact-viewstables">Mapping from attachment point to testable data objects (fact views/tables)</a></li>
+<li><a href="#mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</a></li>
 </ul></li>
 <li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
 <li><a href="#dbo.uspdatacompare"><code>dbo.uspDataCompare</code></a></li>
@@ -23,10 +24,21 @@
 <li><a href="#if-isprocessstart1">If <code>@IsProcessStart=1</code></a></li>
 <li><a href="#if-isprocessstart0">If <code>@IsProcessStart=0</code></a></li>
 </ul></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 <h1 id="autotest">AutoTest</h1>
-<h2 id="requirements">Requirements:</h2>
+<p>Automated regression testing for the tables/views affected by an ETL execution.</p>
+<ul>
+<li>implemented with <code>AutoTest</code> database, procedures, functions, temporary snap shot tables, and logging tables <a href="www.nhl.com">see AutoTest schema</a></li>
+<li>automatically executed during normal ETL package/job execution <a href="#attachment-point">see attachment points section</a></li>
+<li>results summarized by SSRS reports <a href="#Results">see Results section</a></li>
+<li>minimal change to existing warehouse structures <a href="#Requirements">see Requirements section</a></li>
+<li>configuration mostly automated by seperate SSIS job that parses packages deployed to <code>msdb</code> <a href="#mapping-packages-to-tablesviews">see Mapping Packages to Tables/Views</a></li>
+</ul>
+<h2 id="implemenation">Implemenation</h2>
+<p>Prior to ETL execution snap shots of views/tables are copied to <code>AutoTest.SnapShot</code> schema</p>
+<h2 id="requirements">Requirements</h2>
 <h3 id="comparison-key">Comparison Key</h3>
 <p>All fact tables have comparison/business key column meta data available from: 1. <code>DQMF.dbo.MD_ObjectAttribute.IsBusinessKey</code> - or 2. <code>DQMF.dbo.MD_Object.PKField</code> - or 3. physical primary key column Key column must include source system columns whose values that only change when business attribute(s) change</p>
 <h3 id="attachment-point">Attachment Point</h3>
@@ -46,10 +58,11 @@
 <li>As job step
 <ul>
 <li>1 step added at start and end</li>
-<li>be done automattically/in-bulk with <code>sp_jobaddstep</code></li>
+<li>can be done automattically/in-bulk with <a href="https://msdn.microsoft.com/en-us/library/ms182079.aspx"><code>sp_add_job</code></a> and <a href="https://msdn.microsoft.com/en-ca/library/ms187358.aspx"><code>sp_add_jobstep</code></a></li>
 </ul></li>
 </ul>
-<h3 id="mapping-from-attachment-point-to-testable-data-objects-fact-viewstables">Mapping from attachment point to testable data objects (fact views/tables)</h3>
+<h3 id="mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</h3>
+<p>see new table <code>DQMF.dbo.ETL_PackageObject</code> For each package/job a list of tables/views to be tested is required. This mapping from attachment point to data object is specified by <code>DQMF.dbo.ETL_PackageObject</code>. This table is also populated by a <code>C#</code> executable that walks the <code>msdb</code> folders and loads each package into memory using <a href="https://msdn.microsoft.com/en-us/library/ms136025.aspx">the SSIS object model</a> to extract the destination tables of the data flow tasks contained in each package. A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.</p>
 <ul>
 <li>All <code>DQMF_BizRule</code> rows include</li>
 </ul>
@@ -102,18 +115,9 @@
 <li>call <code>uspDataCompare</code></li>
 </ul></li>
 </ol>
-<!-- 
-
-
-        call `uspGetKey` to get key columns: look in:
-            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` sdfs
-            a. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` as
-            b. 1;lkj
-        2. dsaf
-    B. sdfs 
-
-
-
- -->
+<h1 id="references">References</h1>
+<p><a href="https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE">Case Study Regression Testing</a></p>
+<p><a href="http://www.agiledata.org/essays/databaseTesting.html">Regression Test Relational Database</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Regression_testing">Wikipedia: Regression Testing</a></p>
 </body>
 </html>
