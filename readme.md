@@ -93,7 +93,7 @@ call `uspPkgRegressionTest` with parameter `@PkgExecKey`
     - call `uspDataCompare`
 # AutoTest Schema Diagram
 
-![Alt text](/Documentation/AutoTest_Schema.svg?raw=true "Optional Title")
+![AutoTest_Schema](/Documentation/AutoTest_Schema.jpg?raw=true "AutoTest_Schema")
 # References
 
 [Case Study Regression Testing](https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE)
