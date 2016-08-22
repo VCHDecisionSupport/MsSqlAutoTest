@@ -24,11 +24,11 @@
 <li><a href="#if-isprocessstart1">If <code>@IsProcessStart=1</code></a></li>
 <li><a href="#if-isprocessstart0">If <code>@IsProcessStart=0</code></a></li>
 </ul></li>
-<li><a href="#references">References</a></li>
 </ul>
 </div>
 <h1 id="autotest">AutoTest</h1>
 <p>Automated regression testing for the tables/views affected by an ETL execution.</p>
+<p>Automate detection of expected and unexpected changes to content of tables and views by</p>
 <ul>
 <li>implemented with <code>AutoTest</code> database, procedures, functions, temporary snap shot tables, and logging tables <a href="www.nhl.com">see AutoTest schema</a></li>
 <li>automatically executed during normal ETL package/job execution <a href="#attachment-point">see attachment points section</a></li>
@@ -40,7 +40,11 @@
 <p>Prior to ETL execution snap shots of views/tables are copied to <code>AutoTest.SnapShot</code> schema</p>
 <h2 id="requirements">Requirements</h2>
 <h3 id="comparison-key">Comparison Key</h3>
-<p>All fact tables have comparison/business key column meta data available from: 1. <code>DQMF.dbo.MD_ObjectAttribute.IsBusinessKey</code> - or 2. <code>DQMF.dbo.MD_Object.PKField</code> - or 3. physical primary key column Key column must include source system columns whose values that only change when business attribute(s) change</p>
+<p>All fact tables have comparison/business key column meta data available from:</p>
+<pre><code>1. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` - or
+2. `DQMF.dbo.MD_Object.PKField` - or
+3. physical primary key column</code></pre>
+<p>Key column must include source system columns whose values that only change when business attribute(s) change</p>
 <h3 id="attachment-point">Attachment Point</h3>
 <h4 id="package-level-setauditpackageexecution">Package Level: <code>SetAuditPackageExecution</code></h4>
 <ul>
@@ -79,9 +83,9 @@
 <li>get row count and <code>INSERT INTO dbo.TableProfile</code></li>
 <li>get distinct count of each column, <code>UNPIVOT</code>, then <code>INSERT INTO dbo.ColumnProfile</code></li>
 <li>cursor on <code>dbo.ColumnProfile</code>
-<ol style="list-style-type: lower-alpha">
+<ul>
 <li>call <code>dbo.uspInsColumnHistogram</code> to <code>INSERT INTO dbo.ColumnHistogram</code></li>
-</ol></li>
+</ul></li>
 </ol>
 <h2 id="dbo.uspdatacompare"><code>dbo.uspDataCompare</code></h2>
 <ol style="list-style-type: decimal">
@@ -112,10 +116,10 @@
 <li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
 <ul>
 <li>call <code>uspCreateSnapShot</code> to <em>PostEtl</em> create snap shot of table with new column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
-<li>call <code>uspDataCompare</code></li>
+<li>call <code>uspDataCompare</code> # AutoTest Schema Diagram</li>
 </ul></li>
 </ol>
-<h1 id="references">References</h1>
+<p><img src="/Documentation/AutoTest_Schema.svg?raw=true" title="Optional Title" alt="Alt text" /> # References</p>
 <p><a href="https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE">Case Study Regression Testing</a></p>
 <p><a href="http://www.agiledata.org/essays/databaseTesting.html">Regression Test Relational Database</a></p>
 <p><a href="https://en.wikipedia.org/wiki/Regression_testing">Wikipedia: Regression Testing</a></p>

@@ -91,7 +91,9 @@ call `uspPkgRegressionTest` with parameter `@PkgExecKey`
 2. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
     - call `uspCreateSnapShot` to _PostEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema
     - call `uspDataCompare`
+# AutoTest Schema Diagram
 
+![Alt text](/Documentation/AutoTest_Schema.svg?raw=true "Optional Title")
 # References
 
 [Case Study Regression Testing](https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE)
