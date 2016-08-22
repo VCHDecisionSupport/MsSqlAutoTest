@@ -7,8 +7,10 @@ SELECT COUNT(*) AS PostEtl
 FROM AutoTest.SnapShot.PostETl_TestConfigID3
 SELECT COUNT(*) AS KeyMatch
 FROM AutoTest.SnapShot.KeyMatch_TestConfigID3
-SELECT COUNT(*) AS KeyMatch
+SELECT COUNT(*) AS PreEtlKeyMisMatch
 FROM AutoTest.SnapShot.PreEtlKeyMisMatch_TestConfigID3
+SELECT COUNT(*) AS PostEtlKeyMisMatch
+FROM AutoTest.SnapShot.PostEtlKeyMisMatch_TestConfigID3
 
 SELECT PreEtlSourceObjectFullName
 ,tprot.TableProfileTypeDesc
