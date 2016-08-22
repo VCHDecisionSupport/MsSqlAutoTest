@@ -40,9 +40,9 @@ uspDiffMaker: TableName: %s (diff percent per column: %i%%)', 0, 1, @pObjectName
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
 
-		EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName='rows deleted',@PercentAffected = @pPercentError, @RowAffected = @rowcount;
-		RAISERROR('
-	delete rowcount: %i', 0, 1, @rowcount) WITH NOWAIT;
+		--EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName='rows deleted',@PercentAffected = @pPercentError, @RowAffected = @rowcount;
+		RAISERROR('AutoTest uspDataDiff: delete %s rowcount: %i (%i)', 0, 1, @pTableName, @rowcount, @pPercentError) WITH NOWAIT, LOG;
+
 
 DECLARE @table TABLE (
 	ColumnName varchar(100)
@@ -88,13 +88,13 @@ BEGIN
 	SELECT @col_name;
 	IF @col_name LIKE '%ID' OR @col_name LIKE '%Key'
 	BEGIN
-		SET @pPercentError = FLOOR(RAND(123)*10)
+		--SET @pPercentError = FLOOR(RAND(123)*10)
 		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
 		RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql)
 		SET @rowcount = @@ROWCOUNT;
-		EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName=@col_name,@PercentAffected = @pPercentError, @RowAffected = @rowcount;
-		RAISERROR('update %s rowcount: %i (%i)', 0, 1, @col_name, @rowcount, @pPercentError) WITH NOWAIT;
+		--EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName=@col_name,@PercentAffected = @pPercentError, @RowAffected = @rowcount;
+		RAISERROR('AutoTest uspDataDiff: update %s.%s rowcount: %i (%i)', 0, 1, @pTableName, @col_name, @rowcount, @pPercentError) WITH NOWAIT, LOG;
 	END
 
 	FETCH NEXT FROM columnCursor INTO @col_name;
@@ -109,23 +109,23 @@ END
 GO
 --#endregion CREATE/ALTER PROC
 
-USE [AUTOTEST]
-GO
+-- USE [AUTOTEST]
+-- GO
 
 
-DECLARE @pDatabaseName nvarchar(200) = 'Prod'
-DECLARE @pSchemaName nvarchar(200) = 'dbo'
-DECLARE @pObjectName nvarchar(200) = 'FactResellerSalesXL_CCI'
-DECLARE @pPercentError int
+-- DECLARE @pDatabaseName nvarchar(200) = 'Prod'
+-- DECLARE @pSchemaName nvarchar(200) = 'dbo'
+-- DECLARE @pObjectName nvarchar(200) = 'FactResellerSalesXL_CCI'
+-- DECLARE @pPercentError int
 
--- TODO: Set parameter values here.
+-- -- TODO: Set parameter values here.
 
-EXECUTE [dbo].[uspDiffMaker] 
-  @pDatabaseName
- ,@pSchemaName
- ,@pObjectName
- ,@pPercentError
-GO
+-- EXECUTE [dbo].[uspDiffMaker] 
+--   @pDatabaseName
+--  ,@pSchemaName
+--  ,@pObjectName
+--  ,@pPercentError
+-- GO
 --GO
 --ALTER TABLE Prod.dbo.FactResellerSalesXL_CCI
 --ADD ETLAuditID int identity(1,1)

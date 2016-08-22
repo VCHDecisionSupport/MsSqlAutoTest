@@ -22,6 +22,7 @@ Prior to ETL execution snap shots of views/tables are copied to `AutoTest.SnapSh
 
 ### Comparison Key
 All fact tables have comparison/business key column meta data available from:
+
     1. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` - or
     2. `DQMF.dbo.MD_Object.PKField` - or
     3. physical primary key column
