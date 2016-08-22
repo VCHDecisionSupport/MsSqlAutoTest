@@ -47,8 +47,33 @@ Other attachment point options:
 see new table `DQMF.dbo.ETL_PackageObject`
 For each package/job a list of tables/views to be tested is required.  This mapping from attachment point to data object is specified by `DQMF.dbo.ETL_PackageObject`.  This table is also populated by a `C#` executable that walks the `msdb` folders and loads each package into memory using [the SSIS object model](https://msdn.microsoft.com/en-us/library/ms136025.aspx) to extract the destination tables of the data flow tasks contained in each package.  A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.
 
+# Procedures
 
-- All `DQMF_BizRule` rows include 
+## `dbo.uspInitPkgRegression`
+
+## `dbo.uspPkgRegressionTest`
+
+## `dbo.uspCreateSnapShot`
+__Parameters:__
+
+    @pQuery varchar(max),
+    @pKeyColumns varchar(max) = NULL,
+    @pHashKeyColumns varchar(max) = NULL,
+    @pDestDatabaseName varchar(100) = 'AutoTest',
+    @pDestSchemaName varchar(100) = 'SnapShot',
+    @pDestTableName varchar(100)
+
+- utility proc that creates a snap shot of the query
+- executes `SELECT` <given query> `INTO` <given destination table>
+- merges `@pHashKeyColumns` into single `HASHBYTES` column
+- drop destination table if it already exists
+- creates indexes on `@pKeyColumns and @pHashKeyColumns`
+
+- `@pQuery` simple query; alias allowed; `WITH`, `GO`, `;`, etc not allowed
+- `@pKeyColumns,@pHashKeyColumns` comma delimited list of column names
+- `@pDestDatabaseName.@pDestSchemaName.@pDestTableName` is snap shot table
+
+
 
 ## `dbo.uspCreateProfile`
 __Parameters:__
