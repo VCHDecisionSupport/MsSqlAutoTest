@@ -1,6 +1,6 @@
-DELETE DQMF.dbo.ETL_PackageObject;
+--DELETE DQMF.dbo.ETL_PackageObject;
 
-DECLARE @PkgName varchar(500) = 'AutoTestTesting3'
+DECLARE @PkgName varchar(500) = 'AutoTestTesting2'
 DECLARE @DatabaseName varchar(500) = 'HCRSMart'
 DECLARE @PackageID int = 333;
 DECLARE @DatabaseID int = 25;
@@ -28,19 +28,20 @@ AND PackageID = @PackageID
 
 
 ;WITH src AS (
-	SELECT TOP 5 *
+	SELECT TOP 10 *
 	FROM DQMF.dbo.MD_Object AS obj
 	WHERE 1=1
 	--AND obj.databaseid = @DatabaseID
-	--AND obj.databaseid = 25
 	AND obj.ObjectPurpose = 'Fact'
 	AND obj.ObjectPKField NOT LIKE 'ETLAuditId'
 	--AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
-	--AND ObjectID NOT IN (1261,1262)
+	AND obj.ObjectSchemaName != 'Secure'
+	AND obj.isactive = 1
 	AND obj.ObjectID IN (
 		SELECT ObjectID
 		FROM DQMF.dbo.MD_ObjectAttribute attr
 		WHERE attr.AttributePhysicalName = 'ETLAuditID'
+		AND attr.isactive = 1
 	)
 	ORDER BY NEWID()
 )
@@ -50,7 +51,7 @@ ON src.ObjectID = dest.ObjectID
 WHEN NOT MATCHED THEN INSERT 
 VALUES (@PackageID, src.ObjectID, @TestTypeID);
 
-SELECT db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, obj.ObjectID, db.DatabaseId, pkg.PkgID
+SELECT pkg.PkgName, db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, obj.ObjectID, db.DatabaseId, pkg.PkgID
 FROM DQMF.dbo.ETL_PackageObject map
 JOIN DQMF.dbo.MD_Object obj
 ON obj.ObjectID = map.OBjectID

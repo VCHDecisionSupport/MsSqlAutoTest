@@ -68,5 +68,5 @@ END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspLog
 --EXEC dbo.uspLog @pMessage = 'testing123'
-SELECT *
-FROM LogDataDiff
+
+

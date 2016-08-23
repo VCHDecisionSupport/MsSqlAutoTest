@@ -3,14 +3,30 @@ GO
 
 --#region get last PkgExecKey
 SELECT TOP 20 
-	pkg.PkgName
+	pkglog.PkgExecKey
+	,pkg.PkgName
+	,db.DatabaseName
+	,obj.ObjectSchemaName
+	,obj.ObjectPhysicalName
+	,tlog.TestConfigID
 	,*
 FROM DQMF.dbo.ETL_PackageObject AS pkgobj
 JOIN DQMF.dbo.ETL_Package AS pkg
 ON pkgobj.PackageID = pkg.PkgID
+JOIN DQMF.dbo.AuditPkgExecution AS pkglog
+ON pkg.PkgID = pkglog.PkgKey
+JOIN DQMF.dbo.MD_Object obj
+ON obj.ObjectID = pkgobj.OBjectID
+JOIN DQMF.dbo.MD_Database AS db
+ON obj.DatabaseID = db.DAtabaseID
+LEFT JOIN AutoTest.dbo.TestConfig AS tlog
+ON obj.ObjectID = tlog.ObjectID
+AND pkglog.PkgExecKey = tlog.PkgExecKey
+ORDER BY pkglog.PkgExecKey DESC
+
 --#endregion get last PkgExecKey
 
---#region SetAuditPkgExecution
+--#region SetAuditPkgExecution start
 IF 1=2
 BEGIN
 DECLARE @pPkgExecKeyout varchar(max);
@@ -25,14 +41,14 @@ EXEC DQMF.dbo.[SetAuditPkgExecution]
            ,@pPkgExecKeyout  = @pPkgExecKeyout   output
 END
 GO
---#endregion SetAuditPkgExecution
+--#endregion SetAuditPkgExecution start
 
 --#region SetAuditPkgExecution end
-IF 1=1
+IF 1=2
 BEGIN
 DECLARE @pPkgExecKeyout varchar(max);
 EXEC DQMF.dbo.[SetAuditPkgExecution]
-            @pPkgExecKey = 313260
+            @pPkgExecKey = 313271
            ,@pParentPkgExecKey = null
            ,@pPkgName = 'AutoTestTesting'
            ,@pPkgVersionMajor = 1
@@ -40,7 +56,7 @@ EXEC DQMF.dbo.[SetAuditPkgExecution]
            ,@pIsProcessStart  = 0
            ,@pIsPackageSuccessful  = 1
            ,@pPkgExecKeyout  = NULL
-SELECT 313260 AS PkgExecKey
+SELECT 313271 AS PkgExecKey
 END
 GO
 --#endregion SetAuditPkgExecution end
@@ -56,16 +72,13 @@ GO
 
 
 
---EXEC xp_ReadErrorLog 0, 1, N'this', N'is', '20160701', NULL, 'DESC'
+EXEC xp_ReadErrorLog 0, 1, N'AutoTest', N'usp', '20160701', NULL, 'DESC'
 
 
 --#region uspPkgRegressionTest
 IF 1=2
 BEGIN
-DECLARE @PkgExecKey int;
-SELECT @PkgExecKey=MAX(PkgExecKey) FROM AUtoTest.dbo.TestConfig;
-SELECT PkgExecKey, * FROM AUtoTest.dbo.TestConfig;
-EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313235
+EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = 313276
 END
 GO
 --#endregion uspPkgRegressionTest
@@ -173,10 +186,40 @@ GO
 IF 1=2
 BEGIN
 	EXEC AutoTest.dbo.uspDropSnapShot @pMaxSchemaSizeMB=0
-	DELETE AutoTest.dbo.TestConfig
-	DELETE AutoTest.dbo.TableProfile
-	DELETE AutoTest.dbo.ColumnProfile
 	DELETE AutoTest.dbo.ColumnHistogram
+	DELETE AutoTest.dbo.ColumnProfile
+	DELETE AutoTest.dbo.TableProfile
+	DELETE AutoTest.dbo.TestConfig
+	DELETE AutoTest.dbo.LogDataDiff
 END
 GO
 --#endregion clean
+
+--#region LogDataDiff
+IF 1=1
+BEGIN
+	SELECT * FROM AutoTest.dbo.LogDataDiff
+END
+--#endregion LogDataDiff
+
+
+--#region row counts
+IF 1=2
+BEGIN
+EXEC sp_MSforeachtable @command1 = '
+DECLARE @rcount int;
+DECLARE @tableName varchar(500);
+
+SET @tableNAme = ''%sHoNoSFact''
+
+IF OBJECT_SCHEMA_NAME(OBJECT_ID(''?'')) = ''SnapShot'' AND ''?'' LIKE ISNULL(@tableName, ''?'')
+BEGIN
+	SELECT @rcount=COUNT(*) FROM ?;
+	INSERT INTO ##tab VALUES (''?'', @rcount);
+END
+', @precommand = 'CREATE TABLE ##tab (
+	TableName varchar(200)
+	,rcount int
+);',@postcommand = 'SELECT * FROM ##tab order by rcount desc; DROP TABLE ##tab;'
+END
+--#endregoin row counts

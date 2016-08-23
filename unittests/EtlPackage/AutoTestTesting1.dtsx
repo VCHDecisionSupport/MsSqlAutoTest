@@ -5,14 +5,14 @@
   DTS:CreationName="SSIS.Package.3"
   DTS:CreatorComputerName="PC030107"
   DTS:CreatorName="VCH\gcrowell"
-  DTS:DTSID="{F86A1AEA-2711-4669-B681-D4A796212C75}"
+  DTS:DTSID="{BDDAC042-2ED7-438C-B692-9EABDC00E175}"
   DTS:ExecutableType="SSIS.Package.3"
   DTS:LastModifiedProductVersion="11.0.5583.0"
   DTS:LocaleID="4105"
-  DTS:ObjectName="AutoTestTesting"
+  DTS:ObjectName="AutoTestTesting1"
   DTS:PackageType="5"
-  DTS:VersionBuild="38"
-  DTS:VersionGUID="{70B2B60A-CF4F-42E6-A338-5E1D499B7E4A}">
+  DTS:VersionBuild="41"
+  DTS:VersionGUID="{1CB3969D-137A-4070-A4D2-70C4A53D0AB2}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">6</DTS:Property>
   <DTS:ConnectionManagers>
@@ -144,10 +144,10 @@
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{90BD5971-CE76-4488-BD07-955E337F2998}"
-          SQLTask:SqlStatementSource="--#region diff maker loop&#xA;DECLARE diffCursor CURSOR&#xA;FOR&#xA;SELECT db.databasename, obj.ObjectSchemaName, obj.ObjectPhysicalName&#xA;FROM DQMF.dbo.ETL_PackageObject AS pkg&#xA;JOIN DQMF.dbo.MD_Object obj&#xA;ON obj.ObjectID = pkg.OBjectID&#xA;JOIN DQMF.dbo.MD_Database db&#xA;ON obj.Databaseid = db.DatabaseId&#xA;WHERE pkg.PackageID = ?&#xA;&#xA;OPEN diffCursor;&#xA;&#xA;DECLARE @RC int&#xA;DECLARE @pDatabaseName nvarchar(200) = 'CommunityMart'&#xA;DECLARE @pSchemaName nvarchar(200) = 'dbo'&#xA;DECLARE @pObjectName nvarchar(200) = 'SchoolHistoryFact'&#xA;DECLARE @pPercentError int&#xA;&#xA;FETCH NEXT FROM diffCursor INTO @pDatabaseName, @pSchemaName, @pObjectName&#xA;&#xA;-- TODO: Set parameter values here.&#xA;WHILE @@FETCH_STATUS = 0&#xA;BEGIN&#xA;&#x9;PRINT @pDatabaseName;&#xA;&#x9;PRINT @pSchemaName;&#xA;&#x9;PRINT @pObjectName;&#xA;&#xA;&#x9;EXECUTE @RC = AutoTest.[dbo].[uspDiffMaker] &#xA;&#x9;   @pDatabaseName&#xA;&#x9;  ,@pSchemaName&#xA;&#x9;  ,@pObjectName&#xA;&#x9;  ,@pPercentError&#xA;&#x9;FETCH NEXT FROM diffCursor INTO @pDatabaseName, @pSchemaName, @pObjectName&#xA;&#xA;END&#xA;&#xA;CLOSE diffCursor&#xA;DEALLOCATE diffCursor;&#xA;--#endregion diff maker loop&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          SQLTask:SqlStatementSource="--#region diff maker loop&#xA;DECLARE @PkgExecKey int = ?&#xA;&#xA;DECLARE diffCursor CURSOR&#xA;FOR&#xA;SELECT PreEtlSnapShotName&#xA;FROM DQMF.dbo.AuditPkgExecution AS pkglog&#xA;JOIN AutoTest.dbo.TestConfig AS tlog&#xA;ON pkglog.PkgExecKey = tlog.PkgExecKey&#xA;WHERE 1=1&#xA;AND tlog.PkgExecKey=@PkgExecKey&#xA;&#xA;&#xA;OPEN diffCursor;&#xA;&#xA;DECLARE @RC int&#xA;DECLARE @pDatabaseName nvarchar(200) = 'AutoTest'&#xA;DECLARE @pSchemaName nvarchar(200) = 'SnapShot'&#xA;DECLARE @pObjectName nvarchar(200) = 'SchoolHistoryFact'&#xA;DECLARE @pPercentError int&#xA;&#xA;FETCH NEXT FROM diffCursor INTO @pObjectName&#xA;&#xA;-- TODO: Set parameter values here.&#xA;WHILE @@FETCH_STATUS = 0&#xA;BEGIN&#xA;&#x9;PRINT @pDatabaseName;&#xA;&#x9;PRINT @pSchemaName;&#xA;&#x9;PRINT @pObjectName;&#xA;&#xA;&#x9;EXECUTE @RC = AutoTest.[dbo].[uspDiffMaker] &#xA;&#x9;   @pDatabaseName&#xA;&#x9;  ,@pSchemaName&#xA;&#x9;  ,@pObjectName&#xA;&#x9;  ,@pPercentError&#xA;&#x9;FETCH NEXT FROM diffCursor INTO @pObjectName&#xA;&#xA;END&#xA;&#xA;CLOSE diffCursor&#xA;DEALLOCATE diffCursor;&#xA;--#endregion diff maker loop&#xA;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
           <SQLTask:ParameterBinding
             SQLTask:ParameterName="0"
-            SQLTask:DtsVariableName="User::PkgId"
+            SQLTask:DtsVariableName="User::BatchID"
             SQLTask:ParameterDirection="Input"
             SQLTask:DataType="3"
             SQLTask:ParameterSize="-1" />

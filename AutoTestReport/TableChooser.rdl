@@ -2,90 +2,6 @@
 <Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
   <AutoRefresh>0</AutoRefresh>
   <DataSets>
-    <DataSet Name="TableSummary">
-      <SharedDataSet>
-        <SharedDataSetReference>TableSummary</SharedDataSetReference>
-      </SharedDataSet>
-      <Fields>
-        <Field Name="TestDate">
-          <DataField>TestDate</DataField>
-          <rd:TypeName>System.DateTime</rd:TypeName>
-        </Field>
-        <Field Name="PkgName">
-          <DataField>PkgName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="RegressionAgeDays">
-          <DataField>RegressionAgeDays</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="DatabaseName">
-          <DataField>DatabaseName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="ObjectSchemaName">
-          <DataField>ObjectSchemaName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlSourceObjectFullName">
-          <DataField>PreEtlSourceObjectFullName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="ObjectPhysicalName">
-          <DataField>ObjectPhysicalName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="ObjectID">
-          <DataField>ObjectID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PkgExecKey">
-          <DataField>PkgExecKey</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="TestConfigID">
-          <DataField>TestConfigID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="RecordMatchTableProfile">
-          <DataField>RecordMatchTableProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="KeyMatchTableProfile">
-          <DataField>KeyMatchTableProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlKeyMisMatchTableProfile">
-          <DataField>PreEtlKeyMisMatchTableProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlKeyMisMatchTableProfile">
-          <DataField>PostEtlKeyMisMatchTableProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PreEtl_RecordCount">
-          <DataField>PreEtl_RecordCount</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PostEtl_RecordCount">
-          <DataField>PostEtl_RecordCount</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="KeyMatch_Count">
-          <DataField>KeyMatch_Count</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-      </Fields>
-      <Filters>
-        <Filter>
-          <FilterExpression>=Fields!PkgExecKey.Value</FilterExpression>
-          <Operator>Equal</Operator>
-          <FilterValues>
-            <FilterValue>=Parameters!PkgExecKey.Value</FilterValue>
-          </FilterValues>
-        </Filter>
-      </Filters>
-    </DataSet>
     <DataSet Name="TableChooser">
       <SharedDataSet>
         <SharedDataSetReference>TableChooser</SharedDataSetReference>
@@ -183,7 +99,7 @@
                 <TextRuns>
                   <TextRun>
                     <Label>Test Date</Label>
-                    <Value>=First(Fields!TestDate.Value, "TableSummary")</Value>
+                    <Value>=First(Fields!TestDate.Value, "TableChooser")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -194,7 +110,7 @@
             </Paragraphs>
             <rd:DefaultName>TestDate</rd:DefaultName>
             <Top>0.52599cm</Top>
-            <Left>4.60058cm</Left>
+            <Left>5.81734cm</Left>
             <Height>0.6cm</Height>
             <Width>13.79708cm</Width>
             <Style>
@@ -215,7 +131,7 @@
                 <TextRuns>
                   <TextRun>
                     <Label>Package Name</Label>
-                    <Value>=First(Fields!PkgName.Value, "TableSummary")</Value>
+                    <Value>=First(Fields!PkgName.Value, "TableChooser")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -226,7 +142,7 @@
             </Paragraphs>
             <rd:DefaultName>PkgName</rd:DefaultName>
             <Top>1.55787cm</Top>
-            <Left>4.60058cm</Left>
+            <Left>5.81734cm</Left>
             <Height>0.6cm</Height>
             <Width>13.79708cm</Width>
             <ZIndex>1</ZIndex>
@@ -248,7 +164,10 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Test Date:</Value>
-                    <Style />
+                    <Style>
+                      <FontSize>12pt</FontSize>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -258,7 +177,7 @@
             <Top>0.57891cm</Top>
             <Left>1.47849cm</Left>
             <Height>0.6cm</Height>
-            <Width>2.5cm</Width>
+            <Width>3.47896cm</Width>
             <ZIndex>2</ZIndex>
             <Style>
               <Border>
@@ -278,7 +197,10 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Package Name</Value>
-                    <Style />
+                    <Style>
+                      <FontSize>12pt</FontSize>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -288,7 +210,7 @@
             <Top>1.55787cm</Top>
             <Left>1.47849cm</Left>
             <Height>0.6cm</Height>
-            <Width>2.5cm</Width>
+            <Width>3.47896cm</Width>
             <ZIndex>3</ZIndex>
             <Style>
               <Border>
@@ -307,8 +229,9 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Label>Package Name</Label>
+                    <Label>PkgExecKey</Label>
                     <Value>=Parameters!PkgExecKey.Value</Value>
+                    <ToolTip>see DQMF.dbo.AuditPkgExecution</ToolTip>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -319,7 +242,7 @@
             </Paragraphs>
             <rd:DefaultName>PkgName</rd:DefaultName>
             <Top>2.44835cm</Top>
-            <Left>4.60058cm</Left>
+            <Left>5.81734cm</Left>
             <Height>0.6cm</Height>
             <Width>13.79708cm</Width>
             <ZIndex>4</ZIndex>
@@ -341,7 +264,10 @@
                 <TextRuns>
                   <TextRun>
                     <Value>PkgExecKey</Value>
-                    <Style />
+                    <Style>
+                      <FontSize>12pt</FontSize>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -351,7 +277,7 @@
             <Top>2.44835cm</Top>
             <Left>1.47849cm</Left>
             <Height>0.6cm</Height>
-            <Width>2.5cm</Width>
+            <Width>3.47896cm</Width>
             <ZIndex>5</ZIndex>
             <Style>
               <Border>
@@ -370,13 +296,16 @@
                   <Width>7.22281cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>4.33885cm</Width>
+                  <Width>3.69191cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>4.33885cm</Width>
+                  <Width>4.73572cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>4.33885cm</Width>
+                  <Width>4.94739cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>3.67739cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -393,13 +322,49 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>Object Physical Name</Value>
-                                  <Style />
+                                  <Style>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox73</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Test Config ID</Value>
+                                  <Style>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -423,7 +388,10 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>Pre Etl Record Count</Value>
-                                  <Style />
+                                  <Style>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
@@ -453,7 +421,10 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>Post Etl Record Count</Value>
-                                  <Style />
+                                  <Style>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
@@ -486,7 +457,10 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>Percent Change</Value>
-                                  <Style />
+                                  <Style>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
@@ -521,7 +495,11 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value>=Fields!ObjectPhysicalName.Value</Value>
-                                  <Style />
+                                  <Style>
+                                    <FontWeight>Bold</FontWeight>
+                                    <TextDecoration>Underline</TextDecoration>
+                                    <Color>Blue</Color>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
@@ -542,6 +520,7 @@
                               </Action>
                             </Actions>
                           </ActionInfo>
+                          <ToolTip>Click to drill into object details</ToolTip>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -554,6 +533,38 @@
                           </Style>
                         </Textbox>
                         <rd:Selected>true</rd:Selected>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="TestConfigID">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!TestConfigID.Value</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>TestConfigID</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -662,6 +673,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -678,7 +690,10 @@
                             <TextRuns>
                               <TextRun>
                                 <Value>Database Name</Value>
-                                <Style />
+                                <Style>
+                                  <FontSize>12pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
                               </TextRun>
                             </TextRuns>
                             <Style />
@@ -701,7 +716,7 @@
                   <TablixMembers>
                     <TablixMember>
                       <TablixHeader>
-                        <Size>4.33885cm</Size>
+                        <Size>5.00031cm</Size>
                         <CellContents>
                           <Textbox Name="Textbox77">
                             <CanGrow>true</CanGrow>
@@ -711,7 +726,10 @@
                                 <TextRuns>
                                   <TextRun>
                                     <Value>Object Schema Name</Value>
-                                    <Style />
+                                    <Style>
+                                      <FontSize>12pt</FontSize>
+                                      <FontWeight>Bold</FontWeight>
+                                    </Style>
                                   </TextRun>
                                 </TextRuns>
                                 <Style />
@@ -793,7 +811,7 @@
                         </SortExpression>
                       </SortExpressions>
                       <TablixHeader>
-                        <Size>4.33885cm</Size>
+                        <Size>5.00031cm</Size>
                         <CellContents>
                           <Textbox Name="ObjectSchemaName">
                             <CanGrow>true</CanGrow>
@@ -837,7 +855,7 @@
             <Top>4.01849cm</Top>
             <Left>1.47849cm</Left>
             <Height>1.2cm</Height>
-            <Width>28.91708cm</Width>
+            <Width>33.61439cm</Width>
             <ZIndex>6</ZIndex>
             <Style>
               <Border>
@@ -846,10 +864,10 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>3.04411in</Height>
+        <Height>2.95036in</Height>
         <Style />
       </Body>
-      <Width>13.42026in</Width>
+      <Width>15.28484in</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>

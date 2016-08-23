@@ -26,27 +26,18 @@ BEGIN
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	SET @pPercentError = ISNULL(@pPercentError, 1);
-	RAISERROR('
-uspDiffMaker: TableName: %s (diff percent per column: %i%%)', 0, 1, @pObjectName, @pPercentError) WITH NOWAIT;
+	SET @pPercentError = ISNULL(@pPercentError, FLOOR(RAND()*10));
+	DECLARE @pTableName varchar(500) = @pDatabaseName +'.'+ @pSchemaName +'.'+ @pObjectName;
 	DECLARE @sql varchar(max);
 	DECLARE @rowcount int;
-	DECLARE @pTableName varchar(500) = @pDatabaseName +'.'+ @pSchemaName +'.'+ @pObjectName;
 
+	SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT __hashkey__ FROM %s) DELETE %s FROM %s AS target JOIN cte ON target.__hashkey__ = cte.__hashkey__;',@pPercentError, @pTableName, @pTableName, @pTableName);
+	RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	EXEC(@sql)
+	SET @rowcount = @@ROWCOUNT;
+	EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName='DELETE ROWS',@PercentAffected = @pPercentError, @RowAffected = @rowcount;
+	RAISERROR('AutoTest uspDataDiff: delete %s rowcount: %i (%i)', 0, 1, @pTableName, @rowcount, @pPercentError) WITH NOWAIT, LOG;
 
-
-	SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) DELETE %s FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @pTableName);
-		RAISERROR(@sql, 0, 1) WITH NOWAIT;
-		EXEC(@sql)
-		SET @rowcount = @@ROWCOUNT;
-
-		--EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName='rows deleted',@PercentAffected = @pPercentError, @RowAffected = @rowcount;
-		RAISERROR('AutoTest uspDataDiff: delete %s rowcount: %i (%i)', 0, 1, @pTableName, @rowcount, @pPercentError) WITH NOWAIT, LOG;
-
-
-DECLARE @table TABLE (
-	ColumnName varchar(100)
-);
 
 DECLARE @cols varchar(max);
 
@@ -58,45 +49,49 @@ EXEC dbo.uspGetColumnNames
 	,@pColStr=@cols OUTPUT
 	,@pSkipPkHash = 1
 
-		RAISERROR('
-	@pColStr: %s', 0, 1, @cols) WITH NOWAIT;
+		-- RAISERROR('@pColStr: %s', 0, 1, @cols) WITH NOWAIT;
 
 DECLARE columnCursor CURSOR
 FOR 
 SELECT item
-FROM dbo.strSplit(@cols, ',') AS csv;
-
-SELECT TOP 10 item, typ.name
 FROM dbo.strSplit(@cols, ',') AS csv
-JOIN sys.columns AS col
-ON csv.Item = col.name
+JOIN sys.columns AS cols
+ON csv.Item = cols.name
 JOIN sys.tables AS tab
-ON col.object_id = tab.object_id
+ON cols.object_id = tab.object_id
 AND tab.name = @pObjectName
 JOIN sys.types AS typ
-ON typ.system_type_id = col.system_type_id
+ON typ.system_type_id = cols.system_type_id
+WHERE 1=1
+AND cols.is_identity = 0
+AND cols.name LIKE '%ID'
+AND typ.name IN ('int','bigint')
 ORDER BY NEWID()
 
-DECLARE @col_name varchar(100);
+DECLARE @col_name varchar(100),
+	@col_count int = 0,
+	@rand_col_count int = FLOOR(RAND()*4)
+
+RAISERROR('AutoTest uspDataDiff: %s update %i columns', 0, 1, @pObjectName, @rand_col_count) WITH NOWAIT, LOG;
 
 OPEN columnCursor;
 
 FETCH NEXT FROM columnCursor INTO @col_name;
-
+SET @rand_col_count = 0;
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	SELECT @col_name;
-	IF @col_name LIKE '%ID' OR @col_name LIKE '%Key'
+	IF @col_count < @rand_col_count
 	BEGIN
-		--SET @pPercentError = FLOOR(RAND(123)*10)
-		SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT ETLAuditID FROM %s) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.ETLAuditID = cte.ETLAuditID;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
-		RAISERROR(@sql, 0, 1) WITH NOWAIT;
-		EXEC(@sql)
-		SET @rowcount = @@ROWCOUNT;
-		--EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName=@col_name,@PercentAffected = @pPercentError, @RowAffected = @rowcount;
-		RAISERROR('AutoTest uspDataDiff: update %s.%s rowcount: %i (%i)', 0, 1, @pTableName, @col_name, @rowcount, @pPercentError) WITH NOWAIT, LOG;
+	SELECT @col_name;
+	SET @pPercentError = FLOOR(RAND()*10)
+	SET @sql = FORMATMESSAGE('WITH cte AS (SELECT TOP (%i) PERCENT __hashkey__ FROM %s) UPDATE %s SET %s = target.%s * - 1 FROM %s AS target JOIN cte ON target.__hashkey__ = cte.__hashkey__;',@pPercentError, @pTableName, @pTableName, @col_name, @col_name, @pTableName);
+	RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	EXEC(@sql)
+	SET @rowcount = @@ROWCOUNT;
+	EXEC dbo.uspLog @PkgExecKey = NULL, @TargetTableFullName = @pTableName, @TargetColumnName=@col_name,@PercentAffected = @pPercentError, @RowAffected = @rowcount;
+	RAISERROR('AutoTest uspDataDiff: update %s.%s rowcount: %i (%i)', 0, 1, @pTableName, @col_name, @rowcount, @pPercentError) WITH NOWAIT, LOG;
 	END
-
+	SET @col_count = @col_count + 1
 	FETCH NEXT FROM columnCursor INTO @col_name;
 END
 
@@ -109,23 +104,49 @@ END
 GO
 --#endregion CREATE/ALTER PROC
 
--- USE [AUTOTEST]
--- GO
 
 
--- DECLARE @pDatabaseName nvarchar(200) = 'Prod'
--- DECLARE @pSchemaName nvarchar(200) = 'dbo'
--- DECLARE @pObjectName nvarchar(200) = 'FactResellerSalesXL_CCI'
--- DECLARE @pPercentError int
+--#region diff maker loop
+DECLARE @PkgExecKey int = 313276
 
--- -- TODO: Set parameter values here.
+DECLARE diffCursor CURSOR
+FOR
+SELECT PreEtlSnapShotName
+FROM DQMF.dbo.AuditPkgExecution AS pkglog
+JOIN AutoTest.dbo.TestConfig AS tlog
+ON pkglog.PkgExecKey = tlog.PkgExecKey
+WHERE 1=1
+AND tlog.PkgExecKey=@PkgExecKey
 
--- EXECUTE [dbo].[uspDiffMaker] 
---   @pDatabaseName
---  ,@pSchemaName
---  ,@pObjectName
---  ,@pPercentError
--- GO
---GO
---ALTER TABLE Prod.dbo.FactResellerSalesXL_CCI
---ADD ETLAuditID int identity(1,1)
+
+
+OPEN diffCursor;
+
+DECLARE @RC int
+DECLARE @pDatabaseName nvarchar(200) = 'AutoTest'
+DECLARE @pSchemaName nvarchar(200) = 'SnapShot'
+DECLARE @pObjectName nvarchar(200) = 'SchoolHistoryFact'
+DECLARE @pPercentError int
+
+FETCH NEXT FROM diffCursor INTO @pObjectName
+
+-- TODO: Set parameter values here.
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	PRINT @pDatabaseName;
+	PRINT @pSchemaName;
+	PRINT @pObjectName;
+
+	EXECUTE @RC = AutoTest.[dbo].[uspDiffMaker] 
+	   @pDatabaseName
+	  ,@pSchemaName
+	  ,@pObjectName
+	  ,@pPercentError
+	FETCH NEXT FROM diffCursor INTO @pObjectName
+
+END
+
+CLOSE diffCursor
+DEALLOCATE diffCursor;
+--#endregion diff maker loop
+

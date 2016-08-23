@@ -6,7 +6,7 @@
       <CommandText>
 SELECT pkg.PkgName AS PackageName, map.PackageID
 ,CASE 
-WHEN DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()) = 1
+WHEN DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()) = 0
 	THEN FORMATMESSAGE('%i minutes', DATEDIFF(minute, MAX(tlog.TestDate), GETDATE()))
 WHEN DATEDIFF(day, MAX(tlog.TestDate), GETDATE()) = 0
 	THEN FORMATMESSAGE('%i hours', DATEDIFF(hour, MAX(tlog.TestDate), GETDATE()))

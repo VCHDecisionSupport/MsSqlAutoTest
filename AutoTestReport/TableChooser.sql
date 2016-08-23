@@ -1,4 +1,5 @@
-DECLARE @PkgExecKey int = 313267;
+DECLARE @PkgExecKey int = null;
+DECLARE @DatabaseID int;
 
 SELECT *
 	,CAST((1.*PostEtl_RecordCount/sub.PreEtl_RecordCount-1) AS decimal(10,8)) AS PercentChange
@@ -18,8 +19,8 @@ SELECT
 	,piv.KeyMatchTableProfile 
 	,piv.PreEtlKeyMisMatchTableProfile 
 	,piv.PostEtlKeyMisMatchTableProfile	
-	,ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PreEtlKeyMisMatchTableProfile,0) AS PreEtl_RecordCount
-	,ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PostEtlKeyMisMatchTableProfile,0) AS PostEtl_RecordCount
+	,CASE WHEN ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PreEtlKeyMisMatchTableProfile,0) = 0 THEN NULL ELSE ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PreEtlKeyMisMatchTableProfile,0) END AS PreEtl_RecordCount
+	,CASE WHEN ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PostEtlKeyMisMatchTableProfile,0) = 0 THEN NULL ELSE ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) + ISNULL(PostEtlKeyMisMatchTableProfile,0) END AS PostEtl_RecordCount
 	,ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) AS KeyMatch_Count
 FROM (
 SELECT tlog.PkgExecKey, pkg.PkgName ,tlog.TestConfigID, tlog.PreEtlSourceObjectFullName, db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, tlog.ObjectID, tpro.RecordCount, tlog.TestDate, 
@@ -32,6 +33,7 @@ ELSE FORMATMESSAGE('%i days', DATEDIFF(hour, tlog.TestDate, GETDATE()))
 END
  AS RegressionTestAge
 , tprot.TableProfileTypeDesc
+,db.DatabaseId
 FROM AutoTest.dbo.TestConfig AS tlog
 JOIN AutoTest.dbo.TestType AS tt
 ON tlog.TestTypeID = tt.TestTypeID
@@ -55,5 +57,7 @@ PIVOT
 	SUM(RecordCount) FOR TableProfileTypeDesc IN ([RecordMatchTableProfile], [KeyMatchTableProfile], [PreEtlKeyMisMatchTableProfile], [PostEtlKeyMisMatchTableProfile])
 ) AS piv
 WHERE 1=1
-AND piv.PkgExecKey= @PkgExecKey) sub
+AND piv.PkgExecKey= ISNULL(@PkgExecKey, piv.PkgExecKey)
+AND piv.DatabaseID= ISNULL(@DatabaseID, piv.DatabaseID)
+) sub
 ORDER BY sub.PkgExecKey DESC, sub.TestConfigID DESC
