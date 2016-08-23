@@ -17,6 +17,11 @@
 <li><a href="#attachment-point">Attachment Point</a></li>
 <li><a href="#mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</a></li>
 </ul></li>
+</ul></li>
+<li><a href="#procedures">Procedures</a><ul>
+<li><a href="#dbo.uspinitpkgregression"><code>dbo.uspInitPkgRegression</code></a></li>
+<li><a href="#dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></a></li>
+<li><a href="#dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></a></li>
 <li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
 <li><a href="#dbo.uspdatacompare"><code>dbo.uspDataCompare</code></a></li>
 </ul></li>
@@ -24,6 +29,8 @@
 <li><a href="#if-isprocessstart1">If <code>@IsProcessStart=1</code></a></li>
 <li><a href="#if-isprocessstart0">If <code>@IsProcessStart=0</code></a></li>
 </ul></li>
+<li><a href="#autotest-schema-diagram">AutoTest Schema Diagram</a></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 <h1 id="autotest">AutoTest</h1>
@@ -67,8 +74,29 @@
 </ul>
 <h3 id="mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</h3>
 <p>see new table <code>DQMF.dbo.ETL_PackageObject</code> For each package/job a list of tables/views to be tested is required. This mapping from attachment point to data object is specified by <code>DQMF.dbo.ETL_PackageObject</code>. This table is also populated by a <code>C#</code> executable that walks the <code>msdb</code> folders and loads each package into memory using <a href="https://msdn.microsoft.com/en-us/library/ms136025.aspx">the SSIS object model</a> to extract the destination tables of the data flow tasks contained in each package. A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.</p>
+<h1 id="procedures">Procedures</h1>
+<h2 id="dbo.uspinitpkgregression"><code>dbo.uspInitPkgRegression</code></h2>
+<p><strong>Parameters:</strong></p>
+<pre><code>@pPkgExecKey int</code></pre>
+<p>Called once per package execution from <code>DQMF.dbo.SetAuditPackageExecution</code>.</p>
+<h2 id="dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></h2>
+<h2 id="dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></h2>
+<p><strong>Parameters:</strong></p>
+<pre><code>@pQuery varchar(max),
+@pKeyColumns varchar(max) = NULL,
+@pHashKeyColumns varchar(max) = NULL,
+@pDestDatabaseName varchar(100) = &#39;AutoTest&#39;,
+@pDestSchemaName varchar(100) = &#39;SnapShot&#39;,
+@pDestTableName varchar(100)</code></pre>
 <ul>
-<li>All <code>DQMF_BizRule</code> rows include</li>
+<li>utility proc that creates a snap shot of the query</li>
+<li>executes <code>SELECT</code> <given query> <code>INTO</code> <given destination table></li>
+<li>merges <code>@pHashKeyColumns</code> into single <code>HASHBYTES</code> column</li>
+<li>drop destination table if it already exists</li>
+<li><p>creates indexes on <code>@pKeyColumns and @pHashKeyColumns</code></p></li>
+<li><code>@pQuery</code> simple query; alias allowed; <code>WITH</code>, <code>GO</code>, <code>;</code>, etc not allowed</li>
+<li><code>@pKeyColumns,@pHashKeyColumns</code> comma delimited list of column names</li>
+<li><p><code>@pDestDatabaseName.@pDestSchemaName.@pDestTableName</code> is snap shot table</p></li>
 </ul>
 <h2 id="dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></h2>
 <p><strong>Parameters:</strong></p>
@@ -101,25 +129,29 @@
 <h1 id="regression-testing-package-at-package-runtime">Regression Testing Package At Package Runtime</h1>
 <p><code>DQMF.dbo.SetAuditPackageExecution</code> is called at start/end of package</p>
 <h2 id="if-isprocessstart1">If <code>@IsProcessStart=1</code></h2>
-<p>call <code>AutoTest.dbo.uspInitPkgRegressionTest</code> with parameter <code>@PkgExecKey</code></p>
+<p>call <a href="#dbouspinitpkgregression"><code>AutoTest.dbo.uspInitPkgRegressionTest</code></a> with parameter <code>@PkgExecKey</code></p>
 <ol style="list-style-type: decimal">
-<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>AutoTest.dbo.TestConfig</code></li>
+<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>DQMF.dbo.ETL_PackageObject</code> mapping table for this <code>PkgID</code></li>
 <li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
 <ul>
-<li>call <code>uspCreateSnapShot</code> to <em>PreEtl</em> create snap shot of table with new column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
+<li>call <code>uspCreateSnapShot</code> to create <em>PreEtl</em> snap shot of table with added column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
 </ul></li>
 </ol>
 <h2 id="if-isprocessstart0">If <code>@IsProcessStart=0</code></h2>
 <p>call <code>uspPkgRegressionTest</code> with parameter <code>@PkgExecKey</code></p>
 <ol style="list-style-type: decimal">
-<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>AutoTest.dbo.TestConfig</code></li>
 <li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
 <ul>
-<li>call <code>uspCreateSnapShot</code> to <em>PostEtl</em> create snap shot of table with new column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
-<li>call <code>uspDataCompare</code> # AutoTest Schema Diagram</li>
+<li>call <code>uspCreateSnapShot</code> to <em>PostEtl</em> create snap shot of table with added column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
+<li>call <code>uspDataCompare</code></li>
 </ul></li>
 </ol>
-<p><img src="/Documentation/AutoTest_Schema.svg?raw=true" title="Optional Title" alt="Alt text" /> # References</p>
+<h1 id="autotest-schema-diagram">AutoTest Schema Diagram</h1>
+<div class="figure">
+<img src="/Documentation/AutoTest_Schema.jpg?raw=true" title="AutoTest_Schema" alt="AutoTest_Schema" />
+<p class="caption">AutoTest_Schema</p>
+</div>
+<h1 id="references">References</h1>
 <p><a href="https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE">Case Study Regression Testing</a></p>
 <p><a href="http://www.agiledata.org/essays/databaseTesting.html">Regression Test Relational Database</a></p>
 <p><a href="https://en.wikipedia.org/wiki/Regression_testing">Wikipedia: Regression Testing</a></p>

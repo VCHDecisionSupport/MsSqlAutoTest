@@ -50,6 +50,11 @@ For each package/job a list of tables/views to be tested is required.  This mapp
 # Procedures
 
 ## `dbo.uspInitPkgRegression`
+__Parameters:__
+
+    @pPkgExecKey int
+
+Called once per package execution from `DQMF.dbo.SetAuditPackageExecution`.
 
 ## `dbo.uspPkgRegressionTest`
 
@@ -103,18 +108,17 @@ __Parameters:__
 `DQMF.dbo.SetAuditPackageExecution` is called at start/end of package
 
 ## If `@IsProcessStart=1` 
-call `AutoTest.dbo.uspInitPkgRegressionTest` with parameter `@PkgExecKey` 
+call [`AutoTest.dbo.uspInitPkgRegressionTest`](#dbouspinitpkgregression) with parameter `@PkgExecKey` 
 
-1. populate `AutoTest.dbo.TestConfig` from `AutoTest.dbo.TestConfig`
+1. populate `AutoTest.dbo.TestConfig` from `DQMF.dbo.ETL_PackageObject` mapping table for this `PkgID`
 2. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
-    - call `uspCreateSnapShot` to _PreEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema 
+    - call `uspCreateSnapShot` to create _PreEtl_ snap shot of table with added column: `__pkhash__` in `AutoTest.SnapShot` schema 
 
 ## If `@IsProcessStart=0` 
 call `uspPkgRegressionTest` with parameter `@PkgExecKey` 
 
-1. populate `AutoTest.dbo.TestConfig` from `AutoTest.dbo.TestConfig`
-2. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
-    - call `uspCreateSnapShot` to _PostEtl_ create snap shot of table with new column: `__pkhash__` in `AutoTest.SnapShot` schema
+1. cursor on `AutoTest.dbo.TestConfig` for this `PkgExecKey`
+    - call `uspCreateSnapShot` to _PostEtl_ create snap shot of table with added column: `__pkhash__` in `AutoTest.SnapShot` schema
     - call `uspDataCompare`
 
 # AutoTest Schema Diagram
