@@ -14,6 +14,7 @@ BEGIN
 	EXEC(@sql);
 END
 GO
+ALTER PROC dbo.uspInitPkgRegressionTest
 	@pPkgExecKey int
 AS
 BEGIN
