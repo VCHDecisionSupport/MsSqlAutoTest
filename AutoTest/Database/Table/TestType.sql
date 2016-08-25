@@ -12,7 +12,8 @@ GO
 ALTER TABLE dbo.TestType ADD CONSTRAINT TestType_PK PRIMARY KEY CLUSTERED (TestTypeID)
 GO
 INSERT INTO dbo.TestType VALUES ('Not Tested')
-INSERT INTO dbo.TestType VALUES ('StandAloneProfile')
+INSERT INTO dbo.TestType VALUES ('RuntimeProfile')
 INSERT INTO dbo.TestType VALUES ('RuntimeRegressionTest')
-INSERT INTO dbo.TestType VALUES ('AdHocComparison')
+INSERT INTO dbo.TestType VALUES ('AdHocDataComparison')
+INSERT INTO dbo.TestType VALUES ('AdHocDataProfile')
 GO

@@ -49,8 +49,8 @@ BEGIN
 		,CASE 
 			-- RuntimeRegressionTest tables require snap shots:  PreEtlSourceObjectFullName stores fully qualified name of table to be snap shot
 			WHEN tt.TestTypeDesc = 'RuntimeRegressionTest' THEN db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName 
-			-- StandAloneProfile do not need snap shots
-			WHEN tt.TestTypeDesc = 'StandAloneProfile' THEN NULL
+			-- RuntimeProfile do not need snap shots
+			WHEN tt.TestTypeDesc = 'RuntimeProfile' THEN NULL
 			ELSE NULL
 		END
 		AS PreEtlSourceObjectFullName
@@ -129,7 +129,7 @@ DECLARE cur CURSOR
 	ON tconfig.TestTypeID = tt.TestTypeID
 	WHERE 1=1
 	AND tconfig.PkgExecKey = @pPkgExecKey	
-	AND tt.TestTypeDesc = 'StandAloneProfile'
+	AND tt.TestTypeDesc = 'RuntimeProfile'
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;

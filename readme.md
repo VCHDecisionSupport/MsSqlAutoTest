@@ -54,7 +54,7 @@ __Parameters:__
 
     @pPkgExecKey int
 
-Called once per package execution from `DQMF.dbo.SetAuditPackageExecution`.
+Called once per package execution from `DQMF.dbo.SetAuditPackageExecution` [see Regression Testing Package At Package Runtime section](#regression-testing-package-at-package-runtime)
 
 ## `dbo.uspPkgRegressionTest`
 

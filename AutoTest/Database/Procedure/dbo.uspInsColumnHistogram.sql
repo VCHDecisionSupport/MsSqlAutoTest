@@ -31,7 +31,7 @@ BEGIN
 	DECLARE @param nvarchar(max);
 	DECLARE @full_table_name varchar(200) = FORMATMESSAGE('%s.%s.%s',@pTargetDatabaseName,@pTargetSchemaName, @pTargetTableName)
 
-	SET @sql = FORMATMESSAGE('        uspInsColumnHistogram: @pColumnProfileID=%i  @pTargetTableName=%s  @pTargetColumnName=%s',@pColumnProfileID, @pTargetTableName, @pTargetColumnName)
+	SET @sql = FORMATMESSAGE('        uspInsColumnHistogram: @pColumnProfileID=%i  @pTargetTableName=''%s''  @pTargetColumnName=''%s'' @pColumnHistogramTypeID=%i',@pColumnProfileID, @pTargetTableName, @pTargetColumnName, @pColumnHistogramTypeID)
 	 RAISERROR(@sql,0,1) WITH NOWAIT;
 
 	SELECT @pSubQueryFilter = ISNULL(@pSubQueryFilter, '')
@@ -58,8 +58,9 @@ BEGIN
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, [ColumnValue], ValueCount, ColumnHistogramTypeID) VALUES (%i, ''%s'', %i, %i)',@pColumnProfileID, CAST(@columnValue AS varchar(200)), @valueCount, @pColumnHistogramTypeID)
-		 --RAISERROR(@sql, 0, 1) WITH NOWAIT;
+		SET @sql = FORMATMESSAGE('INSERT INTO AutoTest.dbo.ColumnHistogram (ColumnProfileID, ColumnValue, ValueCount, ColumnHistogramTypeID) VALUES (%i, ''%s'', %i, %i)',@pColumnProfileID, REPLACE(CAST(@columnValue AS varchar(200)),'''',''''''), @valueCount, @pColumnHistogramTypeID)
+
+		--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 		EXEC(@sql);
 		FETCH NEXT FROM valueCursor INTO @valueCount, @columnValue;
 	END
@@ -75,4 +76,4 @@ BEGIN
 	RETURN(@runtime);
 END
 GO
---EXEC dbo.uspInsColumnHistogram @pColumnProfileID=6,  @pTargetTableName='PreDR123AssessmentContactFactPkgExecKey312705',  @pTargetColumnName='UDFTable'
+--EXEC dbo.uspInsColumnHistogram @pColumnProfileID=80,  @pTargetTableName='PreEtl_TestConfigID975',  @pTargetColumnName='ReferralReasonDesc', @pColumnHistogramTypeID=1

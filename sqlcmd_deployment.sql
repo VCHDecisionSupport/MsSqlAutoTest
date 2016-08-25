@@ -13,14 +13,14 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
 :r $(pathvar)\AutoTest\Database\SCHEMA-SnapShot.sql
 
-:r $(pathvar)\AutoTest\Database\Table\ColumnHistogramType.sql
 :r $(pathvar)\AutoTest\Database\Table\ColumnHistogram.sql
-:r $(pathvar)\AutoTest\Database\Table\ColumnProfileType.sql
+:r $(pathvar)\AutoTest\Database\Table\ColumnHistogramType.sql
 :r $(pathvar)\AutoTest\Database\Table\ColumnProfile.sql
-:r $(pathvar)\AutoTest\Database\Table\TableProfileType.sql
+:r $(pathvar)\AutoTest\Database\Table\ColumnProfileType.sql
 :r $(pathvar)\AutoTest\Database\Table\TableProfile.sql
-:r $(pathvar)\AutoTest\Database\Table\TestType.sql
+:r $(pathvar)\AutoTest\Database\Table\TableProfileType.sql
 :r $(pathvar)\AutoTest\Database\Table\TestConfig.sql
+:r $(pathvar)\AutoTest\Database\Table\TestType.sql
 :r $(pathvar)\AutoTest\Database\Table\ForeignKeys.sql
 
 :r $(pathvar)\AutoTest\Database\Function\dbo.strSplit.sql
@@ -35,7 +35,8 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspInitPkgRegressionTest.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspPkgRegressionTest.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDataCompare.sql
+:r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDataProfile.sql
 
-:r $(pathvar)\dev\dbo.uspDiffMaker.sql
+-- :r $(pathvar)\unittests\dbo.uspDiffMaker.sql
 
 :r $(pathvar)\msdb\scripts\CREATE-Job.sql

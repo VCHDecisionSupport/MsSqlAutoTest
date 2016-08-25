@@ -82,7 +82,7 @@ AND db.DatabaseName = @pDatabaseNameIN
 AND obj.ObjectSchemaName = @pSchemaNameIN
 AND obj.ObjectPhysicalName = @pObjectNameIN
 ), Split AS (
-SELECT xapp.column_name FROM DQMF_PkField AS prev CROSS APPLY (SELECT Item AS column_name FROM dbo.strSplit(prev.ObjectPKField,'','')) xapp
+SELECT DISTINCT LTRIM(RTRIM(xapp.column_name)) AS column_name FROM DQMF_PkField AS prev CROSS APPLY (SELECT Item AS column_name FROM dbo.strSplit(prev.ObjectPKField,'','')) xapp
 )
 SELECT @pColStrOUT = SUBSTRING((
 SELECT REPLACE(''%s'', ''%s'',Split.column_name)
@@ -91,8 +91,11 @@ ORDER BY Split.column_name
 FOR XML PATH('''')),1,10000)
 '
 ,@pFmt,'%s')
+RAISERROR(@sql, 0, 1) WITH NOWAIT;
+
 EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
 END
+	RAISERROR('ObjectPKField %s',0,1, @pColStr)
 
 IF @pColStr IS NULL
 BEGIN
@@ -152,24 +155,24 @@ END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspGetColumnNames
 
---DECLARE @pDatabaseName varchar(100) = 'Prod'
---	,@pSchemaName varchar(100) = 'dbo'
---	,@pObjectName varchar(100) = 'FactInternetSalesReason'
---	,@pFmt varchar(max) = 'pre.%s,'
---	,@pColStr varchar(max)
+DECLARE @pDatabaseName varchar(100) = 'CommunityMart'
+	,@pSchemaName varchar(100) = 'Dim'
+	,@pObjectName varchar(100) = 'Dx'
+	,@pFmt varchar(max) = 'pre.%s,'
+	,@pColStr varchar(max)
 
 --SET @pFmt = ',pre_%s=pre.%s,post_%s=post.%s'
---EXEC dbo.uspGetKey 
---	@pDatabaseName
---	,@pSchemaName
---	,@pObjectName
---	,@pFmt = @pFmt
---	,@pColStr = @pColStr OUTPUT
+EXEC dbo.uspGetKey 
+	@pDatabaseName
+	,@pSchemaName
+	,@pObjectName
+	,@pFmt = @pFmt
+	,@pColStr = @pColStr OUTPUT
 
---SELECT @pColStr
---IF @pColStr IS NULL
---BEGIN 
---	PRINT 'null';
---END
+SELECT @pColStr
+IF @pColStr IS NULL
+BEGIN 
+	PRINT 'null';
+END
 
 

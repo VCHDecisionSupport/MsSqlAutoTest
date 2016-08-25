@@ -1,7 +1,7 @@
 --DELETE DQMF.dbo.ETL_PackageObject;
 
 DECLARE @PkgName varchar(500) = 'AutoTestTesting2'
-DECLARE @DatabaseName varchar(500) = 'HCRSMart'
+DECLARE @DatabaseName varchar(500) = 'CommunityMart'
 DECLARE @PackageID int = 333;
 DECLARE @DatabaseID int = 25;
 DECLARE @ObjectID int = 53085;
@@ -34,8 +34,9 @@ AND PackageID = @PackageID
 	--AND obj.databaseid = @DatabaseID
 	AND obj.ObjectPurpose = 'Fact'
 	AND obj.ObjectPKField NOT LIKE 'ETLAuditId'
-	--AND obj.ObjectPhysicalName = 'RaiHCAssessmentFact'
+	AND obj.ObjectPhysicalName = 'SchoolHistoryFact'
 	AND obj.ObjectSchemaName != 'Secure'
+	and obj.objectid = 53898
 	AND obj.isactive = 1
 	AND obj.ObjectID IN (
 		SELECT ObjectID

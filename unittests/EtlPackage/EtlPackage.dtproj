@@ -14,8 +14,8 @@
     <Manifest>
       <DTSPackages>
         <DtsPackage FormatVersion="6">
-          <Name>AutoTestTesting1.dtsx</Name>
-          <FullPath>AutoTestTesting1.dtsx</FullPath>
+          <Name>AutoTestTesting2.dtsx</Name>
+          <FullPath>AutoTestTesting2.dtsx</FullPath>
           <References />
         </DtsPackage>
       </DTSPackages>

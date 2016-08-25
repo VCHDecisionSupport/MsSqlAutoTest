@@ -9,7 +9,7 @@ SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name)
 
 RAISERROR(@name, 0, 0) WITH NOWAIT;
 
-IF OBJECT_ID(@sql,'P') IS NULL
+IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
 	EXEC(@sql);
 END
@@ -89,7 +89,7 @@ FETCH NEXT FROM reg_cur INTO @TestConfigID, @TestTypeDesc, @PreEtlSourceObjectFu
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-	IF @TestTypeDesc IN ('RuntimeRegressionTest', 'StandAloneProfile')
+	IF @TestTypeDesc IN ('RuntimeRegressionTest', 'RuntimeProfile')
 	BEGIN
 		SET @PostEtlSourceObjectTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
 		SET @PreEtlSourceObjectTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
@@ -100,7 +100,6 @@ BEGIN
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
 		-- SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
-
 	END
 	IF @TestTypeDesc IN ('RuntimeRegressionTest')
 	BEGIN
@@ -110,7 +109,7 @@ BEGIN
 		EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostEtlSnapShotName
 		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 	END
-	ELSE IF @TestTypeDesc IN ('StandAloneProfile')
+	ELSE IF @TestTypeDesc IN ('RuntimeProfile')
 	BEGIN
 		DECLARE @StandAloneTableProfileTypeID int;
 		DECLARE @StandAloneColumnProfileTypeID int;

@@ -11,7 +11,7 @@ CREATE TABLE dbo.TestConfig (
 	TestConfigID INT IDENTITY(1, 1) NOT NULL
 	,TestTypeID INT NOT NULL
 	,PreEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view
-	,PostEtlSourceObjectFullName varchar(200) NOT NULL -- fully qualified name of table/view same as above if Etl Regression Test (ie not AdHoc)
+	,PostEtlSourceObjectFullName varchar(200) NULL -- fully qualified name of table/view same as above if Etl Regression Test (ie not AdHoc)
 	,TestDate datetime NOT NULL
 	--,SnapShotBaseName varchar(200) NULL -- only null initially, suffix of names of tables in SnapShot schema
 	,SnapShotBaseName AS 'TestConfigID'+CAST(TestConfigID AS varchar)
