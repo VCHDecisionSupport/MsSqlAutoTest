@@ -19,7 +19,7 @@
 </ul></li>
 </ul></li>
 <li><a href="#procedures">Procedures</a><ul>
-<li><a href="#dbo.uspinitpkgregression"><code>dbo.uspInitPkgRegression</code></a></li>
+<li><a href="#dbo.uspInitPkgRegressionTest"><code>dbo.uspInitPkgRegressionTest</code></a></li>
 <li><a href="#dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></a></li>
 <li><a href="#dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></a></li>
 <li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
@@ -75,7 +75,7 @@
 <h3 id="mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</h3>
 <p>see new table <code>DQMF.dbo.ETL_PackageObject</code> For each package/job a list of tables/views to be tested is required. This mapping from attachment point to data object is specified by <code>DQMF.dbo.ETL_PackageObject</code>. This table is also populated by a <code>C#</code> executable that walks the <code>msdb</code> folders and loads each package into memory using <a href="https://msdn.microsoft.com/en-us/library/ms136025.aspx">the SSIS object model</a> to extract the destination tables of the data flow tasks contained in each package. A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.</p>
 <h1 id="procedures">Procedures</h1>
-<h2 id="dbo.uspinitpkgregression"><code>dbo.uspInitPkgRegression</code></h2>
+<h2 id="dbo.uspInitPkgRegressionTest"><code>dbo.uspInitPkgRegressionTest</code></h2>
 <p><strong>Parameters:</strong></p>
 <pre><code>@pPkgExecKey int</code></pre>
 <p>Called once per package execution from <code>DQMF.dbo.SetAuditPackageExecution</code>.</p>

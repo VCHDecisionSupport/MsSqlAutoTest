@@ -8,7 +8,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspAdHocDataProfile';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 0, 0) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 
 IF OBJECT_ID(@name,'P') IS NULL
@@ -62,8 +62,6 @@ BEGIN
 	SELECT @ColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
 	SELECT @ColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
 
-	SELECT @TestTypeID AS TestTypeID
-
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pDatabaseName, @pSchemaName, @pTableName)
 	
 	INSERT INTO AutoTest.dbo.TestConfig (
@@ -105,6 +103,8 @@ BEGIN
 	 	@pTableProfileTypeID = @TableProfileTypeID,
 	 	@pColumnProfileTypeID = @ColumnProfileTypeID,
 	 	@pColumnHistogramTypeID = @ColumnHistogramTypeID
+
+	EXEC dbo.uspDropSnapShot @pTestConfigID = @TestConfigID
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspAdHocDataProfile: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;

@@ -61,14 +61,14 @@ END
 GO
 --#endregion SetAuditPkgExecution end
 
---#region uspInitPkgRegression
+--#region uspInitPkgRegressionTest
 IF 1=2
 BEGIN
-EXEC dbo.uspInitPkgRegression @pPkgExecKey = 313235
+EXEC dbo.uspInitPkgRegressionTest @pPkgExecKey = 313235
 DEClaRE @pPkgExecKeyout  bigint
 END
 GO
---#endregion uspInitPkgRegression
+--#endregion uspInitPkgRegressionTest
 
 
 

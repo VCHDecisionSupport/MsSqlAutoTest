@@ -88,4 +88,4 @@ BEGIN
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspAdHocDatabaseProfile
-EXEC dbo.uspAdHocDatabaseProfile
+-- EXEC dbo.uspAdHocDatabaseProfile

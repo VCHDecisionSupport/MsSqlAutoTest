@@ -7,7 +7,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspCreateProfile';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 0, 0) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
@@ -78,7 +78,7 @@ BEGIN
 	,@pSkipPkHash = 1
 	--RAISERROR(@cols, 0,0) WITH NOWAIT;
 		
-	DECLARE @FullTargetTableName varchar(300) = 'AutoTest.SnapShot.'+@pTargetTableName
+	DECLARE @FullTargetTableName varchar(300) = @pTargetDatabaseName+'.'+@pTargetSchemaName+'.'+@pTargetTableName
 
 	-- nvarchar(max) too small too hold query so can't use FORMATMESSAGE; use REPLACE to keep query string in varchar(max)
 	SET @sql = ''

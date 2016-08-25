@@ -7,7 +7,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspCreateQuerySnapShot';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 0, 1) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN

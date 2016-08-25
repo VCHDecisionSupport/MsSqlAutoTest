@@ -7,7 +7,7 @@ DECLARE @sql nvarchar(max);
 SET @name = 'dbo.uspGetKey';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 0, 0) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
@@ -26,14 +26,14 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspGetKey(%s.%s.%s)'
-	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName) WITH NOWAIT;
+	SET @pFmt = ISNULL(@pFmt, ',%s')
+	SELECT @fmt='dbo.uspGetKey(%s.%s.%s; @pFmt = ''%s'')'
+	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pObjectName, @pFmt) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 	
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
-	SET @pFmt = ISNULL(@pFmt, ',%s')
 	--RAISERROR(@pFmt, 0, 1) WITH NOWAIT;
 
 	SET @param = '
@@ -73,16 +73,21 @@ BEGIN
 
 SET @sql = FORMATMESSAGE('
 ;WITH DQMF_PkField AS (
-SELECT DISTINCT obj.ObjectPKField
-FROM DQMF.dbo.MD_Database AS db
-JOIN DQMF.dbo.MD_Object AS obj
-ON db.DatabaseId = db.DatabaseId
-WHERE 1=1
-AND db.DatabaseName = @pDatabaseNameIN
-AND obj.ObjectSchemaName = @pSchemaNameIN
-AND obj.ObjectPhysicalName = @pObjectNameIN
+	SELECT DISTINCT obj.ObjectPKField
+	FROM DQMF.dbo.MD_Database AS db
+	JOIN DQMF.dbo.MD_Object AS obj
+	ON db.DatabaseId = db.DatabaseId
+	WHERE 1=1
+	AND db.DatabaseName = @pDatabaseNameIN
+	AND obj.ObjectSchemaName = @pSchemaNameIN
+	AND obj.ObjectPhysicalName = @pObjectNameIN
 ), Split AS (
-SELECT DISTINCT LTRIM(RTRIM(xapp.column_name)) AS column_name FROM DQMF_PkField AS prev CROSS APPLY (SELECT Item AS column_name FROM dbo.strSplit(prev.ObjectPKField,'','')) xapp
+	SELECT DISTINCT LTRIM(RTRIM(xapp.column_name)) AS column_name 
+	FROM DQMF_PkField AS prev 
+	CROSS APPLY 
+	(
+		SELECT Item AS column_name FROM dbo.strSplit(prev.ObjectPKField,'','')
+	) xapp
 )
 SELECT @pColStrOUT = SUBSTRING((
 SELECT REPLACE(''%s'', ''%s'',Split.column_name)
@@ -91,13 +96,13 @@ ORDER BY Split.column_name
 FOR XML PATH('''')),1,10000)
 '
 ,@pFmt,'%s')
-RAISERROR(@sql, 0, 1) WITH NOWAIT;
+--RAISERROR(@sql, 0, 1) WITH NOWAIT;
 
 EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
 END
-	RAISERROR('ObjectPKField %s',0,1, @pColStr)
+	--RAISERROR('ObjectPKField %s',0,1, @pColStr)
 
-IF @pColStr IS NULL
+IF @pColStr IS NULL OR @pColStr = REPLACE(@pFmt,'%s','')
 BEGIN
 	RAISERROR('No ObjectPKField set in DQMF.dbo.MD_Object',0,1)
 	SET @param = '
@@ -155,24 +160,26 @@ END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspGetColumnNames
 
-DECLARE @pDatabaseName varchar(100) = 'CommunityMart'
-	,@pSchemaName varchar(100) = 'Dim'
-	,@pObjectName varchar(100) = 'Dx'
-	,@pFmt varchar(max) = 'pre.%s,'
-	,@pColStr varchar(max)
+--DECLARE @pDatabaseName varchar(100) = 'CommunityMart'
+--	,@pSchemaName varchar(100) = 'EMR'
+--	,@pObjectName varchar(100) = 'vwAppointment'
+--	,@pFmt varchar(max) = 'pre.%s,'
+--	,@pColStr varchar(max)
 
 --SET @pFmt = ',pre_%s=pre.%s,post_%s=post.%s'
-EXEC dbo.uspGetKey 
-	@pDatabaseName
-	,@pSchemaName
-	,@pObjectName
-	,@pFmt = @pFmt
-	,@pColStr = @pColStr OUTPUT
+----SET @pSchemaName = 'dbo'
+----SET @pObjectName = 'SchoolHistoryFact'
+--EXEC dbo.uspGetKey 
+--	@pDatabaseName
+--	,@pSchemaName
+--	,@pObjectName
+--	,@pFmt = @pFmt
+--	,@pColStr = @pColStr OUTPUT
 
-SELECT @pColStr
-IF @pColStr IS NULL
-BEGIN 
-	PRINT 'null';
-END
+--SELECT @pColStr
+--IF @pColStr IS NULL
+--BEGIN 
+--	PRINT 'null';
+--END
 
 

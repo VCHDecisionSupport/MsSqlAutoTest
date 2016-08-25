@@ -4,17 +4,16 @@ GO
 DECLARE @name nvarchar(max);
 DECLARE @sql nvarchar(max);
 
-SET @name = 'dbo.uspInitPkgRegression';
+SET @name = 'dbo.uspInitPkgRegressionTest';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
-RAISERROR(@name, 0, 0) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 
 IF OBJECT_ID(@name,'P') IS NULL
 BEGIN
 	EXEC(@sql);
 END
 GO
-ALTER PROC dbo.uspInitPkgRegression
 	@pPkgExecKey int
 AS
 BEGIN
@@ -23,7 +22,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @rowcount int;
-	RAISERROR('uspInitPkgRegression(PkgExecKey=%i)', 0, 1, @pPkgExecKey) WITH NOWAIT;
+	RAISERROR('uspInitPkgRegressionTest(PkgExecKey=%i)', 0, 1, @pPkgExecKey) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -132,7 +131,7 @@ DECLARE cur CURSOR
 	AND tt.TestTypeDesc = 'RuntimeProfile'
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspInitPkgRegression: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;
+	RAISERROR('!dbo.uspInitPkgRegressionTest: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;
 	RETURN(@runtime);
 
 END

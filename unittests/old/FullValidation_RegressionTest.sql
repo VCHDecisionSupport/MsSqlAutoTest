@@ -37,7 +37,7 @@ EXECUTE DQMF.[dbo].[SetAuditPkgExecution]
   ,@pIsPackageSuccessful
   ,@pPkgExecKeyOut OUTPUT
 
---EXEC AutoTest.dbo.uspInitPkgRegression @pPkgExecKey = @pPkgExecKeyOut
+--EXEC AutoTest.dbo.uspInitPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut
 
 --SET @pPkgExecKeyOut = 313200
 EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut

@@ -36,6 +36,7 @@ RAISERROR('@path = $(pathvar) = %s
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspPkgRegressionTest.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDataCompare.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDataProfile.sql
+:r $(pathvar)\AutoTest\Database\Procedure\dbo.uspAdHocDatabaseProfile.sql
 
 -- :r $(pathvar)\unittests\dbo.uspDiffMaker.sql
 

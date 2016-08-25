@@ -12,7 +12,7 @@ DECLARE @name nvarchar(max);
 DECLARE @sql nvarchar(max);
 
 SET @name = 'dbo.SetAuditPkgExecution';
-RAISERROR(@name, 0, 0) WITH NOWAIT;
+RAISERROR(@name, 1, 1) WITH NOWAIT;
 GO
 
 ALTER PROCEDURE  [dbo].[SetAuditPkgExecution]
@@ -60,10 +60,10 @@ BEGIN
       WHERE PkgName = @pPkgName
 
     SET @pPkgExecKeyOut = @@IDENTITY
-	RAISERROR( 'DQMF SetAuditPkgExecution (uspInitPkgRegression): The package name "%s" will be tested', 0, 1, @pPkgName )
+	RAISERROR( 'DQMF SetAuditPkgExecution (uspInitPkgRegressionTest): The package name "%s" will be tested', 0, 1, @pPkgName )
     PRINT '' -- sometimes needed due to ssis bug
 	 -- gcwashere AutoTest...
-	EXEC AutoTest.dbo.uspInitPkgRegression @pPkgExecKey = @pPkgExecKeyOut;
+	EXEC AutoTest.dbo.uspInitPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut;
 END
 
 IF @pIsProcessStart = 0

@@ -49,7 +49,7 @@ For each package/job a list of tables/views to be tested is required.  This mapp
 
 # Procedures
 
-## `dbo.uspInitPkgRegression`
+## `dbo.uspInitPkgRegressionTest`
 __Parameters:__
 
     @pPkgExecKey int
