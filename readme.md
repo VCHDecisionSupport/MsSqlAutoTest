@@ -30,10 +30,12 @@ Key column must include source system columns whose values that only change when
 
 ### Attachment Point
 #### Package Level: `SetAuditPackageExecution`
+Current implementation of `AutoTest` uses SSIS Packages as attachment points.
+
 - All packages (including child packages) call `SetAuditPackageExecution`
     + this implies requirement that all packages exist in `DQMF.dbo.ETL_Package` (in all instances)
 
-Other attachment point options:
+Other potiential attachment point options:
 
 - As automatic DQMF stage?
     + pre/post processing?
