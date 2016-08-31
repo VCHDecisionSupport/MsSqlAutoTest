@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+<Report MustUnderstand="df" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:df="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition/defaultfontfamily">
+  <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
   <DataSets>
-    <DataSet Name="ColumnChooser">
+    <DataSet Name="ColumnChooser2">
       <SharedDataSet>
-        <SharedDataSetReference>ColumnChooser</SharedDataSetReference>
+        <SharedDataSetReference>ColumnChooser2</SharedDataSetReference>
         <QueryParameters>
           <QueryParameter Name="@TestConfigID">
             <Value>=Parameters!TestConfigID.Value</Value>
@@ -12,99 +13,79 @@
         </QueryParameters>
       </SharedDataSet>
       <Fields>
+        <Field Name="ColumnName">
+          <DataField>ColumnName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="RecordMatch">
+          <DataField>RecordMatch</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="KeyMatchValueMatch">
+          <DataField>KeyMatchValueMatch</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="KeyMatchValueMisMatch">
+          <DataField>KeyMatchValueMisMatch</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="NewRecord">
+          <DataField>NewRecord</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="DeletedRecord">
+          <DataField>DeletedRecord</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="AllTableChooser">
+      <SharedDataSet>
+        <SharedDataSetReference>AllTableChooser</SharedDataSetReference>
+      </SharedDataSet>
+      <Fields>
+        <Field Name="PkgName">
+          <DataField>PkgName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Database">
+          <DataField>Database</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Schema">
+          <DataField>Schema</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Table">
+          <DataField>Table</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
         <Field Name="TestConfigID">
           <DataField>TestConfigID</DataField>
           <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
-        <Field Name="TestTypeID">
-          <DataField>TestTypeID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlSourceObjectFullName">
-          <DataField>PreEtlSourceObjectFullName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlSourceObjectFullName">
-          <DataField>PostEtlSourceObjectFullName</DataField>
+        <Field Name="PrettyLastTestDate">
+          <DataField>PrettyLastTestDate</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="TestDate">
           <DataField>TestDate</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
-        <Field Name="SnapShotBaseName">
-          <DataField>SnapShotBaseName</DataField>
+        <Field Name="TestTypeDesc">
+          <DataField>TestTypeDesc</DataField>
           <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlSnapShotName">
-          <DataField>PreEtlSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlSnapShotName">
-          <DataField>PostEtlSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="RecordMatchSnapShotName">
-          <DataField>RecordMatchSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlKeyMisMatchSnapShotName">
-          <DataField>PreEtlKeyMisMatchSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlKeyMisMatchSnapShotName">
-          <DataField>PostEtlKeyMisMatchSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="KeyMatchSnapShotName">
-          <DataField>KeyMatchSnapShotName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="ObjectID">
-          <DataField>ObjectID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PkgExecKey">
-          <DataField>PkgExecKey</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlSnapShotCreationElapsedSeconds">
-          <DataField>PreEtlSnapShotCreationElapsedSeconds</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlSnapShotCreationElapsedSeconds">
-          <DataField>PostEtlSnapShotCreationElapsedSeconds</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="ComparisonRuntimeSeconds">
-          <DataField>ComparisonRuntimeSeconds</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="ColumnName">
-          <DataField>ColumnName</DataField>
-          <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="KeyMatchValueMatchColumnProfile">
-          <DataField>KeyMatchValueMatchColumnProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="KeyMatchValueMisMatchColumnProfile">
-          <DataField>KeyMatchValueMisMatchColumnProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PostEtlKeyMisMatchColumnProfile">
-          <DataField>PostEtlKeyMisMatchColumnProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="PreEtlKeyMisMatchColumnProfile">
-          <DataField>PreEtlKeyMisMatchColumnProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="RecordMatchColumnProfile">
-          <DataField>RecordMatchColumnProfile</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
       </Fields>
+      <Filters>
+        <Filter>
+          <FilterExpression>=Fields!TestConfigID.Value</FilterExpression>
+          <Operator>Equal</Operator>
+          <FilterValues>
+            <FilterValue DataType="Integer">=Parameters!TestConfigID.Value</FilterValue>
+          </FilterValues>
+        </Filter>
+      </Filters>
     </DataSet>
   </DataSets>
   <ReportSections>
@@ -115,13 +96,13 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>7.58cm</Width>
+                  <Width>7.07729cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>7.58cm</Width>
+                  <Width>2.5cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>7.58cm</Width>
+                  <Width>2.5cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.5cm</Width>
@@ -169,21 +150,21 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox3">
+                        <Textbox Name="Textbox15">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Key Match Value Match Column Profile</Value>
+                                  <Value>Deleted Record</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox3</rd:DefaultName>
+                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -206,7 +187,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Key Match Value Mis Match Column Profile</Value>
+                                  <Value>Record Match</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -229,21 +210,21 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox10">
+                        <Textbox Name="Textbox7">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Post Etl Key Mis Match Column Profile</Value>
+                                  <Value>Key Match Value Match</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox10</rd:DefaultName>
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -259,21 +240,21 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox12">
+                        <Textbox Name="Textbox13">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Pre Etl Key Mis Match Column Profile</Value>
+                                  <Value>Key Match Value Mis Match</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox12</rd:DefaultName>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -289,21 +270,21 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox14">
+                        <Textbox Name="Textbox11">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Record Match Column Profile</Value>
+                                  <Value>New Record</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox14</rd:DefaultName>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -354,21 +335,23 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="KeyMatchValueMatchColumnProfile">
+                        <Textbox Name="DeletedRecord">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!KeyMatchValueMatchColumnProfile.Value</Value>
-                                  <Style />
+                                  <Value>=Fields!DeletedRecord.Value</Value>
+                                  <Style>
+                                    <Format>#,0;(#,0)</Format>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>KeyMatchValueMatchColumnProfile</rd:DefaultName>
+                          <rd:DefaultName>DeletedRecord</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -384,21 +367,23 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="KeyMatchValueMisMatchColumnProfile">
+                        <Textbox Name="RecordMatch">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!KeyMatchValueMisMatchColumnProfile.Value</Value>
-                                  <Style />
+                                  <Value>=Fields!RecordMatch.Value</Value>
+                                  <Style>
+                                    <Format>#,0;(#,0)</Format>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>KeyMatchValueMisMatchColumnProfile</rd:DefaultName>
+                          <rd:DefaultName>RecordMatch</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -414,21 +399,23 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="PostEtlKeyMisMatchColumnProfile">
+                        <Textbox Name="KeyMatchValueMatch">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!PostEtlKeyMisMatchColumnProfile.Value</Value>
-                                  <Style />
+                                  <Value>=Fields!KeyMatchValueMatch.Value</Value>
+                                  <Style>
+                                    <Format>#,0;(#,0)</Format>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>PostEtlKeyMisMatchColumnProfile</rd:DefaultName>
+                          <rd:DefaultName>KeyMatchValueMatch</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -444,21 +431,23 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="PreEtlKeyMisMatchColumnProfile">
+                        <Textbox Name="KeyMatchValueMisMatch">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!PreEtlKeyMisMatchColumnProfile.Value</Value>
-                                  <Style />
+                                  <Value>=Fields!KeyMatchValueMisMatch.Value</Value>
+                                  <Style>
+                                    <Format>#,0;(#,0)</Format>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>PreEtlKeyMisMatchColumnProfile</rd:DefaultName>
+                          <rd:DefaultName>KeyMatchValueMisMatch</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -474,21 +463,23 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="RecordMatchColumnProfile">
+                        <Textbox Name="NewRecord">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!RecordMatchColumnProfile.Value</Value>
-                                  <Style />
+                                  <Value>=Fields!NewRecord.Value</Value>
+                                  <Style>
+                                    <Format>#,0;(#,0)</Format>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>RecordMatchColumnProfile</rd:DefaultName>
+                          <rd:DefaultName>NewRecord</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -526,52 +517,22 @@
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
-            <DataSetName>ColumnChooser</DataSetName>
-            <Top>2.48391cm</Top>
-            <Left>2.19287cm</Left>
+            <DataSetName>ColumnChooser2</DataSetName>
+            <Top>2.03412cm</Top>
+            <Left>1.76953cm</Left>
             <Height>1.2cm</Height>
-            <Width>30.24cm</Width>
+            <Width>19.57729cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
               </Border>
             </Style>
           </Tablix>
-          <Textbox Name="Textbox16">
-            <CanGrow>true</CanGrow>
-            <KeepTogether>true</KeepTogether>
-            <Paragraphs>
-              <Paragraph>
-                <TextRuns>
-                  <TextRun>
-                    <Value>=First(Fields!PostEtlSnapShotName.Value, "ColumnChooser")</Value>
-                    <Style />
-                  </TextRun>
-                </TextRuns>
-                <Style />
-              </Paragraph>
-            </Paragraphs>
-            <rd:DefaultName>Textbox16</rd:DefaultName>
-            <Top>1.0287cm</Top>
-            <Left>2.19287cm</Left>
-            <Height>0.6cm</Height>
-            <Width>7.58cm</Width>
-            <ZIndex>1</ZIndex>
-            <Style>
-              <Border>
-                <Style>None</Style>
-              </Border>
-              <PaddingLeft>2pt</PaddingLeft>
-              <PaddingRight>2pt</PaddingRight>
-              <PaddingTop>2pt</PaddingTop>
-              <PaddingBottom>2pt</PaddingBottom>
-            </Style>
-          </Textbox>
         </ReportItems>
         <Height>2in</Height>
         <Style />
       </Body>
-      <Width>14in</Width>
+      <Width>11.35702in</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
@@ -588,14 +549,14 @@
     <ReportParameter Name="TestConfigID">
       <DataType>Integer</DataType>
       <Nullable>true</Nullable>
-      <Prompt>Test Config ID</Prompt>
+      <Prompt>TestConfigID</Prompt>
       <Hidden>true</Hidden>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
-      <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>1</NumberOfRows>
+      <NumberOfColumns>4</NumberOfColumns>
+      <NumberOfRows>2</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -606,5 +567,5 @@
     </GridLayoutDefinition>
   </ReportParametersLayout>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>f1a34a33-1fab-41b9-acf6-6d2ccc15a39e</rd:ReportID>
+  <rd:ReportID>5ed7df80-d7a4-4c23-a9af-bd7937f0163d</rd:ReportID>
 </Report>

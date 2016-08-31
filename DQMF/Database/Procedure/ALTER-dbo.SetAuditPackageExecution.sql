@@ -62,8 +62,13 @@ BEGIN
     SET @pPkgExecKeyOut = @@IDENTITY
 	RAISERROR( 'DQMF SetAuditPkgExecution (uspInitPkgRegressionTest): The package name "%s" will be tested', 0, 1, @pPkgName )
     PRINT '' -- sometimes needed due to ssis bug
-	 -- gcwashere AutoTest...
-	EXEC AutoTest.dbo.uspInitPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut;
+    BEGIN TRY
+		 -- gcwashere AutoTest...
+		EXEC AutoTest.dbo.uspInitPkgRegressionTest @pPkgExecKey = @pPkgExecKeyOut;
+	END TRY
+	BEGIN CATCH
+        RAISERROR('AutoTest.dbo.uspInitPkgRegressionTest ERROR SetAuditPkgExecution: The package name "%s" failed to AutoTest PkgExecKey: %i', 0, 1, @pPkgName, @pPkgExecKeyOut) WITH NOWAIT, LOG
+	END CATCH
 END
 
 IF @pIsProcessStart = 0
@@ -76,7 +81,13 @@ BEGIN
 	 -- gcwashere AutoTest...
 	 RAISERROR('DQMF SetAuditPkgExecution (uspPkgRegressionTest): The package name "%s" will be tested', 0, 1, @pPkgName)
     PRINT '' -- sometimes needed due to ssis bug
-	EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKey;
+    BEGIN TRY
+		 -- gcwashere AutoTest...
+		EXEC AutoTest.dbo.uspPkgRegressionTest @pPkgExecKey = @pPkgExecKey;
+	END TRY
+	BEGIN CATCH
+        RAISERROR( 'AutoTest.dbo.uspPkgRegressionTest ERROR SetAuditPkgExecution: The package name "%s" failed to AutoTest PkgExecKey: %i', 0, 1, @pPkgName, @pPkgExecKeyOut) WITH NOWAIT, LOG
+	END CATCH
 END
 
 -- SELECT @pPkgExecKeyOut PkgExecKey

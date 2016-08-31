@@ -1,17 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SharedDataSet xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition">
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <DataSet Name="">
     <Query>
       <DataSourceReference>AutoTest</DataSourceReference>
-      <DataSetParameters>
-        <DataSetParameter Name="@TestConfigID">
-          <ReadOnly>false</ReadOnly>
-          <Nullable>false</Nullable>
-          <OmitFromQuery>false</OmitFromQuery>
-          <rd:DbType>Int32</rd:DbType>
-        </DataSetParameter>
-      </DataSetParameters>
-      <CommandText>SELECT *
+      <CommandText>DECLARE @TestConfigID int = 6
+
+
+SELECT *
 FROM (
 SELECT tlog.*, cpro.ColumnName, cpro.ColumnCount, cprot.ColumnProfileTypeDesc
 FROM AutoTest.dbo.TestConfig AS tlog
@@ -72,6 +67,10 @@ AND piv.TestConfigID = @TestConfigID</CommandText>
         <DataField>SnapShotBaseName</DataField>
         <rd:TypeName>System.String</rd:TypeName>
       </Field>
+      <Field Name="ColumnName">
+        <DataField>ColumnName</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
       <Field Name="PreEtlSnapShotName">
         <DataField>PreEtlSnapShotName</DataField>
         <rd:TypeName>System.String</rd:TypeName>
@@ -115,10 +114,6 @@ AND piv.TestConfigID = @TestConfigID</CommandText>
       <Field Name="ComparisonRuntimeSeconds">
         <DataField>ComparisonRuntimeSeconds</DataField>
         <rd:TypeName>System.Int32</rd:TypeName>
-      </Field>
-      <Field Name="ColumnName">
-        <DataField>ColumnName</DataField>
-        <rd:TypeName>System.String</rd:TypeName>
       </Field>
       <Field Name="KeyMatchValueMatchColumnProfile">
         <DataField>KeyMatchValueMatchColumnProfile</DataField>

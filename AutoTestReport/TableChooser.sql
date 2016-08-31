@@ -1,5 +1,5 @@
 DECLARE @PkgExecKey int = null;
-DECLARE @DatabaseID int;
+DECLARE @DatabaseID int = null;
 
 SELECT *
 	,CAST((1.*PostEtl_RecordCount/sub.PreEtl_RecordCount-1) AS decimal(10,8)) AS PercentChange
@@ -24,13 +24,7 @@ SELECT
 	,ISNULL(RecordMatchTableProfile,0) + ISNULL(KeyMatchTableProfile,0) AS KeyMatch_Count
 FROM (
 SELECT tlog.PkgExecKey, pkg.PkgName ,tlog.TestConfigID, tlog.PreEtlSourceObjectFullName, db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName, tlog.ObjectID, tpro.RecordCount, tlog.TestDate, 
-CASE 
-WHEN DATEDIFF(hour, tlog.TestDate, GETDATE()) = 0
-	THEN FORMATMESSAGE('%i minutes', DATEDIFF(minute, tlog.TestDate, GETDATE()))
-WHEN DATEDIFF(day, tlog.TestDate, GETDATE()) = 0
-	THEN FORMATMESSAGE('%i hours', DATEDIFF(hour, tlog.TestDate, GETDATE()))
-ELSE FORMATMESSAGE('%i days', DATEDIFF(hour, tlog.TestDate, GETDATE()))
-END
+dbo.ufnPrettyDateDiff(tlog.TestDate, GETDATE()) + ' ago' 
  AS RegressionTestAge
 , tprot.TableProfileTypeDesc
 ,db.DatabaseId

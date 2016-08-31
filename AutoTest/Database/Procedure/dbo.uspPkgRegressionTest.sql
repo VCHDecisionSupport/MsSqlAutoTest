@@ -19,6 +19,10 @@ ALTER PROC dbo.uspPkgRegressionTest
 	@pPkgExecKey int
 AS
 BEGIN
+	--#region descrtiption
+	-- called by DQMF.dbo.SetAuditPkgExecution
+	--#endregion descrtiption
+
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
@@ -42,21 +46,6 @@ BEGIN
 		,@SchemaName varchar(200)
 		,@PreEtlSnapShotName varchar(200)
 		,@PostEtlSnapShotName varchar(200)
-
--- INSERT INTO AutoTest.dbo.TestConfig (PreEtlSourceObjectFullName, PostEtlSourceObjectFullName, ObjectID, TestConfigID, PkgExecKey)
--- SELECT 
--- 	db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PreEtlSourceObjectFullName
--- 	,db.DatabaseName +'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName AS PostEtlSourceObjectFullName
--- 	,obj.ObjectID
--- 	,config.TestConfigID
--- 	,pkglog.PkgExecKey
--- FROM AutoTest.dbo.TestConfig AS config
--- JOIN DQMF.dbo.MD_Object AS obj
--- ON config.ObjectID = obj.ObjectID
--- JOIN DQMF.dbo.MD_Database AS db
--- ON obj.DatabaseId = db.DatabaseId
--- JOIN DQMF.dbo.AuditPkgExecution AS pkglog
--- ON config.PkgID = pkglog.PkgKey
 
 IF (SELECT CURSOR_STATUS('global','reg_cur')) >= -1
 BEGIN
@@ -94,12 +83,9 @@ BEGIN
 		SET @PostEtlSourceObjectTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
 		SET @PreEtlSourceObjectTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
 		RAISERROR('Initializing Post Etl Testing (%s on %s for TestConfigID %i)',0,1,@TestTypeDesc,@PreEtlSourceObjectTableName, @TestConfigID);
-		-- SET @PostEtlSnapShotName = FORMATMESSAGE('TestConfigID%i',@TestConfigID);
-		-- SELECT @PostSnapShotName = 'PostEtl_'+@PostEtlSnapShotName
 		DECLARE @PostEtlQuery nvarchar(max) = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 		SET @DatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
 		SET @SchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
-		-- SET @PreEtlSnapShotName = PARSENAME(@PreEtlSourceObjectFullName,1)
 	END
 	IF @TestTypeDesc IN ('RuntimeRegressionTest')
 	BEGIN
