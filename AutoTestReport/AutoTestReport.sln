@@ -1,7 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "AutoTestReport", "AutoTestReport.rptproj", "{FF9F3D6F-9321-461E-A632-A01709D86A17}"
+EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "ProfileViewer", "..\ProfileViewer\ProfileViewer.rptproj", "{BB8AB490-3F6D-4DBE-850A-F46748E78790}"
+EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "RegressionViewer", "..\RegressionViewer\RegressionViewer.rptproj", "{97AB4490-688B-4754-A123-B49AF46A4D1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +24,22 @@ Global
 		{FF9F3D6F-9321-461E-A632-A01709D86A17}.Release|Default.ActiveCfg = Release
 		{FF9F3D6F-9321-461E-A632-A01709D86A17}.Release|Default.Build.0 = Release
 		{FF9F3D6F-9321-461E-A632-A01709D86A17}.Release|Default.Deploy.0 = Release
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Debug|Default.ActiveCfg = Debug
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Debug|Default.Build.0 = Debug
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Debug|Default.Deploy.0 = Debug
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.DebugLocal|Default.Build.0 = DebugLocal
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Release|Default.ActiveCfg = Release
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Release|Default.Build.0 = Release
+		{BB8AB490-3F6D-4DBE-850A-F46748E78790}.Release|Default.Deploy.0 = Release
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Debug|Default.ActiveCfg = Debug
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Debug|Default.Build.0 = Debug
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Debug|Default.Deploy.0 = Debug
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.DebugLocal|Default.Build.0 = DebugLocal
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Release|Default.ActiveCfg = Release
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Release|Default.Build.0 = Release
+		{97AB4490-688B-4754-A123-B49AF46A4D1D}.Release|Default.Deploy.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

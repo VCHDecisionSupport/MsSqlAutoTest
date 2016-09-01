@@ -11,6 +11,9 @@
 <div id="TOC">
 <ul>
 <li><a href="#autotest">AutoTest</a><ul>
+<li><a href="#how-to">How to:</a><ul>
+<li><a href="#ad-hoc-snap-shot-comparison">Ad-Hoc snap-shot comparison</a></li>
+</ul></li>
 <li><a href="#implemenation">Implemenation</a></li>
 <li><a href="#requirements">Requirements</a><ul>
 <li><a href="#comparison-key">Comparison Key</a></li>
@@ -19,7 +22,7 @@
 </ul></li>
 </ul></li>
 <li><a href="#procedures">Procedures</a><ul>
-<li><a href="#dbo.uspInitPkgRegressionTest"><code>dbo.uspInitPkgRegressionTest</code></a></li>
+<li><a href="#dbo.uspinitpkgregressiontest"><code>dbo.uspInitPkgRegressionTest</code></a></li>
 <li><a href="#dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></a></li>
 <li><a href="#dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></a></li>
 <li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
@@ -34,8 +37,16 @@
 </ul>
 </div>
 <h1 id="autotest">AutoTest</h1>
-<p>Automated regression testing for the tables/views affected by an ETL execution.</p>
-<p>Automate detection of expected and unexpected changes to content of tables and views by</p>
+<p>Automated regression testing of ETL packages. Table/view pre-etl/post-elt snap shots are diff'd and profiled. Results are logged in <code>AutoTest</code> database and presented in SSRS reports.</p>
+<p><strong>Purpose:</strong> Automate detection of expected and unexpected changes to table/view data caused by SSIS ETL package.</p>
+<h2 id="how-to">How to:</h2>
+<h3 id="ad-hoc-snap-shot-comparison">Ad-Hoc snap-shot comparison</h3>
+<p>Compare two view/tables (typically in <code>STDBDECSUP01</code>)</p>
+<ol style="list-style-type: decimal">
+<li><code>EXEC AutoTest.dbo.uspDataCompare . . .</code></li>
+<li>In SSMS editor, highlight table</li>
+<li>press magic button</li>
+</ol>
 <ul>
 <li>implemented with <code>AutoTest</code> database, procedures, functions, temporary snap shot tables, and logging tables <a href="www.nhl.com">see AutoTest schema</a></li>
 <li>automatically executed during normal ETL package/job execution <a href="#attachment-point">see attachment points section</a></li>
@@ -54,13 +65,14 @@
 <p>Key column must include source system columns whose values that only change when business attribute(s) change</p>
 <h3 id="attachment-point">Attachment Point</h3>
 <h4 id="package-level-setauditpackageexecution">Package Level: <code>SetAuditPackageExecution</code></h4>
+<p>Current implementation of <code>AutoTest</code> uses SSIS Packages as attachment points.</p>
 <ul>
 <li>All packages (including child packages) call <code>SetAuditPackageExecution</code>
 <ul>
 <li>this implies requirement that all packages exist in <code>DQMF.dbo.ETL_Package</code> (in all instances)</li>
 </ul></li>
 </ul>
-<p>Other attachment point options:</p>
+<p>Other potiential attachment point options:</p>
 <ul>
 <li>As automatic DQMF stage?
 <ul>
@@ -75,10 +87,10 @@
 <h3 id="mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</h3>
 <p>see new table <code>DQMF.dbo.ETL_PackageObject</code> For each package/job a list of tables/views to be tested is required. This mapping from attachment point to data object is specified by <code>DQMF.dbo.ETL_PackageObject</code>. This table is also populated by a <code>C#</code> executable that walks the <code>msdb</code> folders and loads each package into memory using <a href="https://msdn.microsoft.com/en-us/library/ms136025.aspx">the SSIS object model</a> to extract the destination tables of the data flow tasks contained in each package. A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.</p>
 <h1 id="procedures">Procedures</h1>
-<h2 id="dbo.uspInitPkgRegressionTest"><code>dbo.uspInitPkgRegressionTest</code></h2>
+<h2 id="dbo.uspinitpkgregressiontest"><code>dbo.uspInitPkgRegressionTest</code></h2>
 <p><strong>Parameters:</strong></p>
 <pre><code>@pPkgExecKey int</code></pre>
-<p>Called once per package execution from <code>DQMF.dbo.SetAuditPackageExecution</code>.</p>
+<p>Called once per package execution from <code>DQMF.dbo.SetAuditPackageExecution</code> <a href="#regression-testing-package-at-package-runtime">see Regression Testing Package At Package Runtime section</a></p>
 <h2 id="dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></h2>
 <h2 id="dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></h2>
 <p><strong>Parameters:</strong></p>

@@ -1,13 +1,29 @@
-DECLARE @TestConfigID int = 405
+DECLARE @TestConfigID int = 406
 
+select tpro.RecordCount, cpro.ColumnCount,
+	cprot.ColumnProfileTypeDesc
+
+	,cpro.*, tlog.*
+from AutoTest.dbo.TestConfig tlog
+join AutoTest.dbo.TestType tt
+on tlog.TestTypeID = tt.TestTypeID
+join AutoTest.dbo.TableProfile tpro
+on tlog.TestConfigID = tpro.TestConfigID
+join AutoTest.dbo.ColumnProfile cpro
+on tpro.TableProfileID = cpro.TableProfileID
+LEFT JOIN AutoTest.dbo.ColumnProfileType AS cprot
+ON cprot.ColumnProfileTypeID = cpro.ColumnProfileTypeID
+where tlog.TestConfigID = @TestConfigID
 
 SELECT 
 	pvt.ColumnName
+	,pvt.[StandAloneColumnProfile] AS DistinctCount
 	,pvt.[RecordMatchColumnProfile] AS RecordMatch
 	,pvt.[KeyMatchValueMatchColumnProfile] AS KeyMatchValueMatch
 	,pvt.[KeyMatchValueMisMatchColumnProfile] AS KeyMatchValueMisMatch
 	,pvt.[PostEtlKeyMisMatchColumnProfile] AS NewRecord
 	,ISNULL(pvt.[PreEtlKeyMisMatchColumnProfile],0) AS DeletedRecord
+	,pvt.*
 FROM (
 SELECT tlog.*, cpro.ColumnName, cpro.ColumnCount, cprot.ColumnProfileTypeDesc
 FROM AutoTest.dbo.TestConfig AS tlog
@@ -38,7 +54,8 @@ PIVOT
 			[KeyMatchValueMatchColumnProfile],
 			[KeyMatchValueMisMatchColumnProfile],
 			[PreEtlKeyMisMatchColumnProfile],
-			[PostEtlKeyMisMatchColumnProfile]
+			[PostEtlKeyMisMatchColumnProfile],
+			[StandAloneColumnProfile]
 		)
 ) AS pvt
 WHERE 1=1

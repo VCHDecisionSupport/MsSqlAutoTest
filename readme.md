@@ -1,8 +1,19 @@
 # AutoTest
 
-Automated regression testing for the tables/views affected by an ETL execution.
+Automated regression testing of ETL packages.  Table/view pre-etl/post-elt snap shots are diff'd and profiled.  Results are logged in `AutoTest` database and presented in SSRS reports.
 
-Automate detection of expected and unexpected changes to content of tables and views by 
+**Purpose:** Automate detection of expected and unexpected changes to table/view data caused by SSIS ETL package.
+
+## How to:
+
+### Ad-Hoc snap-shot comparison
+
+Compare two view/tables (typically in `STDBDECSUP01`)
+
+1. `EXEC AutoTest.dbo.uspDataCompare . . . `
+2. In SSMS editor, highlight table 
+3. press magic button
+
 
 - implemented with `AutoTest` database, procedures, functions, temporary snap shot tables, and logging tables [see AutoTest schema](www.nhl.com)
 - automatically executed during normal ETL package/job execution [see attachment points section](#attachment-point)
@@ -126,6 +137,10 @@ call `uspPkgRegressionTest` with parameter `@PkgExecKey`
 # AutoTest Schema Diagram
 
 ![AutoTest_Schema](/Documentation/AutoTest_Schema.jpg?raw=true "AutoTest_Schema")
+
+# Formula
+
+Profile of 
 
 # References
 
