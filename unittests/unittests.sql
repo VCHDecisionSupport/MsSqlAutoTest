@@ -167,6 +167,24 @@ END
 GO
 --#endregion Stand Alone Profile
 
+--#region uspAdHocTableViewProfile
+IF 1=2
+BEGIN
+	EXEC AutoTest.dbo.uspAdHocTableViewProfile 'CommunityMart', 'dbo', 'ReferralFact'
+END
+--#endregion uspAdHocTableViewProfile
+
+--#region uspAdHocDataProfile
+IF 1=2
+BEGIN
+	EXEC AutoTest.dbo.uspAdHocDataProfile 'CommunityMart'
+END
+--#endregion uspAdHocDataProfile
+
+
+
+
+
 --#region uspGetKey
 IF 1=2
 BEGIN
@@ -225,7 +243,7 @@ END
 --#endregoin row counts
 
 
-
+--#region fact demotions
 IF 1=2
 BEGIN
 DECLARE @DatabaseName varchar(500) = 'CommunityMart'
@@ -331,17 +349,11 @@ FROM parent_child_pairs
 --AND (parent_child_pairs.ChildTable LIKE '%Fact%'
 --AND parent_child_pairs.ParentTable LIKE '%Fact%')
 ORDER BY parent_child_pairs.ChildTable
-
-
 END
 
 
 IF 1=2
-
 BEGIN
-
-
-
 USE CommunityMart
 DECLARE @Demotions TABLE (
 	TableName varchar(100)
@@ -389,10 +401,11 @@ FETCH NEXT FROM fact_cur INTO @DatabaseName, @SchemaName, @TableName
 WHILE @@FETCH_STATUS = 0
 BEGIN
 	PRINT FORMATMESSAGE('%s.%s.%s','CommunityMart', 'dbo', @TableName);
-	EXEC AutoTest.dbo.uspAdHocDataProfile 'CommunityMart', 'dbo', @TableName;
+	EXEC AutoTest.dbo.uspAdHocTableViewProfile 'CommunityMart', 'dbo', @TableName;
 	FETCH NEXT FROM fact_cur INTO @DatabaseName, @SchemaName, @TableName;
 END
 
 CLOSE fact_cur;
 DEALLOCATE fact_cur;
 END
+--#region fact demotions

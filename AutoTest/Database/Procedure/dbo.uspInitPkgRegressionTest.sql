@@ -18,6 +18,7 @@ ALTER PROC dbo.uspInitPkgRegressionTest
 	@pPkgExecKey int
 AS
 BEGIN
+BEGIN TRY
 	SELECT @pPkgExecKey AS PkgExecKey
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
@@ -134,6 +135,33 @@ DECLARE cur CURSOR
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspInitPkgRegressionTest: runtime: %i seconds (%i table/view are prepared for regression testing, %i tables/views will be stand alone profiled)', 0, 1, @runtime, @RegressionTableCount, @ProfileTableCount) WITH NOWAIT;
 	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
 
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
 END
 GO

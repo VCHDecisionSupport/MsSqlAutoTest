@@ -11,161 +11,42 @@
 <div id="TOC">
 <ul>
 <li><a href="#autotest">AutoTest</a><ul>
-<li><a href="#how-to">How to:</a><ul>
-<li><a href="#ad-hoc-snap-shot-comparison">Ad-Hoc snap-shot comparison</a></li>
+<li><a href="#profile-or-compare-data">Profile or Compare Data</a><ul>
+<li><a href="#profile">Profile</a></li>
 </ul></li>
-<li><a href="#implemenation">Implemenation</a></li>
-<li><a href="#requirements">Requirements</a><ul>
-<li><a href="#comparison-key">Comparison Key</a></li>
-<li><a href="#attachment-point">Attachment Point</a></li>
-<li><a href="#mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</a></li>
+<li><a href="#compare">Compare</a><ul>
+<li><a href="#etl-regression-testing">ETL Regression Testing</a></li>
 </ul></li>
+<li><a href="#automated-and-ad-hoc">Automated and Ad-Hoc</a></li>
 </ul></li>
-<li><a href="#procedures">Procedures</a><ul>
-<li><a href="#dbo.uspinitpkgregressiontest"><code>dbo.uspInitPkgRegressionTest</code></a></li>
-<li><a href="#dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></a></li>
-<li><a href="#dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></a></li>
-<li><a href="#dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></a></li>
-<li><a href="#dbo.uspdatacompare"><code>dbo.uspDataCompare</code></a></li>
-</ul></li>
-<li><a href="#regression-testing-package-at-package-runtime">Regression Testing Package At Package Runtime</a><ul>
-<li><a href="#if-isprocessstart1">If <code>@IsProcessStart=1</code></a></li>
-<li><a href="#if-isprocessstart0">If <code>@IsProcessStart=0</code></a></li>
-</ul></li>
-<li><a href="#autotest-schema-diagram">AutoTest Schema Diagram</a></li>
-<li><a href="#references">References</a></li>
 </ul>
 </div>
 <h1 id="autotest">AutoTest</h1>
-<p>Automated regression testing of ETL packages. Table/view pre-etl/post-elt snap shots are diff'd and profiled. Results are logged in <code>AutoTest</code> database and presented in SSRS reports.</p>
-<p><strong>Purpose:</strong> Automate detection of expected and unexpected changes to table/view data caused by SSIS ETL package.</p>
-<h2 id="how-to">How to:</h2>
-<h3 id="ad-hoc-snap-shot-comparison">Ad-Hoc snap-shot comparison</h3>
-<p>Compare two view/tables (typically in <code>STDBDECSUP01</code>)</p>
-<ol style="list-style-type: decimal">
-<li><code>EXEC AutoTest.dbo.uspDataCompare . . .</code></li>
-<li>In SSMS editor, highlight table</li>
-<li>press magic button</li>
-</ol>
+<p>Automatic or ad-hoc profiles and comparisons of SQL views and tables. Results are saved in <code>AutoTest</code> database and visualized with several linked SSRS reports. Reports provide a single navigateable source of truth for all team members to quickly understand current data profiles as well as where and when those profiles changed.</p>
+<h2 id="profile-or-compare-data">Profile or Compare Data</h2>
+<h3 id="profile">Profile</h3>
 <ul>
-<li>implemented with <code>AutoTest</code> database, procedures, functions, temporary snap shot tables, and logging tables <a href="www.nhl.com">see AutoTest schema</a></li>
-<li>automatically executed during normal ETL package/job execution <a href="#attachment-point">see attachment points section</a></li>
-<li>results summarized by SSRS reports <a href="#Results">see Results section</a></li>
-<li>minimal change to existing warehouse structures <a href="#Requirements">see Requirements section</a></li>
-<li>configuration mostly automated by seperate SSIS job that parses packages deployed to <code>msdb</code> <a href="#mapping-packages-to-tablesviews">see Mapping Packages to Tables/Views</a></li>
+<li>total row count, distinct column count, and column value histogram</li>
+<li>results saved in for future reference</li>
+<li>SSRS <strong>Data Profile Report</strong> presents visual summary with ability to drill down to column value histograms</li>
+<li>single <code>proc</code> call to bulk profile by database, schema, or table/view on a schedule or ad-hoc basis</li>
 </ul>
-<h2 id="implemenation">Implemenation</h2>
-<p>Prior to ETL execution snap shots of views/tables are copied to <code>AutoTest.SnapShot</code> schema</p>
-<h2 id="requirements">Requirements</h2>
-<h3 id="comparison-key">Comparison Key</h3>
-<p>All fact tables have comparison/business key column meta data available from:</p>
-<pre><code>1. `DQMF.dbo.MD_ObjectAttribute.IsBusinessKey` - or
-2. `DQMF.dbo.MD_Object.PKField` - or
-3. physical primary key column</code></pre>
-<p>Key column must include source system columns whose values that only change when business attribute(s) change</p>
-<h3 id="attachment-point">Attachment Point</h3>
-<h4 id="package-level-setauditpackageexecution">Package Level: <code>SetAuditPackageExecution</code></h4>
-<p>Current implementation of <code>AutoTest</code> uses SSIS Packages as attachment points.</p>
+<h2 id="compare">Compare</h2>
+<h3 id="etl-regression-testing">ETL Regression Testing</h3>
 <ul>
-<li>All packages (including child packages) call <code>SetAuditPackageExecution</code>
+<li><p>profile new, deleted, changed, and unchanged records</p></li>
+<li>ETL Regression Testing
 <ul>
-<li>this implies requirement that all packages exist in <code>DQMF.dbo.ETL_Package</code> (in all instances)</li>
+<li>Diffs Pre-Etl snap shot to Post-Etl snap shot</li>
+<li>SSRS <strong>Regression Test Reports</strong> support testers by summarizing which columns in which tables/views changed and by how much</li>
+<li>Logging provides single source of truth</li>
+</ul></li>
+<li>Data Profiles
+<ul>
+<li>Table/view row counts, column distinct counts, and column histograms</li>
+<li>SSRS <strong>Data Profile Reports</strong> inform report specs and mart design by visualizing data profiles</li>
 </ul></li>
 </ul>
-<p>Other potiential attachment point options:</p>
-<ul>
-<li>As automatic DQMF stage?
-<ul>
-<li>pre/post processing?</li>
-</ul></li>
-<li>As job step
-<ul>
-<li>1 step added at start and end</li>
-<li>can be done automattically/in-bulk with <a href="https://msdn.microsoft.com/en-us/library/ms182079.aspx"><code>sp_add_job</code></a> and <a href="https://msdn.microsoft.com/en-ca/library/ms187358.aspx"><code>sp_add_jobstep</code></a></li>
-</ul></li>
-</ul>
-<h3 id="mapping-packages-to-tablesviews">Mapping Packages to Tables/Views</h3>
-<p>see new table <code>DQMF.dbo.ETL_PackageObject</code> For each package/job a list of tables/views to be tested is required. This mapping from attachment point to data object is specified by <code>DQMF.dbo.ETL_PackageObject</code>. This table is also populated by a <code>C#</code> executable that walks the <code>msdb</code> folders and loads each package into memory using <a href="https://msdn.microsoft.com/en-us/library/ms136025.aspx">the SSIS object model</a> to extract the destination tables of the data flow tasks contained in each package. A copy of this executable is required on each server; when could then be called on a regular basis using a SSIS package with a ??? task.</p>
-<h1 id="procedures">Procedures</h1>
-<h2 id="dbo.uspinitpkgregressiontest"><code>dbo.uspInitPkgRegressionTest</code></h2>
-<p><strong>Parameters:</strong></p>
-<pre><code>@pPkgExecKey int</code></pre>
-<p>Called once per package execution from <code>DQMF.dbo.SetAuditPackageExecution</code> <a href="#regression-testing-package-at-package-runtime">see Regression Testing Package At Package Runtime section</a></p>
-<h2 id="dbo.usppkgregressiontest"><code>dbo.uspPkgRegressionTest</code></h2>
-<h2 id="dbo.uspcreatesnapshot"><code>dbo.uspCreateSnapShot</code></h2>
-<p><strong>Parameters:</strong></p>
-<pre><code>@pQuery varchar(max),
-@pKeyColumns varchar(max) = NULL,
-@pHashKeyColumns varchar(max) = NULL,
-@pDestDatabaseName varchar(100) = &#39;AutoTest&#39;,
-@pDestSchemaName varchar(100) = &#39;SnapShot&#39;,
-@pDestTableName varchar(100)</code></pre>
-<ul>
-<li>utility proc that creates a snap shot of the query</li>
-<li>executes <code>SELECT</code> <given query> <code>INTO</code> <given destination table></li>
-<li>merges <code>@pHashKeyColumns</code> into single <code>HASHBYTES</code> column</li>
-<li>drop destination table if it already exists</li>
-<li><p>creates indexes on <code>@pKeyColumns and @pHashKeyColumns</code></p></li>
-<li><code>@pQuery</code> simple query; alias allowed; <code>WITH</code>, <code>GO</code>, <code>;</code>, etc not allowed</li>
-<li><code>@pKeyColumns,@pHashKeyColumns</code> comma delimited list of column names</li>
-<li><p><code>@pDestDatabaseName.@pDestSchemaName.@pDestTableName</code> is snap shot table</p></li>
-</ul>
-<h2 id="dbo.uspcreateprofile"><code>dbo.uspCreateProfile</code></h2>
-<p><strong>Parameters:</strong></p>
-<pre><code>@pTestConfigID int,
-@pTargetDatabaseName nvarchar(200) = &#39;AutoTest&#39;,
-@pTargetSchemaName nvarchar(200) = &#39;SnapShot&#39;,
-@pTargetTableName nvarchar(200),
-@pTableProfileTypeID int,
-@pColumnProfileTypeID int,
-@pColumnHistogramTypeID int</code></pre>
-<ol style="list-style-type: decimal">
-<li>get row count and <code>INSERT INTO dbo.TableProfile</code></li>
-<li>get distinct count of each column, <code>UNPIVOT</code>, then <code>INSERT INTO dbo.ColumnProfile</code></li>
-<li>cursor on <code>dbo.ColumnProfile</code>
-<ul>
-<li>call <code>dbo.uspInsColumnHistogram</code> to <code>INSERT INTO dbo.ColumnHistogram</code></li>
-</ul></li>
-</ol>
-<h2 id="dbo.uspdatacompare"><code>dbo.uspDataCompare</code></h2>
-<ol style="list-style-type: decimal">
-<li>create snap shot of tables' intersection: <em>RecordMatch</em>
-<ul>
-<li>call <code>dbo.uspCreateProfile</code> with name of <em>RecordMatch</em> snap shot as parameter</li>
-</ul></li>
-<li>create snap shot of tables' set difference: on <code>__pkhash__</code>: <em>PreEtl</em>
-<ul>
-<li>call <code>dbo.uspCreateProfile</code> with name of <em>PreEtl</em> snap shot as parameter</li>
-</ul></li>
-</ol>
-<h1 id="regression-testing-package-at-package-runtime">Regression Testing Package At Package Runtime</h1>
-<p><code>DQMF.dbo.SetAuditPackageExecution</code> is called at start/end of package</p>
-<h2 id="if-isprocessstart1">If <code>@IsProcessStart=1</code></h2>
-<p>call <a href="#dbouspinitpkgregression"><code>AutoTest.dbo.uspInitPkgRegressionTest</code></a> with parameter <code>@PkgExecKey</code></p>
-<ol style="list-style-type: decimal">
-<li>populate <code>AutoTest.dbo.TestConfig</code> from <code>DQMF.dbo.ETL_PackageObject</code> mapping table for this <code>PkgID</code></li>
-<li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
-<ul>
-<li>call <code>uspCreateSnapShot</code> to create <em>PreEtl</em> snap shot of table with added column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
-</ul></li>
-</ol>
-<h2 id="if-isprocessstart0">If <code>@IsProcessStart=0</code></h2>
-<p>call <code>uspPkgRegressionTest</code> with parameter <code>@PkgExecKey</code></p>
-<ol style="list-style-type: decimal">
-<li>cursor on <code>AutoTest.dbo.TestConfig</code> for this <code>PkgExecKey</code>
-<ul>
-<li>call <code>uspCreateSnapShot</code> to <em>PostEtl</em> create snap shot of table with added column: <code>__pkhash__</code> in <code>AutoTest.SnapShot</code> schema</li>
-<li>call <code>uspDataCompare</code></li>
-</ul></li>
-</ol>
-<h1 id="autotest-schema-diagram">AutoTest Schema Diagram</h1>
-<div class="figure">
-<img src="/Documentation/AutoTest_Schema.jpg?raw=true" title="AutoTest_Schema" alt="AutoTest_Schema" />
-<p class="caption">AutoTest_Schema</p>
-</div>
-<h1 id="references">References</h1>
-<p><a href="https://www.researchgate.net/publication/230639909_A_CASE_STUDY_ON_REGRESSION_TEST_AUTOMATION_FOR_DATA_WAREHOUSE_QUALITY_ASSURANCE">Case Study Regression Testing</a></p>
-<p><a href="http://www.agiledata.org/essays/databaseTesting.html">Regression Test Relational Database</a></p>
-<p><a href="https://en.wikipedia.org/wiki/Regression_testing">Wikipedia: Regression Testing</a></p>
+<h2 id="automated-and-ad-hoc">Automated and Ad-Hoc</h2>
 </body>
 </html>

@@ -22,6 +22,7 @@ ALTER PROC dbo.uspGetKey
 	,@pColStr varchar(max) OUTPUT
 AS
 BEGIN
+BEGIN TRY
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
@@ -156,6 +157,34 @@ END
 	RAISERROR('!dbo.uspGetKey: runtime: %i seconds(Key Columns: %s)', 0, 1, @runtime, @pColStr) WITH NOWAIT;
 
 	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
+
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspGetColumnNames

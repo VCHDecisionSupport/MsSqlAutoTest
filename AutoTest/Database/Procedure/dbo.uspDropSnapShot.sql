@@ -22,6 +22,7 @@ ALTER PROC dbo.uspDropSnapShot
 
 AS
 BEGIN
+BEGIN TRY
 	-- if no params then drop all derived snap shots (RecordMatch, KeyMatch, PreEtlKeyMisMatch, PostEtlKeyMisMatch) do not drop PreEtlSnapShot or PostEtlSnapShot tables
 	-- if @pTableName is not null then drop it and continue execution
 	-- if @pTestConfigID is not null then drop all tables associated with that ConfigID and continue execution
@@ -120,6 +121,34 @@ BEGIN
 	RAISERROR('!dbo.uspDropSnapShot
 	: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
+
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
 END
 GO
 

@@ -3,14 +3,14 @@ GO
 
 DECLARE @pDatabaseName varchar(500) = 'CommunityMart'
 
---#region CREATE/ALTER PROC dbo.uspAdHocDatabaseProfile
+--#region CREATE/ALTER PROC dbo.uspAdHocDataProfile
 USE AutoTest
 GO
 
 DECLARE @name nvarchar(max);
 DECLARE @sql nvarchar(max);
 
-SET @name = 'dbo.uspAdHocDatabaseProfile';
+SET @name = 'dbo.uspAdHocDataProfile';
 SET @sql = FORMATMESSAGE('CREATE PROC %s AS BEGIN SELECT 1 AS [one] END;',@name);
 
 RAISERROR(@name, 1, 1) WITH NOWAIT;
@@ -21,7 +21,7 @@ BEGIN
 	EXEC(@sql);
 END
 GO
-ALTER PROC dbo.uspAdHocDatabaseProfile
+ALTER PROC dbo.uspAdHocDataProfile
 	@pDatabaseName varchar(100)
 AS
 BEGIN
@@ -29,7 +29,7 @@ BEGIN
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspAdHocDatabaseProfile(%s)'
+	SELECT @fmt='dbo.uspAdHocDataProfile(%s)'
 	RAISERROR(@fmt, 0, 1,@pDatabaseName) WITH NOWAIT;
 	
 	DECLARE @sql nvarchar(max);
@@ -67,7 +67,7 @@ BEGIN
 	BEGIN
 		
 
-		EXEC dbo.uspAdHocDataProfile
+		EXEC dbo.uspAdHocTableViewProfile
 			@pDatabaseName = @pTargetDatabaseName,
 			@pSchemaName = @pTargetSchemaName,
 			@pTableName = @pTargetTableName,
@@ -83,9 +83,9 @@ BEGIN
 	DEALLOCATE cur;
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
-	RAISERROR('!dbo.uspAdHocDatabaseProfile: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
+	RAISERROR('!dbo.uspAdHocDataProfile: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
 END
 GO
---#endregion CREATE/ALTER PROC dbo.uspAdHocDatabaseProfile
-EXEC dbo.uspAdHocDatabaseProfile
+--#endregion CREATE/ALTER PROC dbo.uspAdHocDataProfile
+EXEC dbo.uspAdHocDataProfile
