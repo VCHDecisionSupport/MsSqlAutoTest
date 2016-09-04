@@ -24,6 +24,7 @@ RAISERROR('@path = $(pathvar) = %s
  :r $(pathvar)\AutoTest\Database\Table\ForeignKeys.sql
 
 :r $(pathvar)\AutoTest\Database\Function\dbo.strSplit.sql
+:r $(pathvar)\AutoTest\Database\Function\dbo.ufnPrettyDateDiff.sql
 
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspGetKey.sql
 :r $(pathvar)\AutoTest\Database\Procedure\dbo.uspCreateQuerySnapShot.sql
