@@ -70,7 +70,7 @@ BEGIN TRY
 	ON obj.DatabaseID = db.DatabaseId
 	WHERE 1=1
 	AND CASE WHEN @pDatabaseName IS NULL THEN '' 
-			ELSE db.DatabaseId END = 
+			ELSE db.DatabaseName END = 
 		CASE WHEN @pDatabaseName IS NULL THEN '' 
 			ELSE @pDatabaseName END
 	AND CASE WHEN @pSchemaName IS NULL THEN '' 
