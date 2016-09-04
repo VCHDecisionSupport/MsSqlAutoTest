@@ -19,6 +19,7 @@ ALTER PROC dbo.uspDataCompare
 	@pTestConfigID int
 AS
 BEGIN
+BEGIN TRY
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
@@ -397,11 +398,37 @@ ELSE
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspDataCompare: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
-	--RETURN(@runtime);
-END	
+	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
 
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
+END
 GO
-
 ----dbo.uspDataCompare @pTestConfigID=25
 --DECLARE 
 --	@pPreEtlBaseName varchar(100) = 'SM_02_DischargeFact' + 'Adhoc'

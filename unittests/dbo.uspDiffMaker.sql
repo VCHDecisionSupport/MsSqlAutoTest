@@ -107,6 +107,9 @@ GO
 
 
 --#region diff maker loop
+IF 1=2
+BEGIN
+
 DECLARE @PkgExecKey int = 313276
 
 DECLARE diffCursor CURSOR
@@ -148,5 +151,6 @@ END
 
 CLOSE diffCursor
 DEALLOCATE diffCursor;
+END
 --#endregion diff maker loop
 

@@ -1,3 +1,8 @@
+USE AutoTest
+GO
+
+DECLARE @pDatabaseName varchar(500) = 'CommunityMart'
+
 --#region CREATE/ALTER PROC dbo.uspAdHocDataProfile
 USE AutoTest
 GO
@@ -17,99 +22,123 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspAdHocDataProfile
-	@pDatabaseName varchar(100)
-	,@pSchemaName varchar(100)
-	,@pTableName varchar(100)
-	,@pObjectID int = NULL
+	@pDatabaseName varchar(100) = NULL
+	,@pSchemaName varchar(100) = NULL
+	,@pViewTableName varchar(100) = NULL
 AS
 BEGIN
+BEGIN TRY
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
 	DECLARE @fmt nvarchar(4000);
-	SELECT @fmt='dbo.uspAdHocDataProfile(%s.%s.%s)'
-	RAISERROR(@fmt, 0, 1, @pDatabaseName, @pSchemaName, @pTableName) WITH NOWAIT;
-	
+	SELECT @fmt='dbo.uspAdHocDataProfile'
+	SET @fmt = @fmt + CASE WHEN @pDatabaseName IS NULL THEN '
+	All Databases' ELSE '
+	Only Database ' + @pDatabaseName END 	
+	SET @fmt = @fmt + CASE WHEN @pSchemaName IS NULL THEN '
+	All Schemas' ELSE '
+	Only Schema ' + @pSchemaName END 
+	SET @fmt = @fmt + CASE WHEN @pViewTableName IS NULL THEN '
+	All ViewTables' ELSE '
+	Only ViewTable ' + @pViewTableName END 	
+	RAISERROR(@fmt, 0, 1) WITH NOWAIT;
+
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
-
-	DECLARE 
-		@TestTypeID int
-		,@TestConfigID int
-		,@PreEtlSourceObjectFullName varchar(500)
-		,@PreEtlSnapShotCreationElapsedSeconds int
-		,@PreEtlSnapShotName varchar(200)
-		,@pPreEtlQuery nvarchar(max)
-		,@TableProfileTypeID int
-		,@ColumnProfileTypeID int
-		,@ColumnHistogramTypeID int
-		,@pObjectPkColumns varchar(500)
 	
-	IF @pObjectID IS NULL
+	DECLARE @DatabaseID int;
+
+	SELECT @DatabaseID = DatabaseId
+	FROM DQMF.dbo.MD_Database
+	WHERE DatabaseName = @pDatabaseName
+
+	DECLARE @ObjectID int;
+	DECLARE @pTargetDatabaseName varchar(500);
+	DECLARE @pTargetSchemaName varchar(500);
+	DECLARE @pTargetTableName varchar(500);
+	DECLARE @PreEtlSourceObjectFullName varchar(500);
+
+	DECLARE cur cursor
+	FOR
+	SELECT 
+		db.DatabaseName, obj.ObjectSchemaName, obj.ObjectPhysicalName
+		,db.DatabaseName+'.'+obj.ObjectSchemaName+'.'+obj.ObjectPhysicalName
+		,obj.ObjectID
+	FROM DQMF.dbo.MD_Object obj
+	JOIN DQMF.dbo.MD_Database AS db
+	ON obj.DatabaseID = db.DatabaseId
+	WHERE 1=1
+	AND CASE WHEN @pDatabaseName IS NULL THEN '' 
+			ELSE db.DatabaseId END = 
+		CASE WHEN @pDatabaseName IS NULL THEN '' 
+			ELSE @pDatabaseName END
+	AND CASE WHEN @pSchemaName IS NULL THEN '' 
+			ELSE obj.ObjectSchemaName END = 
+		CASE WHEN @pSchemaName IS NULL THEN '' 
+			ELSE @pSchemaName END
+	AND CASE WHEN @pViewTableName IS NULL THEN '' 
+			ELSE obj.ObjectPhysicalName END = 
+		CASE WHEN @pViewTableName IS NULL THEN '' 
+			ELSE @pViewTableName END
+	AND obj.ObjectType IN ('Table', 'View')
+	AND db.DatabaseName != 'DQMF'
+
+	OPEN cur;
+
+	FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PreEtlSourceObjectFullName,@ObjectID
+
+	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		SELECT @pObjectID = ObjectID
-		FROM DQMF.dbo.MD_Object AS obj
-		JOIN DQMF.dbo.MD_Database AS db
-		ON obj.DatabaseID = db.DatabaseID
-		WHERE 1=1
-		AND obj.ObjectPhysicalName = @pTableName
-		AND obj.ObjectSchemaName = @pSchemaName
-		AND db.DatabaseName = @pDatabaseName
+		
+
+		EXEC AutoTest.dbo.uspAdHocTableViewProfile
+			@pDatabaseName = @pTargetDatabaseName,
+			@pSchemaName = @pTargetSchemaName,
+			@pTableName = @pTargetTableName,
+			@pObjectID = @ObjectID
+
+		FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PreEtlSourceObjectFullName,@ObjectID
+		
+
+
 	END
 
-	SELECT @TestTypeID = TestTypeID FROM AutoTest.dbo.TestType WHERE TestTypeDesc = 'AdHocDataProfile'
-	SELECT @TableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'StandAloneTableProfile'
-	SELECT @ColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
-	SELECT @ColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
-
-	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pDatabaseName, @pSchemaName, @pTableName)
-	
-	INSERT INTO AutoTest.dbo.TestConfig (
-		TestTypeID
-		,PreEtlSourceObjectFullName
-		,TestDate
-		,ObjectID) 
-	VALUES(
-		@TestTypeID
-		,@PreEtlSourceObjectFullName
-		,GETDATE()
-		,@pObjectID);
-	
-	SET @TestConfigID = @@IDENTITY;
-
-	 SELECT 
-	 	@PreEtlSnapShotName = PreEtlSnapShotName
-	 FROM AutoTest.dbo.TestConfig tlog
-	 WHERE tlog.TestConfigID = @TestConfigID
-
-	 EXEC dbo.uspGetKey
-	 	@pDatabaseName = @pDatabaseName
-	 	,@pSchemaName = @pSchemaName
-	 	,@pObjectName = @pTableName
-	 	,@pColStr = @pObjectPkColumns OUTPUT
-
-	 SET @pPreEtlQuery = FORMATMESSAGE(' (SELECT * FROM %s) ', @PreEtlSourceObjectFullName);
-
-	 EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPreEtlQuery, @pKeyColumns = @pObjectPkColumns, @pHashKeyColumns = @pObjectPkColumns, @pDestTableName = @PreEtlSnapShotName
-
-	 UPDATE AutoTest.dbo.TestConfig 
-	 SET	PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
-	 FROM AutoTest.dbo.TestConfig tlog
-	 WHERE tlog.TestConfigID = @TestConfigID
-
-	 EXEC dbo.uspCreateProfile 
-	 	@pTestConfigID = @TestConfigID,
-	 	@pTargetTableName = @PreEtlSnapShotName,
-	 	@pTableProfileTypeID = @TableProfileTypeID,
-	 	@pColumnProfileTypeID = @ColumnProfileTypeID,
-	 	@pColumnHistogramTypeID = @ColumnHistogramTypeID
-
-	EXEC dbo.uspDropSnapShot @pTestConfigID = @TestConfigID
+	CLOSE cur;
+	DEALLOCATE cur;
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspAdHocDataProfile: runtime: %i seconds', 0, 1, @runtime) WITH NOWAIT;
 	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
+
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
 END
 GO
 --#endregion CREATE/ALTER PROC dbo.uspAdHocDataProfile
---EXEC dbo.uspAdHocDataProfile
+-- EXEC dbo.uspAdHocDataProfile

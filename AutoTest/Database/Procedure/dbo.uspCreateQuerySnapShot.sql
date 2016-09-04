@@ -24,6 +24,7 @@ ALTER PROC dbo.uspCreateQuerySnapShot
 	@pDestTableName varchar(100)
 AS 
 BEGIN
+BEGIN TRY
 -- utility proc that creates a snap shot of the query
 -- executes SELECT <given query> INTO <given destination table>
 -- merges @pHashKeyColumns into single HASHBYTES column
@@ -155,6 +156,33 @@ BEGIN
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());
 	RAISERROR('!dbo.uspCreateQuerySnapShot: runtime: %i seconds (rowcount: %i)', 0, 1, @runtime, @rowcount) WITH NOWAIT;
 	RETURN(@runtime);
+END TRY
+BEGIN CATCH
+	DECLARE @ErrorNumber int;
+	DECLARE @ErrorSeverity int;
+	DECLARE @ErrorState int;
+	DECLARE @ErrorProcedure int;
+	DECLARE @ErrorLine int;
+	DECLARE @ErrorMessage varchar(max);
+	DECLARE @UserMessage nvarchar(max);
 
+	SELECT 
+		@ErrorNumber = ERROR_NUMBER(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE(),
+		@ErrorProcedure = ERROR_PROCEDURE(),
+		@ErrorLine = ERROR_LINE(),
+		@ErrorMessage = ERROR_MESSAGE()
+
+	SET @UserMessage = FORMATMESSAGE('AutoTest proc ERROR: %s 
+		Error Message: %s
+		Line Number: %i
+		Severity: %i
+		State: %i
+		Error Number: %i
+	',@ErrorProcedure, @ErrorMessage, @ErrorNumber, @ErrorLine, @ErrorSeverity, @ErrorState, @ErrorNumber);
+
+	RAISERROR(@UserMessage,0,1) WITH NOWAIT, LOG
+END CATCH;
 END
 GO
