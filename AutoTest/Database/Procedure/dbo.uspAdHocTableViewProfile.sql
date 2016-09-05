@@ -34,18 +34,20 @@ BEGIN TRY
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
 
+	-- declare all local variables
 	DECLARE 
 		@TestTypeID int
 		,@TestConfigID int
-		,@PreEtlSourceObjectFullName varchar(500)
-		,@PreEtlSnapShotCreationElapsedSeconds int
-		,@PreEtlSnapShotName varchar(200)
-		,@pPreEtlQuery nvarchar(max)
+		,@PostEtlSourceObjectFullName varchar(500)
+		,@PostEtlSnapShotCreationElapsedSeconds int
+		,@PostEtlSnapShotName varchar(200)
+		,@pPostEtlQuery nvarchar(max)
 		,@TableProfileTypeID int
 		,@ColumnProfileTypeID int
 		,@ColumnHistogramTypeID int
 		,@pObjectPkColumns varchar(500)
 	
+	-- get objectID if it exists
 	IF @pObjectID IS NULL
 	BEGIN
 		SELECT @pObjectID = ObjectID
@@ -58,53 +60,71 @@ BEGIN TRY
 		AND db.DatabaseName = @pDatabaseName
 	END
 
+	-- get type IDs
 	SELECT @TestTypeID = TestTypeID FROM AutoTest.dbo.TestType WHERE TestTypeDesc = 'AdHocDataProfile'
 	SELECT @TableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'StandAloneTableProfile'
 	SELECT @ColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
 	SELECT @ColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
 
-	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pDatabaseName, @pSchemaName, @pTableName)
+	-- set table/view to be profiled
+	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pDatabaseName, @pSchemaName, @pTableName)
 	
+	-- set old profiles for this table to IsMostRecent = 0
+	UPDATE AutoTest.dbo.TestConfig
+	SET IsMostRecent = 0
+	FROM AutoTest.dbo.TestConfig AS tlog
+	WHERE tlog.PostEtlKeyMisMatchSnapShotName = @PostEtlSourceObjectFullName
+
+	-- populate TestConfig
 	INSERT INTO AutoTest.dbo.TestConfig (
 		TestTypeID
-		,PreEtlSourceObjectFullName
+		,PostEtlSourceObjectFullName
 		,TestDate
-		,ObjectID) 
+		,ObjectID
+		,IsMostRecent) 
 	VALUES(
 		@TestTypeID
-		,@PreEtlSourceObjectFullName
+		,@PostEtlSourceObjectFullName
 		,GETDATE()
-		,@pObjectID);
+		,@pObjectID
+		,1);
 	
+	-- get TestConfigID 
 	SET @TestConfigID = @@IDENTITY;
 
-	 SELECT 
-	 	@PreEtlSnapShotName = PreEtlSnapShotName
-	 FROM AutoTest.dbo.TestConfig tlog
-	 WHERE tlog.TestConfigID = @TestConfigID
+	-- get PostEtlSnapShotName from calculated column
+	SELECT 
+		@PostEtlSnapShotName = PostEtlSnapShotName
+	FROM AutoTest.dbo.TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
-	 EXEC dbo.uspGetKey
-	 	@pDatabaseName = @pDatabaseName
-	 	,@pSchemaName = @pSchemaName
-	 	,@pObjectName = @pTableName
-	 	,@pColStr = @pObjectPkColumns OUTPUT
+	-- create snap shot (better performance with profiling complex views)
+	EXEC dbo.uspGetKey
+		@pDatabaseName = @pDatabaseName
+		,@pSchemaName = @pSchemaName
+		,@pObjectName = @pTableName
+		,@pColStr = @pObjectPkColumns OUTPUT
 
-	 SET @pPreEtlQuery = FORMATMESSAGE(' (SELECT * FROM %s) ', @PreEtlSourceObjectFullName);
+	SET @pPostEtlQuery = FORMATMESSAGE(' (SELECT * FROM %s) ', @PostEtlSourceObjectFullName);
 
-	 EXEC @PreEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPreEtlQuery, @pKeyColumns = @pObjectPkColumns, @pHashKeyColumns = @pObjectPkColumns, @pDestTableName = @PreEtlSnapShotName
+	-- make snapshot
+	EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @pPostEtlQuery, @pKeyColumns = @pObjectPkColumns, @pHashKeyColumns = @pObjectPkColumns, @pDestTableName = @PostEtlSnapShotName
 
-	 UPDATE AutoTest.dbo.TestConfig 
-	 SET	PreEtlSnapShotCreationElapsedSeconds = @PreEtlSnapShotCreationElapsedSeconds
-	 FROM AutoTest.dbo.TestConfig tlog
-	 WHERE tlog.TestConfigID = @TestConfigID
+	-- update TestConfig runtime
+	UPDATE AutoTest.dbo.TestConfig 
+	SET	PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
+	FROM AutoTest.dbo.TestConfig tlog
+	WHERE tlog.TestConfigID = @TestConfigID
 
-	 EXEC dbo.uspCreateProfile 
-	 	@pTestConfigID = @TestConfigID,
-	 	@pTargetTableName = @PreEtlSnapShotName,
-	 	@pTableProfileTypeID = @TableProfileTypeID,
-	 	@pColumnProfileTypeID = @ColumnProfileTypeID,
-	 	@pColumnHistogramTypeID = @ColumnHistogramTypeID
+	-- do table profile, column profile, and column histogram
+	EXEC dbo.uspCreateProfile 
+		@pTestConfigID = @TestConfigID,
+		@pTargetTableName = @PostEtlSnapShotName,
+		@pTableProfileTypeID = @TableProfileTypeID,
+		@pColumnProfileTypeID = @ColumnProfileTypeID,
+		@pColumnHistogramTypeID = @ColumnHistogramTypeID
 
+	-- clean up
 	EXEC dbo.uspDropSnapShot @pTestConfigID = @TestConfigID
 
 	SELECT @runtime=DATEDIFF(second, @start, sysdatetime());

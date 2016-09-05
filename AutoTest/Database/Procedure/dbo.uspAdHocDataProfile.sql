@@ -57,7 +57,7 @@ BEGIN TRY
 	DECLARE @pTargetDatabaseName varchar(500);
 	DECLARE @pTargetSchemaName varchar(500);
 	DECLARE @pTargetTableName varchar(500);
-	DECLARE @PreEtlSourceObjectFullName varchar(500);
+	DECLARE @PostEtlSourceObjectFullName varchar(500);
 
 	DECLARE cur cursor
 	FOR
@@ -86,7 +86,7 @@ BEGIN TRY
 
 	OPEN cur;
 
-	FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PreEtlSourceObjectFullName,@ObjectID
+	FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PostEtlSourceObjectFullName,@ObjectID
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
@@ -98,7 +98,7 @@ BEGIN TRY
 			@pTableName = @pTargetTableName,
 			@pObjectID = @ObjectID
 
-		FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PreEtlSourceObjectFullName,@ObjectID
+		FETCH NEXT FROM cur INTO @pTargetDatabaseName,@pTargetSchemaName,@pTargetTableName,@PostEtlSourceObjectFullName,@ObjectID
 		
 
 

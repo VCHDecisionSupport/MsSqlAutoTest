@@ -31,9 +31,9 @@ BEGIN
 END
 GO
 --#endregion dbo.ufnPrettyDateDiff
-DECLARE @pStartDate datetime = '2016-08-28 09:02'
-DECLARE @pEndDate datetime = '2016-08-30 09:00'
+--DECLARE @pStartDate datetime = '2016-08-28 09:02'
+--DECLARE @pEndDate datetime = '2016-08-30 09:00'
 
-SELECT dbo.ufnPrettyDateDiff(@pStartDate, @pEndDate)
+--SELECT dbo.ufnPrettyDateDiff(@pStartDate, @pEndDate)
 
 

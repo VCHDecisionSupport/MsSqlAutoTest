@@ -43,7 +43,7 @@ BEGIN TRY
 		,@SnapShotBaseName varchar(500)
 		,@PreEtlSnapShotCreationElapsedSeconds int
 		,@PostEtlSnapShotCreationElapsedSeconds int
-		,@ComparisonRuntimeSeconds int
+		,@TestRuntimeSeconds int
 		,@TestTypeID int
 	
 	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
@@ -78,10 +78,10 @@ BEGIN TRY
 	FROM AutoTest.dbo.TestConfig tlog
 	WHERE tlog.TestConfigID = @TestConfigID
 
-	EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
+	EXEC @TestRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 
 	UPDATE TestConfig SET
-		ComparisonRuntimeSeconds = @ComparisonRuntimeSeconds
+		TestRuntimeSeconds = @TestRuntimeSeconds
 	FROM TestConfig tlog
 	WHERE tlog.TestConfigID = @TestConfigID
 

@@ -42,7 +42,7 @@ BEGIN TRY
 		,@SnapShotBaseName varchar(200)
 		,@KeyColumns varchar(500)
 		,@PostEtlSnapShotCreationElapsedSeconds int
-		,@ComparisonRuntimeSeconds int
+		,@TestRuntimeSeconds int
 		,@DatabaseName varchar(200)
 		,@SchemaName varchar(200)
 		,@PreEtlSnapShotName varchar(200)
@@ -94,7 +94,7 @@ BEGIN
 		EXEC AutoTest.dbo.uspGetKey @pDatabaseName = @DatabaseName, @pSchemaName = @SchemaName, @pObjectName = @PostEtlSourceObjectTableName, @pColStr=@KeyColumns OUTPUT
 		PRINT @KeyColumns;
 		EXEC @PostEtlSnapShotCreationElapsedSeconds = AutoTest.dbo.uspCreateQuerySnapShot @pQuery = @PostEtlQuery, @pKeyColumns = @KeyColumns, @pHashKeyColumns = @KeyColumns, @pDestTableName = @PostEtlSnapShotName
-		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
+		EXEC @TestRuntimeSeconds = AutoTest.dbo.uspDataCompare @pTestConfigID = @TestConfigID
 	END
 	ELSE IF @TestTypeDesc IN ('RuntimeProfile')
 	BEGIN
@@ -104,11 +104,11 @@ BEGIN
 		SELECT @StandAloneTableProfileTypeID = TableProfileTypeID FROM AutoTest.dbo.TableProfileType WHERE TableProfileTypeDesc = 'StandAloneTableProfile'
 		SELECT @StandAloneColumnProfileTypeID = ColumnProfileTypeID FROM AutoTest.dbo.ColumnProfileType WHERE ColumnProfileTypeDesc = 'StandAloneColumnProfile'
 		SELECT @StandAloneColumnHistogramTypeID = ColumnHistogramTypeID FROM AutoTest.dbo.ColumnHistogramType WHERE ColumnHistogramTypeDesc = 'StandAloneColumnHistogram'
-		EXEC @ComparisonRuntimeSeconds = AutoTest.dbo.uspCreateProfile @pTestConfigID = @TestConfigID, @pTargetTableName = @PostEtlSnapShotName, @pTableProfileTypeID = @StandAloneTableProfileTypeID, @pColumnProfileTypeID = @StandAloneColumnProfileTypeID, @pColumnHistogramTypeID = @StandAloneColumnHistogramTypeID;
+		EXEC @TestRuntimeSeconds = AutoTest.dbo.uspCreateProfile @pTestConfigID = @TestConfigID, @pTargetTableName = @PostEtlSnapShotName, @pTableProfileTypeID = @StandAloneTableProfileTypeID, @pColumnProfileTypeID = @StandAloneColumnProfileTypeID, @pColumnHistogramTypeID = @StandAloneColumnHistogramTypeID;
 	END
 	UPDATE TestConfig SET
 		PostEtlSnapShotCreationElapsedSeconds = @PostEtlSnapShotCreationElapsedSeconds
-		,ComparisonRuntimeSeconds = @ComparisonRuntimeSeconds
+		,TestRuntimeSeconds = @TestRuntimeSeconds
 	FROM TestConfig tlog
 	WHERE tlog.TestConfigID = @TestConfigID
 

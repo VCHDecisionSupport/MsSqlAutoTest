@@ -182,7 +182,7 @@
 							dy="1.2em" class="st8"> </tspan><tspan dx="2.407em" class="st8">PkgExecKey </tspan><tspan x="4"
 							dy="1.2em" class="st8"> </tspan><tspan dx="2.407em" class="st8">PreEtlSnapShotCreationElapsedSeconds </tspan><tspan
 							x="4" dy="1.2em" class="st8"> </tspan><tspan dx="2.407em" class="st8">PostEtlSnapShotCreationElapsedSeconds </tspan><tspan
-							x="4" dy="1.2em" class="st8"> </tspan><tspan dx="2.407em" class="st8">ComparisonRuntimeSeconds</tspan></text>			</g>
+							x="4" dy="1.2em" class="st8"> </tspan><tspan dx="2.407em" class="st8">TestRuntimeSeconds</tspan></text>			</g>
 		</g>
 		<g id="group7-57" transform="translate(53.6081,-211.266)" v:mID="7" v:groupContext="group" v:layerMember="0">
 			<v:userDefs>
