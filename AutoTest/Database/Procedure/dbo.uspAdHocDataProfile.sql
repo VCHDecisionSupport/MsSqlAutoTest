@@ -83,6 +83,8 @@ BEGIN TRY
 			ELSE @pViewTableName END
 	AND obj.ObjectType IN ('Table', 'View')
 	AND db.DatabaseName != 'DQMF'
+	AND obj.IsActive = 1
+	AND db.IsActive = 1
 
 	OPEN cur;
 

@@ -13,4 +13,5 @@ CREATE TABLE dbo.ETL_PackageObject (
 	PackageID int NOT NULL
 	,ObjectID int NOT NULL
 	,TestTypeID int NULL
+	,UpdateDate datetime NULL
 );
