@@ -1,0 +1,8 @@
+mkdir "network_info"
+ipconfig /all > "network_info/ipconfig_all.txt"
+netstat -a > "network_info/netstat_a.txt"
+netstat -f > "network_info/netstat_f.txt"
+net view /all > "network_info/netview_all.txt"
+net use > "network_info/mapped_drives.txt"
+powershell -Command "Get-Host" >"network_info/powershell_version.txt"
+powershell -Command "get-psdrive" > "network_info/get_psdrives.txt"

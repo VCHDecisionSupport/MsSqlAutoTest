@@ -1,0 +1,58 @@
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : PC030107
+   Primary Dns Suffix  . . . . . . . : HealthBC.org
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : vch.ca
+                                       healthbc.org
+                                       main.vrhb.local
+                                       vrhb.local
+                                       phcnet.ca
+                                       vanhosp.bc.ca
+                                       phc.bc.ca
+                                       phsabc.ehcnet.ca
+                                       phsa.ca
+                                       fraserhealth.org
+
+Ethernet adapter Local Area Connection:
+
+   Connection-specific DNS Suffix  . : vch.ca
+   Description . . . . . . . . . . . : Intel(R) 82579LM Gigabit Network Connection
+   Physical Address. . . . . . . . . : 00-23-24-44-DB-A2
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::b00b:317d:f7b5:b35c%11(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.21.251.1(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Tuesday, August 23, 2016 9:51:21 AM
+   Lease Expires . . . . . . . . . . : Tuesday, August 30, 2016 9:51:22 AM
+   Default Gateway . . . . . . . . . : 10.21.251.254
+   DHCP Server . . . . . . . . . . . : 10.26.116.50
+   DHCPv6 IAID . . . . . . . . . . . : 234890020
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-19-B8-34-5A-00-23-24-44-DB-A2
+   DNS Servers . . . . . . . . . . . : 142.71.203.86
+                                       142.71.50.13
+   Primary WINS Server . . . . . . . : 142.71.203.160
+   Secondary WINS Server . . . . . . : 142.71.50.12
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Tunnel adapter isatap.vch.ca:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : vch.ca
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+Tunnel adapter 6TO4 Adapter:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Microsoft 6to4 Adapter
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
