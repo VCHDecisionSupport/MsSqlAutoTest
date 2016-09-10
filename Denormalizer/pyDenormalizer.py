@@ -1,5 +1,6 @@
 import pymssql, networkx as nx
 from collections import namedtuple
+import BizRuleMaker
 
 #################################################################
 #
@@ -17,11 +18,11 @@ query_file = 'DenormalizeFact.sql'
 
 # init variable to store query results
 Joins = None
-# read sql source file
-with open(query_file) as sqlfile:
-	query = sqlfile.read()
-	# connect to SQL Server
-	with pymssql.connect(server, user, password, database) as conn:
+with pymssql.connect(server, user, password, database) as conn:
+	# read sql source file
+	with open(query_file) as sqlfile:
+		query = sqlfile.read()
+		# connect to SQL Server
 		# init query
 		cur = conn.cursor()
 		cur.execute(query)
@@ -82,9 +83,7 @@ def TraverseUp(CurrentPositions,i=0):
 		# CurrentPositions is list of parent table names
 		TraverseUp(parent_names,i+1)
 
-# send leaf table names to TraverseUp to initiate one walk for each leaf
-TraverseUp(Leafs)
-fout.close()
+
 # create SQL for Biz Rule
 def getSql(node,i=0,colNames=None):
 	# print('node: {}'.format(node))
@@ -102,7 +101,7 @@ def getSql(node,i=0,colNames=None):
 # print(getSql('dbo.CaseNoteContactFact'))
 
 
-def getSql(node,i=0,colNames=None,sql=None):
+def generateSqlParts(node,i=0,colNames=None,sql=None):
 	# print('node: {}'.format(node))
 	if i == 0:
 		sql=[]
@@ -118,10 +117,29 @@ def getSql(node,i=0,colNames=None,sql=None):
 		getSql(edge[1],i+1,colNames,sql)
 	return colNames,sql
 
+def getSql(node):
+	colNames,sql = generateSqlParts(node)
+	gotcha='SELECT\n\t{}\nFROM {}{}'.format('\n\t,'.join(colNames),table_name,'\n'.join(sql))
+	return gotcha
 
-table_name='dbo.CaseNoteContactFact'
-colNames,sql = getSql(table_name)
-print(colNames)
-print(sql)
-gotcha='SELECT\n\t{}\nFROM {}{}'.format('\n\t,'.join(colNames),table_name,'\n'.join(sql))
-print(gotcha)
+
+if __name__ == '__main__':
+	# send leaf table names to TraverseUp to initiate one walk for each leaf
+	TraverseUp(Leafs)
+	fout.close()
+	table_name='dbo.CaseNoteContactFact'
+	colNames,sql = getSql(table_name)
+	print(colNames)
+	print(sql)
+	gotcha='SELECT\n\t{}\nFROM {}{}'.format('\n\t,'.join(colNames),table_name,'\n'.join(sql))
+	print(gotcha)
+	BizRule = br()
+	br.action_sql = sql.replace("'","''")
+	br.short_name = 'populate denomalized columns: {}'.format(table_name)
+	br.rule_desc = 'populates non-source columns from parent fact and dim tables: {}'.format(table_name)
+	br.sequence = 666
+	br.target_table = table_name
+	br.target_column = 'many'
+
+	with open('BizRule.sql','w') as fout:
+		fout.write(br)
