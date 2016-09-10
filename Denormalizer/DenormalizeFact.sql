@@ -1,6 +1,8 @@
-USE CommunityMart
-GO
+-- GO not allowed in pymssql python module
+-- USE CommunityMart
+-- GO
 
+-- get all id columns
 ;WITH id AS (
 	SELECT 
 		sch.name AS SchemaName
@@ -21,7 +23,9 @@ GO
 	AND typ.name LIKE '%int%'
 	AND col.name != 'ETLAuditID'
 	AND tab.name != 'DischargeFact'
-), ck AS (
+), 
+-- get all candidate key columns 
+ck AS (
 	SELECT 
 		DISTINCT
 		--TOP 10
@@ -56,7 +60,9 @@ GO
 	AND attr.IsActive=1
 	AND cpro.ColumnCount = tpro.RecordCount
 	AND cpro.ColumnCount > 1
-), biz_key AS (
+), 
+-- get all ck columns that are also id columns (ETLAuditID already filtered out)
+biz_key AS (
 SELECT DISTINCT
 	ck.SchemaName
 	,ck.TableName
@@ -70,14 +76,16 @@ JOIN id
 ON ck.SchemaName=id.SchemaName
 AND ck.TableName=id.TableName
 AND ck.ColumnName=id.ColumnName
-), fk_ref AS (
+), 
+-- create parent-child join records
+fk_ref AS (
 	SELECT 
 		DISTINCT
-		biz_key.SchemaName AS Parent_SchemaName
-		,biz_key.TableName AS Parent_TableName
+		biz_key.SchemaName AS Child_SchemaName
+		,biz_key.TableName AS Child_TableName
 		,cpro.ColumnName AS FK_ColumnName
-		,obj.ObjectPhysicalName AS Child_TableName
-		,obj.ObjectSchemaName AS Child_SchemaName
+		,obj.ObjectPhysicalName AS Parent_TableName
+		,obj.ObjectSchemaName AS Parent_SchemaName
 		,attr.Datatype
 		,attr.FKTableObjectID
 		,obj.ObjectPKField
@@ -111,20 +119,32 @@ AND ck.ColumnName=id.ColumnName
 	AND PARSENAME(tlog.PostEtlSourceObjectFullName,1) != 'DischargeFact'
 	AND obj.ObjectType = 'Table'
 	AND cpro.ColumnName != 'ETLAuditID'
-), roots AS (
-	SELECT o.*, 0 AS Level
-	FROM fk_ref o
-	WHERE o.Child_SchemaName+'.'+o.Child_TableName NOT IN (
-		SELECT i.Parent_SchemaName+'.'+i.Parent_TableName
-		FROM fk_ref i
-	)
-	UNION ALL
-	SELECT fk_ref.*, roots.Level + 1
-	FROM fk_ref 
-	JOIN roots 
-	ON roots.Parent_SchemaName+'.'+roots.Parent_TableName = fk_ref.Child_SchemaName+'.'+fk_ref.Child_TableName
 )
-SELECT DISTINCT level, roots.Child_SchemaName, roots.Child_TableName, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
-FROM roots
-ORDER BY level ASC, roots.Child_SchemaName DESC, roots.Child_TableName ASC, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
-OPTION (MAXRECURSION 0);
+--, 
+-- -- not useful; need to traverse join tree with recursion and loop
+-- -- could prolly be done with cross join and recursive CTE but easier in python
+-- roots AS (
+-- 	SELECT o.*, 0 AS Level
+-- 	FROM fk_ref o
+-- 	WHERE o.Child_SchemaName+'.'+o.Child_TableName NOT IN (
+-- 		SELECT i.Parent_SchemaName+'.'+i.Parent_TableName
+-- 		FROM fk_ref i
+-- 	)
+-- 	UNION ALL
+-- 	SELECT fk_ref.*, roots.Level + 1
+-- 	FROM fk_ref 
+-- 	JOIN roots 
+-- 	ON roots.Parent_SchemaName+'.'+roots.Parent_TableName = fk_ref.Child_SchemaName+'.'+fk_ref.Child_TableName
+-- ), 
+-- SELECT DISTINCT level, roots.Child_SchemaName, roots.Child_TableName, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
+-- FROM roots
+-- ORDER BY level ASC, roots.Child_SchemaName DESC, roots.Child_TableName ASC, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
+-- OPTION (MAXRECURSION 0);
+
+-- format joins for python
+SELECT DISTINCT
+	FORMATMESSAGE('%s.%s', fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
+	,fk_ref.FK_ColumnName
+	,FORMATMESSAGE('%s.%s', fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
+FROM fk_ref
+
