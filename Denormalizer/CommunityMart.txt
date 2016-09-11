@@ -1,84 +1,76 @@
-dbo.CDLabReportFact
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
-	dbo.CDPreviousTestResultFact
-		Dim.CommunityDisease
-dbo.CDPublicHealthMeasureFact
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
-	dbo.CDPreviousTestResultFact
-		Dim.CommunityDisease
-dbo.WeightGrowthFact
-	Dim.LocalReportingOffice
-		Dim.CommunityProgram
-		Dim.Provider
-			Dim.Facility
-				Dim.HSDA
-			Dim.LevelOfCare
+dbo.ClientGPFact
 	dbo.PersonFact
 		Dim.DeathLocation
 		Dim.EducationLevelLookup
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
-dbo.ScreeningResultFact
-	Dim.CommunityServiceLocation
+dbo.CurrentLocationFact
+	Dim.LHA
+		Dim.HSDA
 	Dim.LocalReportingOffice
 		Dim.CommunityProgram
 		Dim.Provider
 			Dim.Facility
 				Dim.HSDA
 			Dim.LevelOfCare
-	Dim.ScreeningEvent
-	Dim.ScreeningEventResult
+	Dim.LocationType
+	Dim.PostalCode
+	Dim.Provider
+		Dim.Facility
+			Dim.HSDA
+		Dim.LevelOfCare
+	Dim.Province
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
+dbo.HoNOSFact
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+Dim.AgeMonth
+	Dim.Age
+dbo.ImmAdverseEventFact
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
+dbo.HCRSAssessmentFact
+	Dim.LocalReportingOffice
+		Dim.CommunityProgram
+		Dim.Provider
+			Dim.Facility
+				Dim.HSDA
+			Dim.LevelOfCare
+	Dim.ReferralReason
 	dbo.ReferralFact
 		Dim.DischargeDispositionLookupCOM
 			Dim.DischargeDisposition
@@ -108,46 +100,215 @@ dbo.ScreeningResultFact
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
+dbo.SubstanceUseFact
+	Dim.MethodOfSubstanceIntake
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+	Dim.SubstanceUseLookup
+dbo.CDPublicHealthMeasureFact
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+	dbo.CDPreviousTestResultFact
+		Dim.CommunityDisease
+dbo.CDLabReportFact
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+	dbo.CDPreviousTestResultFact
+		Dim.CommunityDisease
+dbo.InvolvedProfessionFact
+	Dim.ServiceProviderCategoryLookup
+	dbo.ReferralFact
+		Dim.DischargeDispositionLookupCOM
+			Dim.DischargeDisposition
+		Dim.DischargeOutcome
+		Dim.LocalReportingOffice
+			Dim.CommunityProgram
+			Dim.Provider
+				Dim.Facility
+					Dim.HSDA
+				Dim.LevelOfCare
+		Dim.ReasonEndingServiceLookup
+			Dim.ReasonEndingService
+		Dim.ReferralPriority
+		Dim.ReferralReason
+		Dim.ReferralSourceLookup
+			Dim.ReferralSource
+		Dim.ReferralType
+		dbo.PersonFact
+			Dim.DeathLocation
+			Dim.EducationLevelLookup
+				Dim.EducationLevel
+			Dim.Ethnicity
+			Dim.Gender
+dbo.CubeSource
+	Dim.AssessmentType
+	Dim.DischargeDisposition
+	Dim.ReasonEndingService
+	Dim.ReferralPriority
+	Dim.ReferralSource
+	Dim.ReferralSourceLookup
+		Dim.ReferralSource
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+	dbo.CaseNoteHeaderFact
+		Dim.CaseNoteReason
+		Dim.CaseNoteType
+		Dim.LocalReportingOffice
+			Dim.CommunityProgram
+			Dim.Provider
+				Dim.Facility
+					Dim.HSDA
+				Dim.LevelOfCare
+		dbo.ReferralFact
+			Dim.DischargeDispositionLookupCOM
+				Dim.DischargeDisposition
+			Dim.DischargeOutcome
+			Dim.LocalReportingOffice
+				Dim.CommunityProgram
+				Dim.Provider
+					Dim.Facility
+						Dim.HSDA
+					Dim.LevelOfCare
+			Dim.ReasonEndingServiceLookup
+				Dim.ReasonEndingService
+			Dim.ReferralPriority
+			Dim.ReferralReason
+			Dim.ReferralSourceLookup
+				Dim.ReferralSource
+			Dim.ReferralType
+			dbo.PersonFact
+				Dim.DeathLocation
+				Dim.EducationLevelLookup
+					Dim.EducationLevel
+				Dim.Ethnicity
+				Dim.Gender
+		dbo.PersonFact
+			Dim.DeathLocation
+			Dim.EducationLevelLookup
+				Dim.EducationLevel
+			Dim.Ethnicity
+			Dim.Gender
+dbo.ImmunizationHistoryFact
+	Dim.Antigen
+	Dim.CommunityServiceLocation
+	Dim.LocalReportingOffice
+		Dim.CommunityProgram
+		Dim.Provider
+			Dim.Facility
+				Dim.HSDA
+			Dim.LevelOfCare
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
+Map.CustomClientGroup
+	Dim.ClientGroup
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
 dbo.SchoolHistoryFact
 	Dim.CommunityServiceLocation
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
-dbo.CurrentLocationFact
-	Dim.LHA
-		Dim.HSDA
-	Dim.LocalReportingOffice
-		Dim.CommunityProgram
-		Dim.Provider
-			Dim.Facility
-				Dim.HSDA
-			Dim.LevelOfCare
-	Dim.LocationType
-	Dim.PostalCode
-	Dim.Provider
-		Dim.Facility
-			Dim.HSDA
-		Dim.LevelOfCare
-	Dim.Province
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
-dbo.WaitTimeFact
-	Dim.Age
-	Dim.CommunityLHA
-	Dim.Gender
-	Dim.LocalReportingOffice
-		Dim.CommunityProgram
-		Dim.Provider
-			Dim.Facility
-				Dim.HSDA
-			Dim.LevelOfCare
 	dbo.PersonFact
 		Dim.DeathLocation
 		Dim.EducationLevelLookup
@@ -194,14 +355,6 @@ dbo.WaitlistClientOfferFact
 	Dim.WaitlistOfferOutcome
 	Dim.WaitlistReasonNotOffered
 	Dim.WaitlistReasonRejected
-Map.CustomClientGroup
-	Dim.ClientGroup
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
 dbo.AssessmentContactFact
 	Dim.CommunityServiceLocation
 	Dim.ContactType
@@ -231,17 +384,61 @@ dbo.AssessmentContactFact
 					Dim.EducationLevel
 				Dim.Ethnicity
 				Dim.Gender
-dbo.CaseNoteContactFact
-	Dim.ContactType
-	dbo.CaseNoteHeaderFact
-		Dim.CaseNoteReason
-		Dim.CaseNoteType
+dbo.ScreeningResultFact
+	Dim.CommunityServiceLocation
+	Dim.LocalReportingOffice
+		Dim.CommunityProgram
+		Dim.Provider
+			Dim.Facility
+				Dim.HSDA
+			Dim.LevelOfCare
+	Dim.ScreeningEvent
+	Dim.ScreeningEventResult
+	dbo.ReferralFact
+		Dim.DischargeDispositionLookupCOM
+			Dim.DischargeDisposition
+		Dim.DischargeOutcome
 		Dim.LocalReportingOffice
 			Dim.CommunityProgram
 			Dim.Provider
 				Dim.Facility
 					Dim.HSDA
 				Dim.LevelOfCare
+		Dim.ReasonEndingServiceLookup
+			Dim.ReasonEndingService
+		Dim.ReferralPriority
+		Dim.ReferralReason
+		Dim.ReferralSourceLookup
+			Dim.ReferralSource
+		Dim.ReferralType
+		dbo.PersonFact
+			Dim.DeathLocation
+			Dim.EducationLevelLookup
+				Dim.EducationLevel
+			Dim.Ethnicity
+			Dim.Gender
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
+dbo.ImmunizationAlertFact
+	Dim.Antigen
+	Dim.ImmAlert
+	Dim.ImmCategory
+	dbo.PersonFact
+		Dim.DeathLocation
+		Dim.EducationLevelLookup
+			Dim.EducationLevel
+		Dim.Ethnicity
+		Dim.Gender
+dbo.YouthClinicActivityFact
+	Dim.CommunityServiceLocation
+	Dim.ServiceProviderCategoryLookup
+	dbo.AssessmentHeaderFact
+		Dim.AssessmentReason
+		Dim.AssessmentType
 		dbo.ReferralFact
 			Dim.DischargeDispositionLookupCOM
 				Dim.DischargeDisposition
@@ -265,12 +462,8 @@ dbo.CaseNoteContactFact
 					Dim.EducationLevel
 				Dim.Ethnicity
 				Dim.Gender
-		dbo.PersonFact
-			Dim.DeathLocation
-			Dim.EducationLevelLookup
-				Dim.EducationLevel
-			Dim.Ethnicity
-			Dim.Gender
+	dbo.CDPreviousTestResultFact
+		Dim.CommunityDisease
 dbo.HCRSRAIHighRiskSummary
 	Dim.Gender
 dbo.HomeSupportActivityFact
@@ -346,84 +539,8 @@ dbo.HomeSupportActivityFact
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
-dbo.HCRSAssessmentFact
-	Dim.LocalReportingOffice
-		Dim.CommunityProgram
-		Dim.Provider
-			Dim.Facility
-				Dim.HSDA
-			Dim.LevelOfCare
-	Dim.ReferralReason
-	dbo.ReferralFact
-		Dim.DischargeDispositionLookupCOM
-			Dim.DischargeDisposition
-		Dim.DischargeOutcome
-		Dim.LocalReportingOffice
-			Dim.CommunityProgram
-			Dim.Provider
-				Dim.Facility
-					Dim.HSDA
-				Dim.LevelOfCare
-		Dim.ReasonEndingServiceLookup
-			Dim.ReasonEndingService
-		Dim.ReferralPriority
-		Dim.ReferralReason
-		Dim.ReferralSourceLookup
-			Dim.ReferralSource
-		Dim.ReferralType
-		dbo.PersonFact
-			Dim.DeathLocation
-			Dim.EducationLevelLookup
-				Dim.EducationLevel
-			Dim.Ethnicity
-			Dim.Gender
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
-dbo.ClientGPFact
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
-dbo.CubeSource
-	Dim.AssessmentType
-	Dim.DischargeDisposition
-	Dim.ReasonEndingService
-	Dim.ReferralPriority
-	Dim.ReferralSource
-	Dim.ReferralSourceLookup
-		Dim.ReferralSource
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
+dbo.CaseNoteContactFact
+	Dim.ContactType
 	dbo.CaseNoteHeaderFact
 		Dim.CaseNoteReason
 		Dim.CaseNoteType
@@ -462,37 +579,6 @@ dbo.CubeSource
 				Dim.EducationLevel
 			Dim.Ethnicity
 			Dim.Gender
-Dim.AgeMonth
-	Dim.Age
-dbo.SubstanceUseFact
-	Dim.MethodOfSubstanceIntake
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
-	Dim.SubstanceUseLookup
 dbo.AddressFact
 	Dim.AddressType
 	Dim.HouseType
@@ -503,50 +589,10 @@ dbo.AddressFact
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
-dbo.ImmunizationAlertFact
-	Dim.Antigen
-	Dim.ImmAlert
-	Dim.ImmCategory
-	dbo.PersonFact
-		Dim.DeathLocation
-		Dim.EducationLevelLookup
-			Dim.EducationLevel
-		Dim.Ethnicity
-		Dim.Gender
-dbo.YouthClinicActivityFact
-	Dim.CommunityServiceLocation
-	Dim.ServiceProviderCategoryLookup
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
-	dbo.CDPreviousTestResultFact
-		Dim.CommunityDisease
-dbo.ImmunizationHistoryFact
-	Dim.Antigen
-	Dim.CommunityServiceLocation
+dbo.WaitTimeFact
+	Dim.Age
+	Dim.CommunityLHA
+	Dim.Gender
 	Dim.LocalReportingOffice
 		Dim.CommunityProgram
 		Dim.Provider
@@ -559,62 +605,16 @@ dbo.ImmunizationHistoryFact
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
-dbo.HoNOSFact
-	dbo.AssessmentHeaderFact
-		Dim.AssessmentReason
-		Dim.AssessmentType
-		dbo.ReferralFact
-			Dim.DischargeDispositionLookupCOM
-				Dim.DischargeDisposition
-			Dim.DischargeOutcome
-			Dim.LocalReportingOffice
-				Dim.CommunityProgram
-				Dim.Provider
-					Dim.Facility
-						Dim.HSDA
-					Dim.LevelOfCare
-			Dim.ReasonEndingServiceLookup
-				Dim.ReasonEndingService
-			Dim.ReferralPriority
-			Dim.ReferralReason
-			Dim.ReferralSourceLookup
-				Dim.ReferralSource
-			Dim.ReferralType
-			dbo.PersonFact
-				Dim.DeathLocation
-				Dim.EducationLevelLookup
-					Dim.EducationLevel
-				Dim.Ethnicity
-				Dim.Gender
-dbo.ImmAdverseEventFact
+dbo.WeightGrowthFact
+	Dim.LocalReportingOffice
+		Dim.CommunityProgram
+		Dim.Provider
+			Dim.Facility
+				Dim.HSDA
+			Dim.LevelOfCare
 	dbo.PersonFact
 		Dim.DeathLocation
 		Dim.EducationLevelLookup
 			Dim.EducationLevel
 		Dim.Ethnicity
 		Dim.Gender
-dbo.InvolvedProfessionFact
-	Dim.ServiceProviderCategoryLookup
-	dbo.ReferralFact
-		Dim.DischargeDispositionLookupCOM
-			Dim.DischargeDisposition
-		Dim.DischargeOutcome
-		Dim.LocalReportingOffice
-			Dim.CommunityProgram
-			Dim.Provider
-				Dim.Facility
-					Dim.HSDA
-				Dim.LevelOfCare
-		Dim.ReasonEndingServiceLookup
-			Dim.ReasonEndingService
-		Dim.ReferralPriority
-		Dim.ReferralReason
-		Dim.ReferralSourceLookup
-			Dim.ReferralSource
-		Dim.ReferralType
-		dbo.PersonFact
-			Dim.DeathLocation
-			Dim.EducationLevelLookup
-				Dim.EducationLevel
-			Dim.Ethnicity
-			Dim.Gender
