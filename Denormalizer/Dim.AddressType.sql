@@ -1,34 +1,35 @@
-import uuid
 
-biz_rule_template="""
 
---#region BR {short_name}
+--#region BR Dim.AddressType
 SET @UpdatedBy = 'VCH\GCrowell'
 SET @CreatedBy ='VCH\GCrowell'
 SET @IsActive = 1;
 SET @IsLogged = 1;
-SET @GUID = '{guid}'
+SET @GUID = '7a871dd2-77c7-11e6-b044-00232444dba2'
 SELECT @BRID=BRID FROM dbo.DQMF_BizRule WHERE GUID=@GUID
 
 SET @ActionSQL = '
 BEGIN
-	{action_sql}
+	SELECT
+	
+FROM Dim.AddressType
+
 END
 '
 EXEC [dbo].[SetBizRule] 
 @pBRId=@BRID, 
-@pShortNameOfTest='{short_name}', 
-@pRuleDesc='{rule_desc}', 
-@pConditionSQL='{condition_sql}', 
-@pActionID={action_id}, 
+@pShortNameOfTest='Dim.AddressType', 
+@pRuleDesc='', 
+@pConditionSQL='', 
+@pActionID=, 
 @pActionSQL=@ActionSQL,
 @pOlsonTypeID=NULL, 
 @pSeverityTypeID=NULL, 
-@pSequence={sequence}, 
+@pSequence=, 
 @pDefaultValue='0', 
 @pDatabaseId=32, 
-@pTargetObjectPhysicalName='{target_table}', 
-@pTargetAttributePhysicalName='{target_column}', 
+@pTargetObjectPhysicalName='', 
+@pTargetAttributePhysicalName='', 
 @pSourceObjectPhysicalName=NULL, 
 @pSourceAttributePhysicalName=NULL, 
 @pIsActive=@IsActive, 
@@ -44,27 +45,5 @@ INSERT dbo.DQMF_BizRuleSchedule (BRID, ScheduleID) SELECT (SELECT BRID FROM DQMF
 
 DELETE BRM FROM dbo.DQMF_BizRuleLookupMapping BRM INNER JOIN dbo.DQMF_BizRule BR ON BRM.BRID = BR.BRID WHERE BR.GUID = @GUID
 UPDATE DQMF.dbo.DQMF_BizRule SET IsLogged=@IsLogged, IsActive=@IsActive FROM DQMF.dbo.DQMF_BizRule AS br WHERE br.GUID = @GUID;
---#endregion BR {short_name}
+--#endregion BR Dim.AddressType
 
-"""
-
-class BizRule(object):
-	"""creates DQMF BizRule"""
-	def __init__(self):
-		super(BizRule, self).__init__()
-		self.guid = uuid.uuid1()
-		self.action_sql = ''
-		self.short_name = ''
-		self.rule_desc = ''
-		self.condition_sql = ''
-		self.action_id = ''
-		self.sequence = ''
-		self.target_table = ''
-		self.target_column = ''
-
-	def __str__(self):
-		return biz_rule_template.format(**self.__dict__)
-
-if __name__ == '__main__':
-	br = BizRule()
-	print(br)
