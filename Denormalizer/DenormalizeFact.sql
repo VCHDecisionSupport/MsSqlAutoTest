@@ -67,10 +67,10 @@ SELECT DISTINCT
 	ck.SchemaName
 	,ck.TableName
 	,ck.ColumnName
-	,ck.Datatype
 	,ck.ObjectPKField
 	,ck.FKTableObjectID
 	,ck.RecordCount
+	,id.Datatype
 FROM ck
 JOIN id
 ON ck.SchemaName=id.SchemaName
@@ -83,12 +83,13 @@ fk_ref AS (
 		DISTINCT
 		biz_key.SchemaName AS Child_SchemaName
 		,biz_key.TableName AS Child_TableName
+		,biz_key.Datatype
 		,cpro.ColumnName AS FK_ColumnName
 		,obj.ObjectPhysicalName AS Parent_TableName
 		,obj.ObjectSchemaName AS Parent_SchemaName
-		,attr.Datatype
 		,attr.FKTableObjectID
 		,obj.ObjectPKField
+
 	FROM AutoTest.dbo.TestConfig AS tlog
 	JOIN AutoTest.dbo.TestType AS tt
 	ON tlog.TestTypeID = tt.TestTypeID
@@ -145,6 +146,7 @@ fk_ref AS (
 SELECT DISTINCT
 	FORMATMESSAGE('%s.%s', fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
 	,fk_ref.FK_ColumnName
+	,fk_ref.Datatype
 	,FORMATMESSAGE('%s.%s', fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
 FROM fk_ref
 

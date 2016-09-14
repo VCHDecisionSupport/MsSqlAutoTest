@@ -12,6 +12,18 @@ from BizRuleMaker import BizRule
 # 	python C:\Users\gcrowell\AppData\Local\Programs\Python\Python35\Lib\pydoc.py -w Z:\GITHUB\PyUtilities\Denormalizer\pySqlGraph.py
 # """
 
+merge_sql_fmt = """
+;WITH src AS (
+	{src_sql}
+)
+MERGE INTO {dst_table} AS dst
+USING src
+ON dst.ETLAuditID = src.ETLAuditID
+WHEN MATCHED THEN
+UPDATE SET \n{set_clause}
+;
+"""
+
 def get_alias(table_name):
 	# vowels = 'aoeui'
 	suffix = '_fact'
@@ -38,13 +50,15 @@ class SqlGraph(object):
 		self.joins = None
 		# init Networkx DiGraph (directed graph) object
 		self.DiG = nx.DiGraph(database=self.database, server=self.server)
-	
 	def get_joins(self):
 		"""
 			connects to Sql Server, loads query from file, executes query and loads results into list of namedtuple Join
 		"""
 		print('connecting to Sql Server:\n\tserver: {server}\n\tdatabase: {database}'.format(**self.__dict__))
-		Join = namedtuple('Join', 'Child,Column,Parent')
+		# Child: <schema>.<table>
+		# Parent: <schema>.<table>
+		# Column: <column>
+		Join = namedtuple('Join', 'Child,Column,Datatype,Parent')
 		with pymssql.connect(self.server, self.user, self.password, self.database) as conn:
 			# read sql source file
 			print('reading query_file: {}'.format(self.query_file))
@@ -58,7 +72,6 @@ class SqlGraph(object):
 				# load query results into list of namedtuple python data structure
 				self.joins = [j for j in map(Join._make, cur)]
 				# leave file, sql connection contexts
-
 	def generate_graph(self):
 		"""
 			convience function
@@ -75,7 +88,6 @@ class SqlGraph(object):
 		# save names of Leaf tables
 		leafs = list(childs - parents)
 		self._traverse_joins(leafs)
-
 	def _traverse_joins(self, current_nodes,i=0):
 		"""
 			builds/populates Networkx DiGraph object self.DiG repersenting entire database
@@ -98,7 +110,6 @@ class SqlGraph(object):
 				self.DiG.add_edge(table_name,parent_tables_node.Parent,{'Column':parent_tables_node.Column})
 			# CurrentPositions is list of parent table names
 			self._traverse_joins(parent_names,i+1)
-
 	def _generate_sql_parts(self, node,i=0,colNames=None,sql=None):
 		""" 
 			generates sql string parts from self.DiG (assumes self.DiG already exists) that are combined into useable string in self.get_sql(table_name) 
@@ -123,7 +134,6 @@ class SqlGraph(object):
 			if node not in colName:
 				good_colNames.append(colName)
 		return good_colNames,sql
-
 	def _generate_subgraph_sql_parts(self, node, subgraph, i=0,colNames=None,sql=None):
 		""" 
 			generates sql string parts from self.DiG (assumes self.DiG already exists) that are combined into useable string in self.get_sql(table_name) 
@@ -148,18 +158,28 @@ class SqlGraph(object):
 			if node not in colName:
 				good_colNames.append(colName)
 		return good_colNames,sql
-
-
 	def get_sql(self, table_name):
 		"""
 			interface function that returns sql string 
 		"""
 		colNames,sql = self._generate_sql_parts(table_name)
-		query='SELECT\n\t{}\nFROM {}\n{}'.format('\n\t,'.join(colNames),table_name,'\n'.join(sql))
+		query='SELECT\n\t{}.ETLAuditID,\n\t{}\nFROM {}\n{}'.format(table_name,'\n\t,'.join(colNames),table_name,'\n'.join(sql))
 		return query
-
-	def get_sql2(self, table_name):
-		pass
+	def get_alter_sql(self, table_name):
+		"""
+			creates alter statements to add columns 
+		"""
+		alter_sql = ''
+		colNames,sql = self._generate_sql_parts(table_name)
+		for elem in self.joins:
+			colName = '{}.{}'.format(elem.Child,elem.Column)
+			if colName in colNames:
+				alter = "USE CommunityMart\nGO\n\nIF NOT EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \n\tALTER TABLE {} ADD {} {};\n".format(elem.Column,table_name.split('.')[1],table_name,elem.Column,elem.Datatype)
+				alter_sql += alter
+				print(alter)
+		with open('Table/ALTER-{}.sql'.format(table_name),'w') as fout:
+			fout.write(alter_sql)
+		return alter_sql
 	def get_subgraph(self,node,subgraph=None):
 		"""
 			recurses up self.DiG from given node (ie table name)  building/populating a subgraph object
@@ -178,8 +198,6 @@ class SqlGraph(object):
 		# for node in subgraph:
 		# 	subgraph[node]['alias'] = get_alias(node)
 		return subgraph
-
-
 	### short cut functions
 	def plot_sql(self, table_name=None):
 		"""
@@ -187,8 +205,12 @@ class SqlGraph(object):
 			if table_name == None then show database graph, else show subgraph from table_name
 		"""
 		if table_name in self.DiG:
-			subgraph = self.generate_graph(table_name)
-			nx.draw_spring(subgraph)
+			subgraph = self.get_subgraph(table_name)
+			labels={}
+			for node in subgraph:
+				labels[node] = node
+			print(labels)
+			nx.draw_spring(subgraph,labels=labels,font_size=8,node_size=300,alpha=0.7)
 			plt.draw()
 			plt.show()
 			return True
@@ -197,13 +219,15 @@ class SqlGraph(object):
 		plt.show()
 	def save_BizRule(self,table_name=None):
 		if table_name == None:
-			for n in self.DiG:
-				sql = self.get_sql(n)
-				br = BizRule()
-				br.short_name = n
-				br.action_sql = sql
-				with open('BizRule_{}.sql'.format(n),'w') as fout:
-					fout.write(str(br))
+			with open('DenormalizeFact_BizRule.sql','w') as fout:
+				for n in self.DiG:
+					if 'Fact' in n:
+						sql = self.get_merge_sql(n)
+						br = BizRule()
+						br.short_name = n
+						br.action_sql = sql
+						fout.write(str(br))
+						self.get_alter_sql(n)
 		else:
 			sql = self.get_sql(table_name)
 			br = BizRule()
@@ -230,13 +254,23 @@ class SqlGraph(object):
 			cur = conn.cursor()
 			print('executing query')
 			cur.execute(query)
+	def get_merge_sql(self, table_name):
+		colNames,sql = self._generate_sql_parts(table_name)
+		query='SELECT\n\t\t{}.ETLAuditID,\n\t{}\nFROM {}\n{}'.format(table_name,'\n\t\t,'.join(colNames),table_name,'\n'.join(sql))
+		set_clause=',\n'.join(['\tdst.{}=src.{}'.format(colName.split('.')[2],colName.split('.')[2]) for colName in colNames])
+		merge_sql = merge_sql_fmt.format(src_sql=query,dst_table=table_name,set_clause=set_clause)
+		# print(merge_sql)
+		return merge_sql
 if __name__ == '__main__':
 	dargs = {'server' : 'STDBDECSUP02','database' : 'CommunityMart','user' : 'VCH\gcrowell','password' : '2AND2is5.', 'query_file' : 'DenormalizeFact.sql'}
 	sql_graph = SqlGraph(**dargs)
 	sql_graph.generate_graph()
-	
 	# sql_graph.save_BizRule()
-	table_name='dbo.ReferralFact'
-	sql_graph.save_sql(table_name)
-	subgraph=sql_graph.get_subgraph(table_name)
-	sql_graph._generate_subgraph_sql_parts(table_name,subgraph)
+	table_name='dbo.AssessmentContactFact'
+	# sql_graph.get_alter_sql(table_name)
+	# sql_graph.get_merge_sql(table_name)
+	# sql_graph.save_BizRule()
+	sql_graph.plot_sql(table_name)
+	# sql_graph.save_sql(table_name)
+	# subgraph=sql_graph.get_subgraph(table_name)
+	# sql_graph._generate_subgraph_sql_parts(table_name,subgraph)
