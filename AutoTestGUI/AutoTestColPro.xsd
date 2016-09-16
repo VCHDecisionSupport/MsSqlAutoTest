@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AutoTestColPro" targetNamespace="http://tempuri.org/AutoTestColPro.xsd" xmlns:mstns="http://tempuri.org/AutoTestColPro.xsd" xmlns="http://tempuri.org/AutoTestColPro.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="connStr_DEV_AutoTestConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="connStr_DEV_AutoTestConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.AutoTestGUI.Properties.Settings.GlobalReference.Default.connStr_DEV_AutoTestConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="vwColumnProfileChooserTableAdapter" GeneratorDataComponentClassName="vwColumnProfileChooserTableAdapter" Name="vwColumnProfileChooser" UserDataComponentName="vwColumnProfileChooserTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="connStr_DEV_AutoTestConnectionString (Settings)" DbObjectName="AutoTest.dbo.vwColumnProfileChooser" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT ColumnName, DistinctCount, Blank, [NULL], [0], TestConfigID, DataType FROM dbo.vwColumnProfileChooser</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="ColumnName" DataSetColumn="ColumnName" />
+              <Mapping SourceColumn="DistinctCount" DataSetColumn="DistinctCount" />
+              <Mapping SourceColumn="Blank" DataSetColumn="Blank" />
+              <Mapping SourceColumn="NULL" DataSetColumn="NULL" />
+              <Mapping SourceColumn="0" DataSetColumn="0" />
+              <Mapping SourceColumn="TestConfigID" DataSetColumn="TestConfigID" />
+              <Mapping SourceColumn="DataType" DataSetColumn="DataType" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AutoTestColPro" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="AutoTestColPro" msprop:Generator_UserDSName="AutoTestColPro">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="vwColumnProfileChooser" msprop:Generator_TableClassName="vwColumnProfileChooserDataTable" msprop:Generator_TableVarName="tablevwColumnProfileChooser" msprop:Generator_TablePropName="vwColumnProfileChooser" msprop:Generator_RowDeletingName="vwColumnProfileChooserRowDeleting" msprop:Generator_RowChangingName="vwColumnProfileChooserRowChanging" msprop:Generator_RowEvHandlerName="vwColumnProfileChooserRowChangeEventHandler" msprop:Generator_RowDeletedName="vwColumnProfileChooserRowDeleted" msprop:Generator_UserTableName="vwColumnProfileChooser" msprop:Generator_RowChangedName="vwColumnProfileChooserRowChanged" msprop:Generator_RowEvArgName="vwColumnProfileChooserRowChangeEvent" msprop:Generator_RowClassName="vwColumnProfileChooserRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ColumnName" msprop:Generator_ColumnVarNameInTable="columnColumnName" msprop:Generator_ColumnPropNameInRow="ColumnName" msprop:Generator_ColumnPropNameInTable="ColumnNameColumn" msprop:Generator_UserColumnName="ColumnName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DistinctCount" msprop:Generator_ColumnVarNameInTable="columnDistinctCount" msprop:Generator_ColumnPropNameInRow="DistinctCount" msprop:Generator_ColumnPropNameInTable="DistinctCountColumn" msprop:Generator_UserColumnName="DistinctCount" type="xs:int" minOccurs="0" />
+              <xs:element name="Blank" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnBlank" msprop:Generator_ColumnPropNameInRow="Blank" msprop:Generator_ColumnPropNameInTable="BlankColumn" msprop:Generator_UserColumnName="Blank" type="xs:int" minOccurs="0" />
+              <xs:element name="NULL" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnNULL" msprop:Generator_ColumnPropNameInRow="NULL" msprop:Generator_ColumnPropNameInTable="NULLColumn" msprop:Generator_UserColumnName="NULL" type="xs:int" minOccurs="0" />
+              <xs:element name="_x0030_" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="column0" msprop:Generator_ColumnPropNameInRow="_0" msprop:Generator_ColumnPropNameInTable="_0Column" msprop:Generator_UserColumnName="0" type="xs:int" minOccurs="0" />
+              <xs:element name="TestConfigID" msprop:Generator_ColumnVarNameInTable="columnTestConfigID" msprop:Generator_ColumnPropNameInRow="TestConfigID" msprop:Generator_ColumnPropNameInTable="TestConfigIDColumn" msprop:Generator_UserColumnName="TestConfigID" type="xs:int" />
+              <xs:element name="DataType" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnDataType" msprop:Generator_ColumnPropNameInRow="DataType" msprop:Generator_ColumnPropNameInTable="DataTypeColumn" msprop:Generator_UserColumnName="DataType" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4000" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:vwColumnProfileChooser" />
+      <xs:field xpath="mstns:TestConfigID" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

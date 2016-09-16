@@ -15,12 +15,8 @@ BEGIN
 END
 GO
 ALTER PROC dbo.uspAdHocDataCompare
-	@pPreEtlDatabaseName varchar(100)
-	,@pPreEtlSchemaName varchar(100)
-	,@pPreEtlTableName varchar(100)
-	,@pPostEtlDatabaseName varchar(100)
-	,@pPostEtlSchemaName varchar(100)
-	,@pPostEtlTableName varchar(100)
+	@PreEtlSourceObjectFullName varchar(500)
+	,@PostEtlSourceObjectFullName varchar(500)
 	,@pObjectPkColumns varchar(100)
 AS
 BEGIN
@@ -28,7 +24,7 @@ BEGIN TRY
 	SET NOCOUNT ON;
 	DECLARE @start datetime2 = GETDATE();
 	DECLARE @runtime int = 0;
-	RAISERROR('uspAdHocDataCompare', 0, 1) WITH NOWAIT,LOG;
+	RAISERROR('uspAdHocDataCompare(%s vs %s on %s)', 0, 1,@PreEtlSourceObjectFullName,@PostEtlSourceObjectFullName,@pObjectPkColumns) WITH NOWAIT,LOG;
 	
 	DECLARE @sql nvarchar(max);
 	DECLARE @param nvarchar(max);
@@ -37,17 +33,28 @@ BEGIN TRY
 		@Prefix varchar(100)
 		,@PreEtlSnapShotName varchar(200)
 		,@PostEtlSnapShotName varchar(200)
-		,@PreEtlSourceObjectFullName varchar(500)
-		,@PostEtlSourceObjectFullName varchar(500)
 		,@TestConfigID int
 		,@SnapShotBaseName varchar(500)
 		,@PreEtlSnapShotCreationElapsedSeconds int
 		,@PostEtlSnapShotCreationElapsedSeconds int
 		,@TestRuntimeSeconds int
 		,@TestTypeID int
+		,@pPreEtlDatabaseName varchar(100)
+		,@pPreEtlSchemaName varchar(100)
+		,@pPreEtlTableName varchar(100)
+		,@pPostEtlDatabaseName varchar(100)
+		,@pPostEtlSchemaName varchar(100)
+		,@pPostEtlTableName varchar(100)
 	
-	SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
-	SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
+	-- SET @PreEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPreEtlDatabaseName, @pPreEtlSchemaName, @pPreEtlTableName)
+	-- SET @PostEtlSourceObjectFullName = FORMATMESSAGE('%s.%s.%s',@pPostEtlDatabaseName, @pPostEtlSchemaName, @pPostEtlTableName)
+
+	SELECT @pPreEtlDatabaseName = PARSENAME(@PreEtlSourceObjectFullName,3)
+		,@pPreEtlSchemaName = PARSENAME(@PreEtlSourceObjectFullName,2)
+		,@pPreEtlTableName = PARSENAME(@PreEtlSourceObjectFullName,1)
+		,@pPostEtlDatabaseName = PARSENAME(@PostEtlSourceObjectFullName,3)
+		,@pPostEtlSchemaName = PARSENAME(@PostEtlSourceObjectFullName,2)
+		,@pPostEtlTableName = PARSENAME(@PostEtlSourceObjectFullName,1)
 
 	SELECT @TestTypeID = TestTypeID FROM AutoTest.dbo.TestType WHERE TestTypeDesc = 'AdHocDataComparison'
 
