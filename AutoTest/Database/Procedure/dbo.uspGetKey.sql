@@ -66,9 +66,10 @@ FOR XML PATH('''')),1,10000)
 '
 ,@pFmt,'%s')
 
-EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
-
-IF @pColStr IS NULL
+IF DB_ID('DQMF') IS NOT NULL
+	EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
+ELSE RAISERROR('DQMF database does not exist',0,0);
+IF @pColStr IS NULL  OR LEN(@pColStr) = 0
 BEGIN
 	RAISERROR('No BizKey set in DQMF.dbo.MD_ObjectAttribute.IsBusinessKey',0,1)
 
@@ -98,12 +99,12 @@ FOR XML PATH('''')),1,10000)
 '
 ,@pFmt,'%s')
 --RAISERROR(@sql, 0, 1) WITH NOWAIT;
-
-EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
+IF DB_ID('DQMF') IS NOT NULL
+	EXEC sp_executesql @sql, @param, @pDatabaseNameIN = @pDatabaseName, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
+	ELSE RAISERROR('DQMF database does not exist',0,1);
 END
-	--RAISERROR('ObjectPKField %s',0,1, @pColStr)
 
-IF @pColStr IS NULL OR @pColStr = REPLACE(@pFmt,'%s','')
+IF @pColStr IS NULL OR @pColStr = REPLACE(@pFmt,'%s','') OR LEN(@pColStr) = 0
 BEGIN
 	RAISERROR('No ObjectPKField set in DQMF.dbo.MD_Object',0,1)
 	SET @param = '
@@ -136,8 +137,8 @@ BEGIN
 ,@pDatabaseName, @pDatabaseName, @pDatabaseName
 ,@pFmt,'%s')
 
-	--RAISERROR(@sql, 0, 1) WITH NOWAIT;
-	--PRINT @sql
+	RAISERROR(@sql, 0, 1) WITH NOWAIT;
+	PRINT @sql
 	EXEC sp_executesql @sql, @param, @pSchemaNameIN = @pSchemaName, @pObjectNameIN = @pObjectName,@pColStrOUT = @pColStr OUTPUT 
 END
 

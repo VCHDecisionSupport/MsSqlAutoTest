@@ -6,11 +6,14 @@ RAISERROR('@path = $(pathvar) = %s
 
 ',0,1,@path) WITH NOWAIT
 
-:r $(pathvar)\msdb\scripts\UPDATE-TablesToCopy.sql
-:r $(pathvar)\DQMF\Database\Table\TABLE-dbo.ETL_PackageObject.sql
-:r $(pathvar)\DQMF\Database\Table\ALTER-dbo.MD_ObjectAttribute.sql
--- :r $(pathvar)\DQMF\Database\Procedure\ALTER-dbo.SetAuditPackageExecution.sql
-
+IF @@SERVERNAME LIKE '%DBDECSUP%'
+BEGIN
+	PRINT @@SERVERNAME
+	:r $(pathvar)\msdb\scripts\UPDATE-TablesToCopy.sql
+	:r $(pathvar)\DQMF\Database\Table\TABLE-dbo.ETL_PackageObject.sql
+	:r $(pathvar)\DQMF\Database\Table\ALTER-dbo.MD_ObjectAttribute.sql
+	:r $(pathvar)\DQMF\Database\Procedure\ALTER-dbo.SetAuditPackageExecution.sql
+END
  :r $(pathvar)\AutoTest\Database\DATABASE-AutoTest.sql
  :r $(pathvar)\AutoTest\Database\SCHEMA-SnapShot.sql
 

@@ -143,6 +143,15 @@ END
 GO
 --#endregion uspGetColumnNames
 
+--#region uspGetKey
+IF 1=1
+BEGIN
+	DECLARE @colStr varchar(max) = '';
+	EXEC AutoTest.dbo.uspGetKey 'AdventureworksDW2016CTP3','dbo','FactResellerSales', '%s,', @colStr OUTPUT
+	PRINT @colStr
+END
+--#endregion uspGetKey
+
 --#region Stand Alone Profile
 IF 1=2
 BEGIN

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#ad-hoc-data-comparisons-with-autotest">Ad-Hoc Data Comparisons with AutoTest</a><ul>
+<li><a href="#how-to">How To:</a></li>
+<li><a href="#autotest.dbo.uspadhocdatacompare-usage"><code>AutoTest.dbo.uspAdHocDataCompare</code> usage:</a></li>
+<li><a href="#example">Example</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="ad-hoc-data-comparisons-with-autotest">Ad-Hoc Data Comparisons with AutoTest</h1>
+<p><strong>Compare two objects that already exist (table or view)</strong></p>
+<h2 id="how-to">How To:</h2>
+<ol style="list-style-type: decimal">
+<li><code>EXEC</code>ute stored proc: <code>AutoTest.dbo.uspAdHocDataCompare</code></li>
+<li>goto <a href="www.google.com">Comparison Results Report (SSRS)</a> to see results.</li>
+</ol>
+<h2 id="autotest.dbo.uspadhocdatacompare-usage"><code>AutoTest.dbo.uspAdHocDataCompare</code> usage:</h2>
+<pre><code>EXEC AutoTest.dbo.uspAdHocDataCompare  
+    @pPreEtlDatabaseName
+    ,@pPreEtlSchemaName
+    ,@pPreEtlTableName
+    ,@pPostEtlDatabaseName
+    ,@pPostEtlSchemaName
+    ,@pPostEtlTableName
+    ,@pObjectPkColumns</code></pre>
+<h2 id="example">Example</h2>
+<p>Let <code>CCRSMart.dbo.MedicationFact</code> be a table and <code>CCRSMart.dbo.vwMedicationFact</code> be a view with key column (not nessisarly primary key or indexed) <code>MedicationKey</code>.</p>
+</body>
+</html>
