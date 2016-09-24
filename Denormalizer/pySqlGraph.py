@@ -12,6 +12,15 @@ from BizRuleMaker import BizRule
 # 	python C:\Users\gcrowell\AppData\Local\Programs\Python\Python35\Lib\pydoc.py -w Z:\GITHUB\PyUtilities\Denormalizer\pySqlGraph.py
 # """
 
+def get_query(table_name, colNames, sql):
+	colClause = ''
+	if len(colNames) > 0:
+		if 'CommunityMart.dbo.PersonFact.SourceSystemClientID' in colNames:
+			colNames.append('CommunityMart.dbo.PersonFact.PatientID')
+		colClause = ','+'\n\t\t,'.join(colNames)
+		# print(colClause)
+	return 'SELECT\n\t\t{}.ETLAuditID\n\t\t{}\nFROM {}\n{}'.format(table_name,colClause,table_name,'\n'.join(sql))
+
 merge_sql_fmt = """
 ;WITH src AS (
 	{src_sql}
@@ -50,6 +59,7 @@ class SqlGraph(object):
 		self.joins = None
 		# init Networkx DiGraph (directed graph) object
 		self.DiG = nx.DiGraph(database=self.database, server=self.server)
+		self.altered_tables = []
 	def get_joins(self):
 		"""
 			connects to Sql Server, loads query from file, executes query and loads results into list of namedtuple Join
@@ -94,14 +104,14 @@ class SqlGraph(object):
 			recurses from each Child position in current_nodes list to their Parent(s)  
 			current_nodes is list of positions (ie table names) in database graph 
 		"""
-		if i == 0:
-			print('\n\n\n')
+		# if i == 0:
+		# 	print('\n\n\n')
 		# loop over each traversal position
 		for table_name in current_nodes:
 			# get list of parent nodes of this table (if any exist) from Joins (ie sql query results)
 			parent_tables_nodes = [j for j in self.joins if j.Child == table_name]
 			# print to console
-			print('{}{}'.format('\t'*i,table_name))
+			# print('{}{}'.format('\t'*i,table_name))
 			# print to file
 			# fout.write('{}{}\n'.format('\t'*i,table_name))
 			# extract names from each Parent node for next recursive call
@@ -118,22 +128,29 @@ class SqlGraph(object):
 
 			TODO: instead of using self.DiG (ie graph of entire) could use subgraph from given node
 		"""
+		referencesPersonFact = False
 		if i == 0:
 			sql=[]
 			colNames=[]
-			print('\nSELECT *\nFROM {}'.format(node))
+			# print('\nSELECT *\nFROM {}'.format(node))
 		for edge in self.DiG.out_edges(node):
 			# print('\tedge: {}->{} {}'.format(*edge,self.DiG.get_edge_data(*edge)))
-			colNames.append('{}.{}'.format(edge[0],self.DiG.get_edge_data(*edge)['Column']))
-			print('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],self.DiG.get_edge_data(*edge)['Column'],edge[0],self.DiG.get_edge_data(*edge)['Column']))
+			colNames.append('{}.{}'.format(edge[1],self.DiG.get_edge_data(*edge)['Column']))
+			# print('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],self.DiG.get_edge_data(*edge)['Column'],edge[0],self.DiG.get_edge_data(*edge)['Column']))
 			sql.append('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],self.DiG.get_edge_data(*edge)['Column'],edge[0],self.DiG.get_edge_data(*edge)['Column']))
 			self._generate_sql_parts(edge[1],i+1,colNames,sql)
-		# remove colNames of root
-		good_colNames = []
+			# if 'dbo.PersonFact' in edge[0] or 'dbo.PersonFact' in edge[1]:
+				# referencesPersonFact = True
+		# print('_generate_sql_parts')
+		# print(colNames)
+		# if referencesPersonFact and 'CommunityMart.dbo.PersonFact.PatientID' not in colNames:
+			# colNames.append('CommunityMart.dbo.PersonFact.PatientID')
+		net_new_colNames = []
+		# remove colNames of already in leaf table
 		for colName in colNames:
 			if node not in colName:
-				good_colNames.append(colName)
-		return good_colNames,sql
+				net_new_colNames.append(colName)
+		return net_new_colNames,sql
 	def _generate_subgraph_sql_parts(self, node, subgraph, i=0,colNames=None,sql=None):
 		""" 
 			generates sql string parts from self.DiG (assumes self.DiG already exists) that are combined into useable string in self.get_sql(table_name) 
@@ -142,45 +159,72 @@ class SqlGraph(object):
 
 			TODO: node is redundant and should be inferred from subgraph
 		"""
+		referencesPersonFact = False
 		if i == 0:
 			sql=[]
 			colNames=[]
-			print('\nSELECT *\nFROM {}'.format(node))
+			# print('\nSELECT *\nFROM {}'.format(node))
 		for edge in subgraph.out_edges(node):
 			# print('\tedge: {}->{} {}'.format(*edge,subgraph.get_edge_data(*edge)))
 			colNames.append('{}.{}'.format(edge[0],subgraph.get_edge_data(*edge)['Column']))
-			print('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],subgraph.get_edge_data(*edge)['Column'],edge[0],subgraph.get_edge_data(*edge)['Column']))
+			# print('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],subgraph.get_edge_data(*edge)['Column'],edge[0],subgraph.get_edge_data(*edge)['Column']))
 			sql.append('{}LEFT JOIN {}\n{}ON {}.{}={}.{}'.format('\t'*i,edge[1],'\t'*i,edge[1],subgraph.get_edge_data(*edge)['Column'],edge[0],subgraph.get_edge_data(*edge)['Column']))
 			self._generate_subgraph_sql_parts(edge[1],subgraph,i+1,colNames,sql)
-		# remove colNames of root
-		good_colNames = []
+			if 'dbo.PersonFact' in edge[0] or 'dbo.PersonFact' in edge[1]:
+				referencesPersonFact = True
+		# print('_generate_subgraph_sql_parts')
+		# if referencesPersonFact and 'CommunityMart.dbo.PersonFact.PatientID' not in colNames:
+			# colNames.append('CommunityMart.dbo.PersonFact.PatientID')
+		# remove colNames of already in leaf table
+		net_new_colNames = []
 		for colName in colNames:
 			if node not in colName:
-				good_colNames.append(colName)
-		return good_colNames,sql
+				net_new_colNames.append(colName)
+		return net_new_colNames,sql
 	def get_sql(self, table_name):
 		"""
 			interface function that returns sql string 
 		"""
 		colNames,sql = self._generate_sql_parts(table_name)
-		query='SELECT\n\t{}.ETLAuditID,\n\t{}\nFROM {}\n{}'.format(table_name,'\n\t,'.join(colNames),table_name,'\n'.join(sql))
-		return query
-	def get_alter_sql(self, table_name):
+		return get_query(table_name, colNames, sql)
+	def save_deploy_sql(self):
+		with open('sqlcmd_deployment.sql','w') as fdeployout:
+			fdeployout.write("""	PRINT '
+	executing sqlcmd_deployment.sql with variable pathvar $(pathvar)'
+
+DECLARE @path varchar(500) = '$(pathvar)'
+RAISERROR('@path = $(pathvar) = %s
+
+',0,1,@path) WITH NOWAIT""")
+			for table_name in self.altered_tables:
+				fdeployout.write('\n:r $(pathvar)/Table/ALTER-{}.sql'.format(table_name))
+	def save_alter_sql(self, table_name):
 		"""
 			creates alter statements to add columns 
 		"""
 		alter_sql = ''
+		scripted_alters = []
 		colNames,sql = self._generate_sql_parts(table_name)
 		for elem in self.joins:
-			colName = '{}.{}'.format(elem.Child,elem.Column)
-			if colName in colNames:
-				alter = "USE CommunityMart\nGO\n\nIF NOT EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \n\tALTER TABLE {} ADD {} {};\n".format(elem.Column,table_name.split('.')[1],table_name,elem.Column,elem.Datatype)
+			colName = '{}.{}'.format(elem.Parent,elem.Column)
+			print(colName)
+			if colName in colNames and colName not in scripted_alters:
+				if colName == 'CommunityMart.dbo.PersonFact.SourceSystemClientID' and 'CommunityMart.dbo.PersonFact.SourceSystemClientID' not in scripted_alters:
+					scripted_alters.append(colName)
+					alter = "\nUSE CommunityMart\nGO\n\nIF NOT EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \nBEGIN\n\tALTER TABLE {} ADD {} {} NULL;\n\tPRINT '{}';\nEND\n".format('PatientID',table_name.split('.')[2],table_name,'PatientID','int','PatientID')
+					alter = "\nUSE CommunityMart\nGO\n\nIF EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \nBEGIN\n\tALTER TABLE {} ALTER COLUMN {} {} NULL;\n\tPRINT '{}';\nEND\n".format('PatientID',table_name.split('.')[2],table_name,'PatientID','int','PatientID')
+					alter_sql += alter
+				scripted_alters.append(colName)
+				alter = "\nUSE CommunityMart\nGO\n\nIF NOT EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \nBEGIN\n\tALTER TABLE {} ADD {} {} NULL;\n\tPRINT '{}';\nEND\n".format(elem.Column,table_name.split('.')[2],table_name,elem.Column,elem.Datatype,colName)
+				alter = "\nUSE CommunityMart\nGO\n\nIF EXISTS(SELECT * FROM sys.columns AS col WHERE col.name = '{}' AND OBJECT_NAME(col.object_id) = '{}') \nBEGIN\n\tALTER TABLE {} ALTER COLUMN {} {} NULL;\n\tPRINT '{}';\nEND\n".format(elem.Column,table_name.split('.')[2],table_name,elem.Column,elem.Datatype,colName)
+
 				alter_sql += alter
 				print(alter)
 		with open('Table/ALTER-{}.sql'.format(table_name),'w') as fout:
+			self.altered_tables.append(table_name)
 			fout.write(alter_sql)
 		return alter_sql
-	def get_subgraph(self,node,subgraph=None):
+	def get_subgraph(self, node,subgraph=None):
 		"""
 			recurses up self.DiG from given node (ie table name)  building/populating a subgraph object
 		"""
@@ -204,9 +248,9 @@ class SqlGraph(object):
 			use matplotlib plotting module to show visual of graph
 			if table_name == None then show database graph, else show subgraph from table_name
 		"""
+		labels={}
 		if table_name in self.DiG:
 			subgraph = self.get_subgraph(table_name)
-			labels={}
 			for node in subgraph:
 				labels[node] = node
 			print(labels)
@@ -214,20 +258,27 @@ class SqlGraph(object):
 			plt.draw()
 			plt.show()
 			return True
-		nx.draw_spring(self.DiG)
+		nx.draw_spring(self.DiG,labels=labels,font_size=8,node_size=300,alpha=0.7)
 		plt.draw()
 		plt.show()
 	def save_BizRule(self,table_name=None):
 		if table_name == None:
 			with open('DenormalizeFact_BizRule.sql','w') as fout:
+				seq = 1000
 				for n in self.DiG:
 					if 'Fact' in n:
+						print('saving BR {}'.format(n))
 						sql = self.get_merge_sql(n)
 						br = BizRule()
-						br.short_name = n
+						br.target_table = n
+						br.target_column = 'many'
+						br.short_name = 'Update/Merge {} (denormalize)'.format(n)
 						br.action_sql = sql
+						br.sequence = seq
 						fout.write(str(br))
-						self.get_alter_sql(n)
+						self.save_alter_sql(n)
+						seq += 100
+			self.save_deploy_sql()
 		else:
 			sql = self.get_sql(table_name)
 			br = BizRule()
@@ -247,6 +298,7 @@ class SqlGraph(object):
 				fout.write(str(sql))
 	def test_sql(self, table_name):
 		print('connecting to Sql Server:\n\tserver: {server}\n\tdatabase: {database}'.format(**self.__dict__))
+		# self.server = 'STDBDECSUP02'
 		with pymssql.connect(self.server, self.user, self.password, self.database) as conn:
 			query = self.get_sql(table_name)
 			# connect to SQL Server
@@ -256,21 +308,20 @@ class SqlGraph(object):
 			cur.execute(query)
 	def get_merge_sql(self, table_name):
 		colNames,sql = self._generate_sql_parts(table_name)
-		query='SELECT\n\t\t{}.ETLAuditID,\n\t{}\nFROM {}\n{}'.format(table_name,'\n\t\t,'.join(colNames),table_name,'\n'.join(sql))
-		set_clause=',\n'.join(['\tdst.{}=src.{}'.format(colName.split('.')[2],colName.split('.')[2]) for colName in colNames])
+		query = get_query(table_name, colNames, sql)
+		set_clause=',\n'.join(['\tdst.{}=src.{}'.format(colName.split('.')[3],colName.split('.')[3]) for colName in colNames])
 		merge_sql = merge_sql_fmt.format(src_sql=query,dst_table=table_name,set_clause=set_clause)
-		# print(merge_sql)
 		return merge_sql
 if __name__ == '__main__':
 	dargs = {'server' : 'STDBDECSUP02','database' : 'CommunityMart','user' : 'VCH\gcrowell','password' : '2AND2is5.', 'query_file' : 'DenormalizeFact.sql'}
 	sql_graph = SqlGraph(**dargs)
 	sql_graph.generate_graph()
-	# sql_graph.save_BizRule()
-	table_name='dbo.AssessmentContactFact'
-	# sql_graph.get_alter_sql(table_name)
+	sql_graph.save_BizRule()
+	# sql_graph.save_alter_sql()
+	# sql_graph.save_deploy_sql()
 	# sql_graph.get_merge_sql(table_name)
-	# sql_graph.save_BizRule()
-	sql_graph.plot_sql(table_name)
-	# sql_graph.save_sql(table_name)
-	# subgraph=sql_graph.get_subgraph(table_name)
-	# sql_graph._generate_subgraph_sql_parts(table_name,subgraph)
+	# table_name = 'CommunityMart.dbo.ReferralFact'
+	# table_name = 'CommunityMart.dbo.SchoolHistoryFact'
+	# query = sql_graph.get_merge_sql(table_name)
+	# print(query)
+

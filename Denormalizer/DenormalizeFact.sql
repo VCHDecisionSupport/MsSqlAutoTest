@@ -121,6 +121,7 @@ fk_ref AS (
 	AND obj.ObjectType = 'Table'
 	AND cpro.ColumnName != 'ETLAuditID'
 )
+
 --, 
 -- -- not useful; need to traverse join tree with recursion and loop
 -- -- could prolly be done with cross join and recursive CTE but easier in python
@@ -143,10 +144,25 @@ fk_ref AS (
 -- OPTION (MAXRECURSION 0);
 
 -- format joins for python
+, pyfmt AS (
 SELECT DISTINCT
-	FORMATMESSAGE('%s.%s', fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
+	FORMATMESSAGE('CommunityMart.%s.%s', fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
 	,fk_ref.FK_ColumnName
 	,fk_ref.Datatype
-	,FORMATMESSAGE('%s.%s', fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
+	,FORMATMESSAGE('CommunityMart.%s.%s', fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
 FROM fk_ref
+)
+, pat_id AS (
+	-- SELECT REPLACE('SourceSystemClientID','PatientID',pyfmt.Parent) AS Parent
+	-- 	,pyfmt.FK_ColumnName
+	-- 	,pyfmt.Datatype
+	-- 	,pyfmt.Child
+	-- FROM pyfmt
+	-- WHERE pyfmt.Parent LIKE '%PatientFact'
+	-- UNION
+	SELECT *
+	FROM pyfmt
+)
+SELECT *
+FROM pat_id
 
