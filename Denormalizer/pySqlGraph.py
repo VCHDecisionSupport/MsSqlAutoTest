@@ -2,6 +2,7 @@ import pymssql, networkx as nx, matplotlib.pyplot as plt
 from collections import namedtuple
 from BizRuleMaker import BizRule
 
+denormalize_query_script='DenormalizeFact.sql'
 # TODO: generate table alias in sql
 # TODO: handle cycles (eg CaseNoteHeader has SourceSystemClientID column but also joins to ReferralFact which has SourceSystemClientID)
 # TODO: handle quoting is BR generation
@@ -313,7 +314,7 @@ RAISERROR('@path = $(pathvar) = %s
 		merge_sql = merge_sql_fmt.format(src_sql=query,dst_table=table_name,set_clause=set_clause)
 		return merge_sql
 if __name__ == '__main__':
-	dargs = {'server' : 'STDBDECSUP02','database' : 'CommunityMart','user' : 'VCH\gcrowell','password' : '2AND2is5.', 'query_file' : 'DenormalizeFact.sql'}
+	dargs = {'server' : 'STDBDECSUP02','database' : 'CommunityMart','user' : 'VCH\gcrowell','password' : '2AND2is5.', 'query_file' : denormalize_query_script}
 	sql_graph = SqlGraph(**dargs)
 	sql_graph.generate_graph()
 	sql_graph.save_BizRule()
