@@ -34,18 +34,6 @@ UPDATE SET \n{set_clause}
 ;
 """
 
-def get_alias(table_name):
-	# vowels = 'aoeui'
-	suffix = '_fact'
-	if table_name[-4:len(table_name)] == 'Fact':
-		table_name = table_name[0:-4]
-	else:
-		suffix = '_dim'
-
-	# alias = table_name.split('.')[1].lower()[0:4]+(''.join([l for l in (table_name.split('.')[1].lower()[4:len(table_name)]) if l not in vowels]))[0] + suffix
-	alias = table_name.split('.')[1].lower() + suffix
-	# print('{} alias {}'.format(table_name,alias))
-	return alias
 
 class SqlGraph(object):
 	"""SqlGraph generates a Directed Graph from Sql joins that are implied by column names and AutoTest profiles"""

@@ -2,6 +2,8 @@
 -- USE CommunityMart
 -- GO
 
+DECLARE @database_name varchar(500) = 'CommunityMart'
+
 -- get all id columns
 ;WITH id AS (
 	SELECT 
@@ -60,6 +62,8 @@ ck AS (
 	AND attr.IsActive=1
 	AND cpro.ColumnCount = tpro.RecordCount
 	AND cpro.ColumnCount > 1
+	AND db.DatabaseName = @database_name
+	--AND PARSENAME(tlog.PostEtlSourceObjectFullName,3) = @database_name
 ), 
 -- get all ck columns that are also id columns (ETLAuditID already filtered out)
 biz_key AS (
@@ -81,7 +85,8 @@ AND ck.ColumnName=id.ColumnName
 fk_ref AS (
 	SELECT 
 		DISTINCT
-		biz_key.SchemaName AS Child_SchemaName
+		db.DatabaseName
+		,biz_key.SchemaName AS Child_SchemaName
 		,biz_key.TableName AS Child_TableName
 		,biz_key.Datatype
 		,cpro.ColumnName AS FK_ColumnName
@@ -120,49 +125,17 @@ fk_ref AS (
 	AND PARSENAME(tlog.PostEtlSourceObjectFullName,1) != 'DischargeFact'
 	AND obj.ObjectType = 'Table'
 	AND cpro.ColumnName != 'ETLAuditID'
+	AND db.DatabaseName = @database_name
+
 )
-
---, 
--- -- not useful; need to traverse join tree with recursion and loop
--- -- could prolly be done with cross join and recursive CTE but easier in python
--- roots AS (
--- 	SELECT o.*, 0 AS Level
--- 	FROM fk_ref o
--- 	WHERE o.Child_SchemaName+'.'+o.Child_TableName NOT IN (
--- 		SELECT i.Parent_SchemaName+'.'+i.Parent_TableName
--- 		FROM fk_ref i
--- 	)
--- 	UNION ALL
--- 	SELECT fk_ref.*, roots.Level + 1
--- 	FROM fk_ref 
--- 	JOIN roots 
--- 	ON roots.Parent_SchemaName+'.'+roots.Parent_TableName = fk_ref.Child_SchemaName+'.'+fk_ref.Child_TableName
--- ), 
--- SELECT DISTINCT level, roots.Child_SchemaName, roots.Child_TableName, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
--- FROM roots
--- ORDER BY level ASC, roots.Child_SchemaName DESC, roots.Child_TableName ASC, roots.FK_ColumnName, roots.Parent_SchemaName, roots.Parent_TableName
--- OPTION (MAXRECURSION 0);
-
--- format joins for python
 , pyfmt AS (
-SELECT DISTINCT
-	FORMATMESSAGE('CommunityMart.%s.%s', fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
-	,fk_ref.FK_ColumnName
-	,fk_ref.Datatype
-	,FORMATMESSAGE('CommunityMart.%s.%s', fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
-FROM fk_ref
-)
-, pat_id AS (
-	-- SELECT REPLACE('SourceSystemClientID','PatientID',pyfmt.Parent) AS Parent
-	-- 	,pyfmt.FK_ColumnName
-	-- 	,pyfmt.Datatype
-	-- 	,pyfmt.Child
-	-- FROM pyfmt
-	-- WHERE pyfmt.Parent LIKE '%PatientFact'
-	-- UNION
-	SELECT *
-	FROM pyfmt
+	SELECT DISTINCT
+		FORMATMESSAGE('%s.%s.%s', fk_ref.DatabaseName, fk_ref.Parent_SchemaName, fk_ref.Parent_TableName) AS Parent
+		,fk_ref.FK_ColumnName
+		,fk_ref.Datatype
+		,FORMATMESSAGE('%s.%s.%s', fk_ref.DatabaseName, fk_ref.Child_SchemaName, fk_ref.Child_TableName) AS Child
+	FROM fk_ref
 )
 SELECT *
-FROM pat_id
+FROM pyfmt
 
