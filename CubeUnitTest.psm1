@@ -347,13 +347,13 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
 }
 # Export-ModuleMember -Function Invoke-CubeUnitTest
 
-Set-Location -Path "C:\Users\gcrowell\Dropbox\Vault\Dev\CommunityMart\Cube\Tabular\ReferralEDVisitCube\testing"
-$TestCubeServerName="STDSDB004\tabular"
-$TestSqlServerName="STDBDECSUP01"
-$UnitTestName="ReferralEDVisitCube--ED Visits--Fiscal Year--Chief Complaint System"
-$UnitTestName="ReferralEDVisitCube--Active Referrals--Fiscal Year--Paris Team Name"
+# Set-Location -Path "C:\Users\gcrowell\Dropbox\Vault\Dev\CommunityMart\Cube\Tabular\ReferralEDVisitCube\testing"
+# $TestCubeServerName="STDSDB004\tabular"
+# $TestSqlServerName="STDBDECSUP01"
+# $UnitTestName="ReferralEDVisitCube--ED Visits--Fiscal Year--Chief Complaint System"
+# $UnitTestName="ReferralEDVisitCube--Active Referrals--Fiscal Year--Paris Team Name"
 
-$CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
-$CubeName = ConvertTo-CleanName -Name $CubeName
-# Get-CubeProcessDate -Server "$TestCubeServerName" -CubeName $CubeName
-Invoke-CubeUnitTest -TestSqlServerName $TestSqlServerName -TestCubeServerName $TestCubeServerName -UnitTestName $UnitTestName
+# $CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
+# $CubeName = ConvertTo-CleanName -Name $CubeName
+# # Get-CubeProcessDate -Server "$TestCubeServerName" -CubeName $CubeName
+# Invoke-CubeUnitTest -TestSqlServerName $TestSqlServerName -TestCubeServerName $TestCubeServerName -UnitTestName $UnitTestName
