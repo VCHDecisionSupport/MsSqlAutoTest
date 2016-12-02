@@ -1,18 +1,20 @@
-Function Get-UnitTestMeasureName($UnitTestName)
+Function Get-CubeUnitTestMeasureName($UnitTestName)
 {
     $ErrorActionPreference = "Stop"
     # "Cube--Measure--Column Dim--Row Dim"
     return $UnitTestName.Split('-')[2]
 }
+Export-ModuleMember -Function Get-CubeUnitTestMeasureName
 
-Function Get-UnitTestDimensionNames($UnitTestName)
+Function Get-CubeUnitTestDimensionNames($UnitTestName)
 {
     $ErrorActionPreference = "Stop"
     # "Cube--Measure--Column Dim--Row Dim"
     return $UnitTestName.Split('-')[4],$UnitTestName.Split('-')[6]
 }
+Export-ModuleMember -Function Get-CubeUnitTestDimensionNames
 
-Function Get-UnitTestSqlQuery ($UnitTestName)
+Function Get-CubeUnitTestSqlQuery ($UnitTestName)
 {
     $ErrorActionPreference = "Stop"
 	# "Cube--Measure--Column Dim--Row Dim"
@@ -21,32 +23,37 @@ Function Get-UnitTestSqlQuery ($UnitTestName)
     $SqlQuery = Get-Content -Path $SqlScriptPath -Raw
 	return $SqlQuery
 }
+Export-ModuleMember -Function Get-CubeUnitTestSqlQuery
 
-Function ConvertTo-CleanName($Name)
+Function Remove-Brackets($Name)
 {
     return $name.Replace('[','').Replace(']','')
 }
+Export-ModuleMember -Function Remove-Brackets
 
-Function ConvertTo-SafeName($Name)
+Function Add-Brackets($Name)
 {
     return "["+$name.Replace(".","].[")+"]"
 }
+Export-ModuleMember -Function Add-Brackets
 
-Function Get-UnitTestCubeName($UnitTestName)
+Function Get-CubeUnitTestCubeName($UnitTestName)
 {
     $ErrorActionPreference = "Stop"
     # "Cube Name--Measure Name--Column Dim--Row Dim"
     return "["+$UnitTestName.Split('-')[0]+"]"
-} 
+}
+Export-ModuleMember -Function Get-CubeUnitTestCubeName 
 
-Function Get-UnitTestMeasure($UnitTestName)
+Function Get-CubeUnitTestMeasure($UnitTestName)
 {
     $ErrorActionPreference = "Stop"
     # "Cube Name--Measure Name--Column Dim--Row Dim"
     return "["+$UnitTestName.Split('-')[2]+"]"
-} 
+}
+Export-ModuleMember -Function Get-CubeUnitTestMeasure 
 
-Function Get-UnitTestMdxQuery ($UnitTestName)
+Function Get-CubeUnitTestMdxQuery ($UnitTestName)
 {
 	# "Cube--Measure--Column Dim--Row Dim"
     $ErrorActionPreference = "Stop"
@@ -55,19 +62,13 @@ Function Get-UnitTestMdxQuery ($UnitTestName)
     $MdxQuery = Get-Content -Path $MdxScriptPath -Raw
 	return $MdxQuery
 }
-# Export-ModuleMember -Function Get-UnitTestMeasureName
-# Export-ModuleMember -Function Get-UnitTestDimensionNames
-# Export-ModuleMember -Function Get-UnitTestSqlQuery
-# Export-ModuleMember -Function ConvertTo-CleanName
-# Export-ModuleMember -Function ConvertTo-SafeName
-# Export-ModuleMember -Function Get-UnitTestCubeName
-# Export-ModuleMember -Function Get-UnitTestMeasure
-# Export-ModuleMember -Function Get-UnitTestMdxQuery
+Export-ModuleMember -Function Get-CubeUnitTestMdxQuery
+
 
 Function Get-CubeProcessDate($ServerName, $CubeName)
 {
-    $ServerName = ConvertTo-CleanName -Name $ServerName
-    $CubeName = ConvertTo-CleanName -Name $CubeName
+    $ServerName = Remove-Brackets -Name $ServerName
+    $CubeName = Remove-Brackets -Name $CubeName
     $DmvQuery = "SELECT * FROM `$system.DBSCHEMA_CATALOGS WHERE [CATALOG_NAME] = '$CubeName'"
     ## Prepare the connection string based on information provided
     $OleConnectionString="Data source=$ServerName;Provider=MSOLAP.5;Cube=Model;Initial catalog=$CubeName;"
@@ -89,8 +90,7 @@ Function Get-CubeProcessDate($ServerName, $CubeName)
     ## Return all of the rows from their query
     $Dataset.Tables[0].Rows[0].DATE_MODIFIED
 }
-
-
+Export-ModuleMember -Function Get-CubeProcessDate
 
 
 # .\UtilityFunctions.ps1
@@ -117,13 +117,13 @@ UnitTestName
 .LINK 
 http://thepowershellguy.com/blogs/posh/archive/2007/01/21/powershell-gui-scripblock-monitor-script.aspx 
 #> 
-Function Invoke-UnitTestMdxQuery ($ServerName, $UnitTestName) { 
+Function Invoke-CubeUnitTestMdxQuery ($ServerName, $UnitTestName) { 
     [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.AnalysisServices.AdomdClient") | Out-Null
     $ErrorActionPreference = "Stop"
     Write-Host ("Executing Mdx for UnitTest: `n`t{0}" -f $UnitTestName)
-    $MdxQuery = Get-UnitTestMdxQuery -UnitTestName $UnitTestName
-    $CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
-    $CubeName = ConvertTo-CleanName -name $CubeName
+    $MdxQuery = Get-CubeUnitTestMdxQuery -UnitTestName $UnitTestName
+    $CubeName = Get-CubeUnitTestCubeName -UnitTestName $UnitTestName
+    $CubeName = Remove-Brackets -name $CubeName
 
     # Use ADOMD API to execute Mdx query and populate generic DataSet.DataTable
     $SsasConnectionString="Data source=$ServerName;Provider=MSOLAP.5;Cube=Model;Initial catalog=$CubeName;"
@@ -139,20 +139,20 @@ Function Invoke-UnitTestMdxQuery ($ServerName, $UnitTestName) {
     # only 1 table exists in DataSet
     $DataTable=$DataSet.Tables[0]
     
-    $MeasureName = Get-UnitTestMeasure -UnitTestName $UnitTestName
-    $MeasureName = ConvertTo-CleanName -name $MeasureName
-    $MeasureName = ConvertTo-SafeName -name $MeasureName
+    $MeasureName = Get-CubeUnitTestMeasure -UnitTestName $UnitTestName
+    $MeasureName = Remove-Brackets -name $MeasureName
+    $MeasureName = Add-Brackets -name $MeasureName
 
 
     # Mdx returns pivoted output... unpivot into new table to be equivalent to Sql output (columns: DimensionValue0, DimensionValue1, MeasureValue)
     $ColumnCount=$DataTable.Columns.Count
     # get column names for new table
     $AnchorColumnName = $DataTable.Columns[0].ColumnName.Split('.')[-2]
-    $AnchorColumnName = ConvertTo-CleanName -name $AnchorColumnName
-    $AnchorColumnName = ConvertTo-SafeName -name $AnchorColumnName
+    $AnchorColumnName = Remove-Brackets -name $AnchorColumnName
+    $AnchorColumnName = Add-Brackets -name $AnchorColumnName
     $PivotColumnName = $DataTable.Columns[1].ColumnName.Split('.')[-2]
-    $PivotColumnName = ConvertTo-CleanName -name $PivotColumnName
-    $PivotColumnName = ConvertTo-SafeName -name $PivotColumnName
+    $PivotColumnName = Remove-Brackets -name $PivotColumnName
+    $PivotColumnName = Add-Brackets -name $PivotColumnName
 
     
     # simplify mdx output; get dim column name: [DatabaseName].[DimTableName].[DimColumnName].[MdxSelection] -> [DimColumnName]
@@ -201,7 +201,7 @@ Function Invoke-UnitTestMdxQuery ($ServerName, $UnitTestName) {
     }
    return, $DataSet.Tables["$MeasureName"]
 }
-# Export-ModuleMember -Function Invoke-UnitTestMdxQuery
+Export-ModuleMember -Function Invoke-CubeUnitTestMdxQuery
 
 
 
@@ -229,10 +229,10 @@ UnitTestName
 .LINK 
 http://thepowershellguy.com/blogs/posh/archive/2007/01/21/powershell-gui-scripblock-monitor-script.aspx 
 #> 
-Function Invoke-UnitTestSqlQuery ($Server, $UnitTestName) {
+Function Invoke-CubeUnitTestSqlQuery ($Server, $UnitTestName) {
     $ErrorActionPreference = "Stop"
     Write-Host ("Executing Sql for UnitTest: `n`t{0}" -f $UnitTestName)
-    $SqlQuery = Get-UnitTestSqlQuery $UnitTestName
+    $SqlQuery = Get-CubeUnitTestSqlQuery $UnitTestName
     
     # Use SqlClient API to execute Mdx query and populate generic DataSet.DataTable
 	$SqlConnection = New-Object System.Data.SqlClient.SqlConnection
@@ -240,8 +240,8 @@ Function Invoke-UnitTestSqlQuery ($Server, $UnitTestName) {
 	$SqlConnection.Open()
 	$Command = New-Object System.Data.SqlClient.SqlCommand
 	$Command.Connection = $SqlConnection
-    
-	$Command.CommandText = $SqlQuery
+    $Command.CommandText = $SqlQuery
+    $Command.CommandTimeout = 0
     $Adapter = New-Object System.Data.SqlClient.SqlDataAdapter $Command
     $Dataset = New-Object System.Data.DataSet
     $Adapter.Fill($Dataset) | Out-Null
@@ -249,23 +249,23 @@ Function Invoke-UnitTestSqlQuery ($Server, $UnitTestName) {
 
     # standardize column names with [] wrap
     $TempColumnName=$DataSet.Tables[0].Columns[0].ColumnName
-    $TempColumnName = ConvertTo-CleanName -Name $TempColumnName
-    $TempColumnName = ConvertTo-SafeName -Name $TempColumnName
+    $TempColumnName = Remove-Brackets -Name $TempColumnName
+    $TempColumnName = Add-Brackets -Name $TempColumnName
     $DataSet.Tables[0].Columns[0].ColumnName = $TempColumnName
     
     $TempColumnName=$DataSet.Tables[0].Columns[1].ColumnName
-    $TempColumnName = ConvertTo-CleanName -Name $TempColumnName
-    $TempColumnName = ConvertTo-SafeName -Name $TempColumnName
+    $TempColumnName = Remove-Brackets -Name $TempColumnName
+    $TempColumnName = Add-Brackets -Name $TempColumnName
     $DataSet.Tables[0].Columns[1].ColumnName = $TempColumnName
     
     $TempColumnName=$DataSet.Tables[0].Columns[2].ColumnName
-    $TempColumnName = ConvertTo-CleanName -Name $TempColumnName
-    $TempColumnName = ConvertTo-SafeName -Name $TempColumnName
+    $TempColumnName = Remove-Brackets -Name $TempColumnName
+    $TempColumnName = Add-Brackets -Name $TempColumnName
     $DataSet.Tables[0].Columns[2].ColumnName = $TempColumnName
 
     Write-Output $DataSet.Tables
 }
-# Export-ModuleMember -Function Invoke-UnitTestSqlQuery
+Export-ModuleMember -Function Invoke-CubeUnitTestSqlQuery
 
 #.\Invoke-SqlCubeUnitTest.ps1
 #.\Invoke-MdxCubeUnitTest.ps1
@@ -276,12 +276,13 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
     Write-Host ("Executing UnitTest: `n`t{0}" -f $UnitTestName)
     
     ########################     TEMPORARY    ###############################
-    $TestDestinationDatabase = "gcDev"
+    $TestLogServer = "STDBDECSUP01"
+    $TestLogDatabase = "gcDev"
     ########################     TEMPORARY    ###############################
 
     # create Sql Connection to $TestSqlServerName and Database where dependant procs are deployed
     $SqlConnection = New-Object System.Data.SqlClient.SqlConnection
-    $SqlConnection.ConnectionString = "Server='$TestSqlServerName';Database='$TestDestinationDatabase';trusted_connection=true;"
+    $SqlConnection.ConnectionString = "Server='$TestLogServer';Database='$TestLogDatabase';trusted_connection=true;"
     [void]$SqlConnection.Open()
 
     # prepare SqlCommand to call stored proc uspInsertCubeUnitTestResults against above SqlConnection 
@@ -291,16 +292,16 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
     $SqlCommand.Connection = $SqlConnection
 
     # get UnitTest parameters from UnitTestName
-    $CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
-    $CubeName = ConvertTo-CleanName -Name $CubeName
-    $Dimension0Name,$Dimension1Name = Get-UnitTestDimensionNames -UnitTestName $UnitTestName
-    $MeasureName = Get-UnitTestMeasureName -UnitTestName $UnitTestName
+    $CubeName = Get-CubeUnitTestCubeName -UnitTestName $UnitTestName
+    $CubeName = Remove-Brackets -Name $CubeName
+    $Dimension0Name,$Dimension1Name = Get-CubeUnitTestDimensionNames -UnitTestName $UnitTestName
+    $MeasureName = Get-CubeUnitTestMeasureName -UnitTestName $UnitTestName
 
     # get cube process date from Get-CubeProcessDate
     $CubeProcessDate = Get-CubeProcessDate -Server "$TestCubeServerName" -CubeName $CubeName
 
     # get outputs from Sql script
-    $SqlOutput = Invoke-UnitTestSqlQuery -Server $TestSqlServerName -UnitTestName $UnitTestName
+    $SqlOutput = Invoke-CubeUnitTestSqlQuery -Server $TestSqlServerName -UnitTestName $UnitTestName
 
     try
     {
@@ -335,7 +336,7 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
 
     }
     # get Mdx output
-    $MdxOutput = Invoke-UnitTestMdxQuery -Server $TestCubeServerName -UnitTestName $UnitTestName
+    $MdxOutput = Invoke-CubeUnitTestMdxQuery -Server $TestCubeServerName -UnitTestName $UnitTestName
 
     # execute proc with Mdx output
     $TestResultSource = $TestCubeServerName
@@ -345,7 +346,7 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
 
     [void]$SqlConnection.Close()
 }
-# Export-ModuleMember -Function Invoke-CubeUnitTest
+Export-ModuleMember -Function Invoke-CubeUnitTest
 
 # Set-Location -Path "C:\Users\gcrowell\Dropbox\Vault\Dev\CommunityMart\Cube\Tabular\ReferralEDVisitCube\testing"
 # $TestCubeServerName="STDSDB004\tabular"
@@ -353,7 +354,7 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
 # $UnitTestName="ReferralEDVisitCube--ED Visits--Fiscal Year--Chief Complaint System"
 # $UnitTestName="ReferralEDVisitCube--Active Referrals--Fiscal Year--Paris Team Name"
 
-# $CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
-# $CubeName = ConvertTo-CleanName -Name $CubeName
+# $CubeName = Get-CubeUnitTestCubeName -UnitTestName $UnitTestName
+# $CubeName = Remove-Brackets -Name $CubeName
 # # Get-CubeProcessDate -Server "$TestCubeServerName" -CubeName $CubeName
 # Invoke-CubeUnitTest -TestSqlServerName $TestSqlServerName -TestCubeServerName $TestCubeServerName -UnitTestName $UnitTestName

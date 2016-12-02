@@ -1,6 +1,6 @@
 Set-Location -LiteralPath $PSScriptRoot
 $ModuleName="CubeUnitTest"
-$ModuleInstallRoot="C:\Program Files\WindowsPowerShell\Modules"
+$ModuleInstallRoot="$Env:ProgramFiles\WindowsPowerShell\Modules"
 $ModuleInstallFolder="$ModuleInstallRoot\$ModuleName"
 $CurrentScriptName=$PSCommandPath.Split("\")[-1]
 $functions = "Get-UnitTestMeasureName","Get-UnitTestDimensionNames","Get-UnitTestSqlQuery","ConvertTo-CleanName","ConvertTo-SafeName","Get-UnitTestCubeName","Get-UnitTestMeasure","Get-UnitTestMdxQuery","Get-CubeProcessDate","Invoke-UnitTestMdxQuery","Invoke-UnitTestSqlQuery","Invoke-CubeUnitTest"

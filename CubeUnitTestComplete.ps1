@@ -234,15 +234,16 @@ Function Invoke-UnitTestSqlQuery ($Server, $UnitTestName) {
     Write-Host ("Executing Sql for UnitTest: `n`t{0}" -f $UnitTestName)
     $SqlQuery = Get-UnitTestSqlQuery $UnitTestName
     
-    # Use SqlClient API to execute Mdx query and populate generic DataSet.DataTable
+    # Use SqlClient API to execute Sql query and populate generic DataSet.DataTable
 	$SqlConnection = New-Object System.Data.SqlClient.SqlConnection
 	$SqlConnection.ConnectionString = "Server='$Server';Database='tempdb';trusted_connection=true;"
 	$SqlConnection.Open()
-	$Command = New-Object System.Data.SqlClient.SqlCommand
-	$Command.Connection = $SqlConnection
+	$SqlCommand = New-Object System.Data.SqlClient.SqlCommand
+	$SqlCommand.Connection = $SqlConnection
+    $SqlCommand.CommandTimeout = 0
     
-	$Command.CommandText = $SqlQuery
-    $Adapter = New-Object System.Data.SqlClient.SqlDataAdapter $Command
+	$SqlCommand.CommandText = $SqlQuery
+    $Adapter = New-Object System.Data.SqlClient.SqlDataAdapter $SqlCommand
     $Dataset = New-Object System.Data.DataSet
     $Adapter.Fill($Dataset) | Out-Null
     $SqlConnection.Close()
@@ -276,12 +277,13 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
     Write-Host ("Executing UnitTest: `n`t{0}" -f $UnitTestName)
     
     ########################     TEMPORARY    ###############################
+    $TestDestinationServer = "STDBDECSUP01"
     $TestDestinationDatabase = "gcDev"
     ########################     TEMPORARY    ###############################
 
     # create Sql Connection to $TestSqlServerName and Database where dependant procs are deployed
     $SqlConnection = New-Object System.Data.SqlClient.SqlConnection
-    $SqlConnection.ConnectionString = "Server='$TestSqlServerName';Database='$TestDestinationDatabase';trusted_connection=true;"
+    $SqlConnection.ConnectionString = "Server='$TestDestinationServer';Database='$TestDestinationDatabase';trusted_connection=true;"
     [void]$SqlConnection.Open()
 
     # prepare SqlCommand to call stored proc uspInsertCubeUnitTestResults against above SqlConnection 
@@ -347,13 +349,16 @@ Function Invoke-CubeUnitTest ($TestSqlServerName, $TestCubeServerName, $UnitTest
 }
 # Export-ModuleMember -Function Invoke-CubeUnitTest
 
-# Set-Location -Path "C:\Users\gcrowell\Dropbox\Vault\Dev\CommunityMart\Cube\Tabular\ReferralEDVisitCube\testing"
-# $TestCubeServerName="STDSDB004\tabular"
-# $TestSqlServerName="STDBDECSUP01"
+Set-Location -Path "C:\Users\gcrowell\Dropbox\Vault\Dev\CommunityMart\Cube\Tabular\ReferralEDVisitCube\testing"
+$TestCubeServerName="STDSDB004\tabular"
+$TestCubeServerName="VCHDSWebT01\tabular"
+$TestSqlServerName="STDBDECSUP01"
+$TestSqlServerName="STDBDECSUP02"
 # $UnitTestName="ReferralEDVisitCube--ED Visits--Fiscal Year--Chief Complaint System"
-# $UnitTestName="ReferralEDVisitCube--Active Referrals--Fiscal Year--Paris Team Name"
+$UnitTestName="ReferralEDVisitCube--Active Referrals--Fiscal Year--Paris Team Name"
 
 # $CubeName = Get-UnitTestCubeName -UnitTestName $UnitTestName
 # $CubeName = ConvertTo-CleanName -Name $CubeName
 # # Get-CubeProcessDate -Server "$TestCubeServerName" -CubeName $CubeName
-# Invoke-CubeUnitTest -TestSqlServerName $TestSqlServerName -TestCubeServerName $TestCubeServerName -UnitTestName $UnitTestName
+# Invoke-UnitTestSqlQuery -Server $TestSqlServerName -UnitTestName $UnitTestName
+Invoke-CubeUnitTest -TestSqlServerName $TestSqlServerName -TestCubeServerName $TestCubeServerName -UnitTestName $UnitTestName

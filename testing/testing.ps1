@@ -1,9 +1,7 @@
 ﻿
-#Set-Location $PSScriptRoot
-..\Install-Module.ps1
-Import-Module CubeUnitTest -Verbose
+Set-Location $PSScriptRoot
 #Get-Module CubeUnitTest
-$TestCubeServerName="STDSDB004"
+$TestCubeServerName="STDSDB004\tabular"
 $TestSqlServerName="STDBDECSUP01"
 $UnitTestName="ReferralEDVisitCube--ED Visits--Fiscal Year--Chief Complaint System"
 

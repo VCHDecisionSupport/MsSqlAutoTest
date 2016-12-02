@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#cube-unit-test">Cube Unit Test</a><ul>
+<li><a href="#install-cubeunittest-module">1. Install <code>CubeUnitTest</code> Module</a></li>
+<li><a href="#unit-test-walk-through">2. Unit test walk through</a><ul>
+<li><a href="#a.-choose-measure-and-2-dimensions">a.) Choose measure and 2 dimensions</a></li>
+<li><a href="#b.-write-sql-test-script">b.) Write Sql Test Script</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#components">Components</a><ul>
+<li><a href="#sql-source-of-truth">Sql source of truth</a></li>
+<li><a href="#powershell-run-time">PowerShell run time</a></li>
+<li><a href="#mdx-cube-query-diffd-against-sql-fact-table-query">Mdx cube query diffd against Sql fact table query</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="cube-unit-test">Cube Unit Test</h1>
+<p>PowerShell module for parameterized unit testing of SSAS tabular and multidimension cubes.</p>
+<h2 id="install-cubeunittest-module">1. Install <code>CubeUnitTest</code> Module</h2>
+<h2 id="unit-test-walk-through">2. Unit test walk through</h2>
+<p><strong>Example:</strong> Unit test of ED Visit Cube</p>
+<h3 id="a.-choose-measure-and-2-dimensions">a.) Choose measure and 2 dimensions</h3>
+<p><strong>Example:</strong> Unit test of ED Visit Cube (server database name: <code>EDMartCube</code>, cube/perspective: <code>Emergency</code>) on SSAS server: <code>STDSDB004</code> against SQL server: <code>STDBDECSUP02</code></p>
+<ul>
+<li><strong>Measure:</strong> <code>Count - Cases</code> by</li>
+<li><strong>Parameters:</strong>
+<ul>
+<li><code>Chief Complaint System</code>,</li>
+<li><code>Start Date Fiscal Year</code></li>
+</ul></li>
+</ul>
+<h3 id="b.-write-sql-test-script">b.) Write Sql Test Script</h3>
+<ul>
+<li>script returns 3 columns (column names must be exact match to cube names)
+<ul>
+<li>Measure (ie. <code>AS [Count - Cases]</code>)</li>
+<li>Dim1 (ie. <code>AS [Start Date Fiscal Year]</code>)</li>
+<li>Dim2 (ie. <code>AS [Chief Complaint System]</code>)</li>
+</ul></li>
+<li>Use fully qualified tables names (ie. <code>DatabaseName.SchemaName.TableName</code>)</li>
+<li>No <code>GO</code> statements</li>
+<li>script filename must follow strict naming convention
+<ul>
+<li><strong>Sql Server Name--Ssas Database Name--Measure Name--Dim1 Name--Dim2 Name.sql</strong></li>
+<li><strong>STDSDB004--EDMartCube--Count - Cases--Start Date Fiscal Year--Chief Complaint System.sql</strong></li>
+</ul></li>
+</ul>
+<h1 id="components">Components</h1>
+<h2 id="sql-source-of-truth">Sql source of truth</h2>
+<p>Sql script is executed on server specified by PowerShell <code>-TestSqlServerName</code> parameter.</p>
+<h2 id="powershell-run-time">PowerShell run time</h2>
+<h2 id="mdx-cube-query-diffd-against-sql-fact-table-query">Mdx cube query diffd against Sql fact table query</h2>
+</body>
+</html>
