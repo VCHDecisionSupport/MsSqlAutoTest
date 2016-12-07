@@ -1,0 +1,21 @@
+New connections will be remembered.
+
+
+Status       Local     Remote                    Network
+
+-------------------------------------------------------------------------------
+OK           F:        \\VHQSTDB1\Decision Support Admin 
+                                                Microsoft Windows Network
+             G:        \\vch.ca\departments      Microsoft Windows Network
+             H:        \\vch.ca\home$\HomeDir01\GCrowell 
+                                                Microsoft Windows Network
+OK           J:        \\VHQSTDB1\DATA           Microsoft Windows Network
+             Q:        \\vch.ca\profiles$\mandatory\pcisdesk 
+                                                Microsoft Windows Network
+             X:        \\vch.ca\applications     Microsoft Windows Network
+OK           Y:        \\VHQSTDB1\Decision Support Admin 
+                                                Microsoft Windows Network
+OK           Z:        \\vchfas01\regionaldata02$\QUIST\Production\GrahamCrowell 
+                                                Microsoft Windows Network
+The command completed successfully.
+

@@ -1,0 +1,24 @@
+
+Name           Used (GB)     Free (GB) Provider      Root                      
+----           ---------     --------- --------      ----                      
+Alias                                  Alias                                   
+C                 267.89         17.99 FileSystem    C:\                       
+Cert                                   Certificate   \                         
+D                    .39          2.05 FileSystem    D:\                       
+E                                      FileSystem    E:\                       
+Env                                    Environment                             
+F                1346.30        189.69 FileSystem    \\VHQSTDB1\Decision Sup...
+Function                               Function                                
+G                   7.49         32.51 FileSystem    \\vch.ca\departments      
+H               14539.80       2171.88 FileSystem    \\vch.ca\home$\HomeDir0...
+HKCU                                   Registry      HKEY_CURRENT_USER         
+HKLM                                   Registry      HKEY_LOCAL_MACHINE        
+J                1346.30        189.69 FileSystem    \\VHQSTDB1\DATA           
+Q                4432.36       4783.64 FileSystem    \\vch.ca\profiles$\mand...
+Variable                               Variable                                
+WSMan                                  WSMan                                   
+X                   7.50         32.49 FileSystem    \\vch.ca\applications     
+Y                1346.30        189.69 FileSystem    \\VHQSTDB1\Decision Sup...
+Z                8105.56       2134.44 FileSystem    \\vchfas01\regionaldata...
+
+

@@ -1,0 +1,204 @@
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:80             PC030107:0             LISTENING
+  TCP    0.0.0.0:135            PC030107:0             LISTENING
+  TCP    0.0.0.0:445            PC030107:0             LISTENING
+  TCP    0.0.0.0:623            PC030107:0             LISTENING
+  TCP    0.0.0.0:3389           PC030107:0             LISTENING
+  TCP    0.0.0.0:5357           PC030107:0             LISTENING
+  TCP    0.0.0.0:16992          PC030107:0             LISTENING
+  TCP    0.0.0.0:27401          PC030107:0             LISTENING
+  TCP    0.0.0.0:49152          PC030107:0             LISTENING
+  TCP    0.0.0.0:49153          PC030107:0             LISTENING
+  TCP    0.0.0.0:49154          PC030107:0             LISTENING
+  TCP    0.0.0.0:49155          PC030107:0             LISTENING
+  TCP    0.0.0.0:49156          PC030107:0             LISTENING
+  TCP    0.0.0.0:49157          PC030107:0             LISTENING
+  TCP    0.0.0.0:49158          PC030107:0             LISTENING
+  TCP    0.0.0.0:57621          PC030107:0             LISTENING
+  TCP    0.0.0.0:62700          PC030107:0             LISTENING
+  TCP    0.0.0.0:62702          PC030107:0             LISTENING
+  TCP    10.21.251.1:139        PC030107:0             LISTENING
+  TCP    10.21.251.1:49211      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:49320      pa-in-f189:https       ESTABLISHED
+  TCP    10.21.251.1:49467      vhqstdb1:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:49539      pc-in-f189:https       ESTABLISHED
+  TCP    10.21.251.1:49576      151.101.52.246:http    ESTABLISHED
+  TCP    10.21.251.1:50271      cache:https            ESTABLISHED
+  TCP    10.21.251.1:50393      vchdfsp04:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:50397      vchdfsp03:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:50628      cache:https            ESTABLISHED
+  TCP    10.21.251.1:50908      sea15s02-in-f165:https  ESTABLISHED
+  TCP    10.21.251.1:50919      151.101.129.69:http    ESTABLISHED
+  TCP    10.21.251.1:50929      151.101.193.69:http    ESTABLISHED
+  TCP    10.21.251.1:50934      stackoverflow:https    ESTABLISHED
+  TCP    10.21.251.1:50941      cache:https            ESTABLISHED
+  TCP    10.21.251.1:50953      cache:https            ESTABLISHED
+  TCP    10.21.251.1:50983      172.217.3.170:https    ESTABLISHED
+  TCP    10.21.251.1:50985      pa-in-f156:https       ESTABLISHED
+  TCP    10.21.251.1:51006      cache:https            ESTABLISHED
+  TCP    10.21.251.1:51048      cache:https            ESTABLISHED
+  TCP    10.21.251.1:51060      a23-222-160-207:https  ESTABLISHED
+  TCP    10.21.251.1:51062      a23-3-105-176:http     ESTABLISHED
+  TCP    10.21.251.1:51067      151.101.129.69:http    ESTABLISHED
+  TCP    10.21.251.1:51074      151.101.44.134:http    ESTABLISHED
+  TCP    10.21.251.1:51081      sea15s07-in-f2:http    ESTABLISHED
+  TCP    10.21.251.1:51085      sea15s07-in-f2:http    ESTABLISHED
+  TCP    10.21.251.1:51087      sea15s07-in-f2:https   ESTABLISHED
+  TCP    10.21.251.1:51093      sea15s07-in-f2:https   ESTABLISHED
+  TCP    10.21.251.1:51094      172.217.3.170:http     ESTABLISHED
+  TCP    10.21.251.1:51097      40.79.82.220:http      CLOSE_WAIT
+  TCP    10.21.251.1:51098      sea15s08-in-f10:https  ESTABLISHED
+  TCP    10.21.251.1:51099      pc-in-f95:https        ESTABLISHED
+  TCP    10.21.251.1:51100      cache:https            ESTABLISHED
+  TCP    10.21.251.1:51108      sea15s08-in-f97:https  ESTABLISHED
+  TCP    10.21.251.1:51123      a23-73-42-92:https     ESTABLISHED
+  TCP    10.21.251.1:51125      a23-195-227-44:https   ESTABLISHED
+  TCP    10.21.251.1:51127      a23-73-42-92:https     ESTABLISHED
+  TCP    10.21.251.1:51149      104.156.85.134:http    ESTABLISHED
+  TCP    10.21.251.1:51156      sea15s07-in-f72:https  ESTABLISHED
+  TCP    10.21.251.1:51157      151.101.52.134:https   ESTABLISHED
+  TCP    10.21.251.1:51158      151.101.52.134:https   ESTABLISHED
+  TCP    10.21.251.1:51159      23.235.33.233:http     ESTABLISHED
+  TCP    10.21.251.1:51181      151.101.52.188:http    ESTABLISHED
+  TCP    10.21.251.1:51184      72.21.81.200:https     TIME_WAIT
+  TCP    10.21.251.1:51201      img-sj2:https          TIME_WAIT
+  TCP    10.21.251.1:51202      img-sj2:https          TIME_WAIT
+  TCP    10.21.251.1:51203      img-sj2:https          TIME_WAIT
+  TCP    10.21.251.1:51216      a23-73-36-142:https    ESTABLISHED
+  TCP    10.21.251.1:51217      sea15s07-in-f6:https   ESTABLISHED
+  TCP    10.21.251.1:51218      172.217.3.162:https    ESTABLISHED
+  TCP    10.21.251.1:51221      static:https           TIME_WAIT
+  TCP    10.21.251.1:51222      static:https           TIME_WAIT
+  TCP    10.21.251.1:51228      ec2-52-25-226-46:https  TIME_WAIT
+  TCP    10.21.251.1:51229      ec2-52-25-226-46:https  TIME_WAIT
+  TCP    10.21.251.1:51231      a23-73-36-142:https    ESTABLISHED
+  TCP    10.21.251.1:51238      probe-silver:https     TIME_WAIT
+  TCP    10.21.251.1:51239      216-219-112-250:https  TIME_WAIT
+  TCP    10.21.251.1:51240      54-208-199-64:https    TIME_WAIT
+  TCP    10.21.251.1:51241      54-208-199-64:https    TIME_WAIT
+  TCP    10.21.251.1:51242      probe-silver:https     TIME_WAIT
+  TCP    10.21.251.1:51243      216-219-112-250:https  TIME_WAIT
+  TCP    10.21.251.1:51245      54-208-199-64:https    TIME_WAIT
+  TCP    10.21.251.1:51246      probe-silver:https     TIME_WAIT
+  TCP    10.21.251.1:51247      216-219-112-250:https  TIME_WAIT
+  TCP    10.21.251.1:51248      54-208-199-64:https    TIME_WAIT
+  TCP    10.21.251.1:51249      probe-silver:https     TIME_WAIT
+  TCP    10.21.251.1:51250      216-219-112-250:https  TIME_WAIT
+  TCP    10.21.251.1:51251      54-208-199-64:https    TIME_WAIT
+  TCP    10.21.251.1:51252      probe-silver:https     TIME_WAIT
+  TCP    10.21.251.1:51253      216-219-112-250:https  TIME_WAIT
+  TCP    10.21.251.1:51254      64.4.54.254:https      ESTABLISHED
+  TCP    10.21.251.1:51264      ld020999:netbios-ssn   TIME_WAIT
+  TCP    10.21.251.1:51265      ld020999:netbios-ssn   TIME_WAIT
+  TCP    10.21.251.1:52310      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:52333      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:52401      vchdc1:1025            ESTABLISHED
+  TCP    10.21.251.1:52403      10.251.216.37:29941    ESTABLISHED
+  TCP    10.21.251.1:52456      pf-in-f188:https       ESTABLISHED
+  TCP    10.21.251.1:62222      vchocsfep1:5061        ESTABLISHED
+  TCP    10.21.251.1:62805      142.71.81.5:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:62863      spdc0009:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:62896      142.71.81.1:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:62975      sjc1-accesspoint-a87:https  ESTABLISHED
+  TCP    10.21.251.1:63247      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:63263      stdbdecsup01:microsoft-ds  ESTABLISHED
+  TCP    10.21.251.1:63319      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:63345      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    10.21.251.1:63610      spprt008:63969         ESTABLISHED
+  TCP    10.21.251.1:63633      stdbdecsup01:ms-sql-s  ESTABLISHED
+  TCP    127.0.0.1:4370         PC030107:0             LISTENING
+  TCP    127.0.0.1:4371         PC030107:0             LISTENING
+  TCP    127.0.0.1:4380         PC030107:0             LISTENING
+  TCP    127.0.0.1:4381         PC030107:0             LISTENING
+  TCP    127.0.0.1:24801        PC030107:0             LISTENING
+  TCP    127.0.0.1:50475        PC030107:0             LISTENING
+  TCP    127.0.0.1:62752        PC030107:0             LISTENING
+  TCP    127.0.0.1:62920        PC030107:0             LISTENING
+  TCP    [::]:80                PC030107:0             LISTENING
+  TCP    [::]:135               PC030107:0             LISTENING
+  TCP    [::]:445               PC030107:0             LISTENING
+  TCP    [::]:623               PC030107:0             LISTENING
+  TCP    [::]:3389              PC030107:0             LISTENING
+  TCP    [::]:5357              PC030107:0             LISTENING
+  TCP    [::]:16992             PC030107:0             LISTENING
+  TCP    [::]:49152             PC030107:0             LISTENING
+  TCP    [::]:49153             PC030107:0             LISTENING
+  TCP    [::]:49154             PC030107:0             LISTENING
+  TCP    [::]:49155             PC030107:0             LISTENING
+  TCP    [::]:49156             PC030107:0             LISTENING
+  TCP    [::]:49157             PC030107:0             LISTENING
+  TCP    [::]:49158             PC030107:0             LISTENING
+  TCP    [::]:62700             PC030107:0             LISTENING
+  TCP    [::]:62702             PC030107:0             LISTENING
+  TCP    [::1]:49158            PC030107:51256         ESTABLISHED
+  TCP    [::1]:49158            PC030107:51261         ESTABLISHED
+  TCP    [::1]:49158            PC030107:51262         ESTABLISHED
+  TCP    [::1]:49158            PC030107:51263         ESTABLISHED
+  TCP    [::1]:49158            PC030107:52502         ESTABLISHED
+  TCP    [::1]:49158            PC030107:63244         ESTABLISHED
+  TCP    [::1]:51185            PC030107:49158         TIME_WAIT
+  TCP    [::1]:51186            PC030107:49158         TIME_WAIT
+  TCP    [::1]:51256            PC030107:49158         ESTABLISHED
+  TCP    [::1]:51261            PC030107:49158         ESTABLISHED
+  TCP    [::1]:51262            PC030107:49158         ESTABLISHED
+  TCP    [::1]:51263            PC030107:49158         ESTABLISHED
+  TCP    [::1]:52502            PC030107:49158         ESTABLISHED
+  TCP    [::1]:62695            PC030107:0             LISTENING
+  TCP    [::1]:62736            PC030107:62738         ESTABLISHED
+  TCP    [::1]:62738            PC030107:62736         ESTABLISHED
+  TCP    [::1]:63244            PC030107:49158         ESTABLISHED
+  UDP    0.0.0.0:123            *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:3702           *:*                    
+  UDP    0.0.0.0:5353           *:*                    
+  UDP    0.0.0.0:5353           *:*                    
+  UDP    0.0.0.0:5355           *:*                    
+  UDP    0.0.0.0:53563          *:*                    
+  UDP    0.0.0.0:57621          *:*                    
+  UDP    0.0.0.0:61521          *:*                    
+  UDP    0.0.0.0:64595          *:*                    
+  UDP    10.21.251.1:137        *:*                    
+  UDP    10.21.251.1:138        *:*                    
+  UDP    10.21.251.1:1900       *:*                    
+  UDP    10.21.251.1:50445      *:*                    
+  UDP    10.21.251.1:50447      *:*                    
+  UDP    10.21.251.1:61201      *:*                    
+  UDP    127.0.0.1:1900         *:*                    
+  UDP    127.0.0.1:52424        *:*                    
+  UDP    127.0.0.1:54814        *:*                    
+  UDP    127.0.0.1:56188        *:*                    
+  UDP    127.0.0.1:56192        *:*                    
+  UDP    127.0.0.1:57337        *:*                    
+  UDP    127.0.0.1:58495        *:*                    
+  UDP    127.0.0.1:58503        *:*                    
+  UDP    127.0.0.1:59239        *:*                    
+  UDP    127.0.0.1:60059        *:*                    
+  UDP    127.0.0.1:61202        *:*                    
+  UDP    127.0.0.1:61595        *:*                    
+  UDP    [::]:123               *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:3702              *:*                    
+  UDP    [::]:5353              *:*                    
+  UDP    [::]:5355              *:*                    
+  UDP    [::]:53564             *:*                    
+  UDP    [::]:61522             *:*                    
+  UDP    [::]:64596             *:*                    
+  UDP    [::1]:1900             *:*                    
+  UDP    [::1]:61200            *:*                    
+  UDP    [fe80::b00b:317d:f7b5:b35c%11]:1900  *:*                    
+  UDP    [fe80::b00b:317d:f7b5:b35c%11]:61199  *:*                    
