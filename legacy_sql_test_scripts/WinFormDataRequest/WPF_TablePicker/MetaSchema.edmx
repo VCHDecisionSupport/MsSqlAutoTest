@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="TestLogModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="MD_Database">
+          <Key>
+            <PropertyRef Name="DatabaseId" />
+          </Key>
+          <Property Name="DatabaseId" Type="int" Nullable="false" />
+          <Property Name="DatabaseName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DatabaseShortDescription" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="DatabaseLongDescription" Type="varchar(max)" />
+          <Property Name="DatabaseType" Type="varchar" MaxLength="50" />
+          <Property Name="IsActive" Type="bit" />
+        </EntityType>
+        <EntityType Name="MD_Object">
+          <Key>
+            <PropertyRef Name="ObjectID" />
+          </Key>
+          <Property Name="DatabaseId" Type="int" Nullable="false" />
+          <Property Name="SubjectAreaID" Type="int" Nullable="false" />
+          <Property Name="ObjectID" Type="int" Nullable="false" />
+          <Property Name="ObjectDisplayName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ObjectSchemaName" Type="varchar" MaxLength="50" />
+          <Property Name="ObjectPhysicalName" Type="varchar" MaxLength="255" />
+          <Property Name="ObjectPKField" Type="varchar" MaxLength="255" />
+          <Property Name="ObjectType" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ObjectPurpose" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ObjectShortDescription" Type="varchar" MaxLength="250" />
+          <Property Name="ObjectLongDescription" Type="varchar" MaxLength="2000" />
+          <Property Name="ObjectUsageTips" Type="varchar(max)" />
+          <Property Name="ObjectStewardContact" Type="varchar" MaxLength="50" />
+          <Property Name="LastRefreshDate" Type="datetime" />
+          <Property Name="UpdateFrequency" Type="varchar" MaxLength="5" />
+          <Property Name="ObjectOutputLocation" Type="varchar" MaxLength="1000" />
+          <Property Name="ObjectOutputRecipients" Type="varchar(max)" />
+          <Property Name="IsActive" Type="bit" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreatedDT" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="UpdatedDT" Type="datetime" Nullable="false" />
+          <Property Name="KeyDateObjectAttributeID" Type="int" />
+          <Property Name="IsObjectInDB" Type="bit" />
+        </EntityType>
+        <Association Name="Fk_MD_Object_MD_Database">
+          <End Role="MD_Database" Type="Self.MD_Database" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="MD_Object" Type="Self.MD_Object" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MD_Database">
+              <PropertyRef Name="DatabaseId" />
+            </Principal>
+            <Dependent Role="MD_Object">
+              <PropertyRef Name="DatabaseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TestLogModelStoreContainer">
+          <EntitySet Name="MD_Database" EntityType="Self.MD_Database" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MD_Object" EntityType="Self.MD_Object" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="Fk_MD_Object_MD_Database" Association="Self.Fk_MD_Object_MD_Database">
+            <End Role="MD_Database" EntitySet="MD_Database" />
+            <End Role="MD_Object" EntitySet="MD_Object" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TestLogModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="MD_Database">
+          <Key>
+            <PropertyRef Name="DatabaseId" />
+          </Key>
+          <Property Name="DatabaseId" Type="Int32" Nullable="false" />
+          <Property Name="DatabaseName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DatabaseShortDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DatabaseLongDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DatabaseType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" />
+          <NavigationProperty Name="MD_Object" Relationship="Self.Fk_MD_Object_MD_Database" FromRole="MD_Database" ToRole="MD_Object" />
+        </EntityType>
+        <EntityType Name="MD_Object">
+          <Key>
+            <PropertyRef Name="ObjectID" />
+          </Key>
+          <Property Name="DatabaseId" Type="Int32" Nullable="false" />
+          <Property Name="SubjectAreaID" Type="Int32" Nullable="false" />
+          <Property Name="ObjectID" Type="Int32" Nullable="false" />
+          <Property Name="ObjectDisplayName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ObjectSchemaName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectPhysicalName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectPKField" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ObjectPurpose" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ObjectShortDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectLongDescription" Type="String" MaxLength="2000" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectUsageTips" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectStewardContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LastRefreshDate" Type="DateTime" Precision="3" />
+          <Property Name="UpdateFrequency" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectOutputLocation" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectOutputRecipients" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreatedDT" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="UpdatedDT" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="KeyDateObjectAttributeID" Type="Int32" />
+          <Property Name="IsObjectInDB" Type="Boolean" />
+          <NavigationProperty Name="MD_Database" Relationship="Self.Fk_MD_Object_MD_Database" FromRole="MD_Object" ToRole="MD_Database" />
+        </EntityType>
+        <Association Name="Fk_MD_Object_MD_Database">
+          <End Role="MD_Database" Type="Self.MD_Database" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="MD_Object" Type="Self.MD_Object" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MD_Database">
+              <PropertyRef Name="DatabaseId" />
+            </Principal>
+            <Dependent Role="MD_Object">
+              <PropertyRef Name="DatabaseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TestLogEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="MD_Database" EntityType="Self.MD_Database" />
+          <EntitySet Name="MD_Object" EntityType="Self.MD_Object" />
+          <AssociationSet Name="Fk_MD_Object_MD_Database" Association="Self.Fk_MD_Object_MD_Database">
+            <End Role="MD_Database" EntitySet="MD_Database" />
+            <End Role="MD_Object" EntitySet="MD_Object" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TestLogModelStoreContainer" CdmEntityContainer="TestLogEntities">
+          <EntitySetMapping Name="MD_Database">
+            <EntityTypeMapping TypeName="TestLogModel.MD_Database">
+              <MappingFragment StoreEntitySet="MD_Database">
+                <ScalarProperty Name="DatabaseId" ColumnName="DatabaseId" />
+                <ScalarProperty Name="DatabaseName" ColumnName="DatabaseName" />
+                <ScalarProperty Name="DatabaseShortDescription" ColumnName="DatabaseShortDescription" />
+                <ScalarProperty Name="DatabaseLongDescription" ColumnName="DatabaseLongDescription" />
+                <ScalarProperty Name="DatabaseType" ColumnName="DatabaseType" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MD_Object">
+            <EntityTypeMapping TypeName="TestLogModel.MD_Object">
+              <MappingFragment StoreEntitySet="MD_Object">
+                <ScalarProperty Name="DatabaseId" ColumnName="DatabaseId" />
+                <ScalarProperty Name="SubjectAreaID" ColumnName="SubjectAreaID" />
+                <ScalarProperty Name="ObjectID" ColumnName="ObjectID" />
+                <ScalarProperty Name="ObjectDisplayName" ColumnName="ObjectDisplayName" />
+                <ScalarProperty Name="ObjectSchemaName" ColumnName="ObjectSchemaName" />
+                <ScalarProperty Name="ObjectPhysicalName" ColumnName="ObjectPhysicalName" />
+                <ScalarProperty Name="ObjectPKField" ColumnName="ObjectPKField" />
+                <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
+                <ScalarProperty Name="ObjectPurpose" ColumnName="ObjectPurpose" />
+                <ScalarProperty Name="ObjectShortDescription" ColumnName="ObjectShortDescription" />
+                <ScalarProperty Name="ObjectLongDescription" ColumnName="ObjectLongDescription" />
+                <ScalarProperty Name="ObjectUsageTips" ColumnName="ObjectUsageTips" />
+                <ScalarProperty Name="ObjectStewardContact" ColumnName="ObjectStewardContact" />
+                <ScalarProperty Name="LastRefreshDate" ColumnName="LastRefreshDate" />
+                <ScalarProperty Name="UpdateFrequency" ColumnName="UpdateFrequency" />
+                <ScalarProperty Name="ObjectOutputLocation" ColumnName="ObjectOutputLocation" />
+                <ScalarProperty Name="ObjectOutputRecipients" ColumnName="ObjectOutputRecipients" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDT" ColumnName="CreatedDT" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedDT" ColumnName="UpdatedDT" />
+                <ScalarProperty Name="KeyDateObjectAttributeID" ColumnName="KeyDateObjectAttributeID" />
+                <ScalarProperty Name="IsObjectInDB" ColumnName="IsObjectInDB" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

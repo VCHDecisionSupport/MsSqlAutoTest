@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSources>
+    <DataSource Name="DQMF">
+      <rd:DataSourceID>21151e7b-a2dd-423b-afb0-ab31b6faf0de</rd:DataSourceID>
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString>Data Source=PC;Initial Catalog=DQMF</ConnectString>
+        <IntegratedSecurity>true</IntegratedSecurity>
+      </ConnectionProperties>
+    </DataSource>
+  </DataSources>
+  <rd:ReportID>c798f934-fb1d-4691-b678-ffba26193ae1</rd:ReportID>
+  <Width>5in</Width>
+  <Body>
+    <Height>1.29in</Height>
+    <ColumnSpacing>0.5in</ColumnSpacing>
+    <ReportItems>
+      <Textbox Name="textbox1">
+        <Style>
+          <FontFamily>Tahoma</FontFamily>
+          <FontSize>20pt</FontSize>
+          <Color>SteelBlue</Color>
+          <FontWeight>Bold</FontWeight>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+        <rd:DefaultName>textbox1</rd:DefaultName>
+        <Value>BizRule Viewer</Value>
+        <CanGrow>true</CanGrow>
+        <Height>0.37in</Height>
+      </Textbox>
+      <List Name="List1">
+        <Style>
+          <FontFamily>Tahoma</FontFamily>
+          <FontSize>14pt</FontSize>
+          <Color>SlateGray</Color>
+        </Style>
+        <ReportItems>
+          <Textbox Name="BRId">
+            <Style>
+              <FontFamily>Tahoma</FontFamily>
+              <FontSize>14pt</FontSize>
+              <Color>SlateGray</Color>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <rd:DefaultName>BRId</rd:DefaultName>
+            <Value>=Fields!BRId.Value</Value>
+            <CanGrow>true</CanGrow>
+            <Height>0.27in</Height>
+          </Textbox>
+          <Matrix Name="matrix1">
+            <Top>0.5in</Top>
+            <RowGroupings>
+              <RowGrouping>
+                <DynamicRows>
+                  <Grouping Name="matrix1_SourceObjectPhysicalName">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!SourceObjectPhysicalName.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Grouping>
+                  <Sorting>
+                    <SortBy>
+                      <SortExpression>=Fields!SourceObjectPhysicalName.Value</SortExpression>
+                    </SortBy>
+                  </Sorting>
+                  <ReportItems>
+                    <Textbox Name="SourceObjectPhysicalName">
+                      <Style>
+                        <FontFamily>Tahoma</FontFamily>
+                        <FontSize>10pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                        <Color>White</Color>
+                        <BackgroundColor>#6e9eca</BackgroundColor>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor>
+                          <Default>LightGrey</Default>
+                        </BorderColor>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                      <rd:DefaultName>SourceObjectPhysicalName</rd:DefaultName>
+                      <Value>=Fields!SourceObjectPhysicalName.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Height>0.21in</Height>
+                      <Width>1in</Width>
+                    </Textbox>
+                  </ReportItems>
+                </DynamicRows>
+                <Width>1in</Width>
+              </RowGrouping>
+            </RowGroupings>
+            <MatrixRows>
+              <MatrixRow>
+                <MatrixCells>
+                  <MatrixCell>
+                    <ReportItems>
+                      <Textbox Name="textbox2">
+                        <Style>
+                          <FontFamily>Tahoma</FontFamily>
+                          <FontSize>10pt</FontSize>
+                          <BorderStyle>
+                            <Default>Solid</Default>
+                          </BorderStyle>
+                          <BorderColor>
+                            <Default>LightGrey</Default>
+                          </BorderColor>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                        <rd:DefaultName>textbox2</rd:DefaultName>
+                        <Value>=Sum(Fields!DQMF_ScheduleId.Value)</Value>
+                        <CanGrow>true</CanGrow>
+                        <Height>0.21in</Height>
+                        <Width>1in</Width>
+                      </Textbox>
+                    </ReportItems>
+                  </MatrixCell>
+                </MatrixCells>
+                <Height>0.21in</Height>
+              </MatrixRow>
+            </MatrixRows>
+            <Corner>
+              <ReportItems>
+                <Textbox Name="textbox3">
+                  <Style>
+                    <FontFamily>Tahoma</FontFamily>
+                    <FontSize>10pt</FontSize>
+                    <BorderStyle>
+                      <Default>Solid</Default>
+                    </BorderStyle>
+                    <BorderColor>
+                      <Default>LightGrey</Default>
+                    </BorderColor>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                  <rd:DefaultName>textbox3</rd:DefaultName>
+                  <Value>
+                  </Value>
+                  <CanGrow>true</CanGrow>
+                  <Height>0.21in</Height>
+                </Textbox>
+              </ReportItems>
+            </Corner>
+            <DataSetName>DataSet1</DataSetName>
+            <MatrixColumns>
+              <MatrixColumn>
+                <Width>1in</Width>
+              </MatrixColumn>
+            </MatrixColumns>
+            <ColumnGroupings>
+              <ColumnGrouping>
+                <DynamicColumns>
+                  <Grouping Name="matrix1_ActionIdName">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!ActionIdName.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Grouping>
+                  <Sorting>
+                    <SortBy>
+                      <SortExpression>=Fields!ActionIdName.Value</SortExpression>
+                    </SortBy>
+                  </Sorting>
+                  <ReportItems>
+                    <Textbox Name="ActionIdName">
+                      <Style>
+                        <FontFamily>Tahoma</FontFamily>
+                        <FontSize>10pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                        <Color>White</Color>
+                        <BackgroundColor>#6e9eca</BackgroundColor>
+                        <BorderStyle>
+                          <Default>Solid</Default>
+                        </BorderStyle>
+                        <BorderColor>
+                          <Default>LightGrey</Default>
+                        </BorderColor>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                      <rd:DefaultName>ActionIdName</rd:DefaultName>
+                      <Value>=Fields!ActionIdName.Value</Value>
+                      <CanGrow>true</CanGrow>
+                      <Height>0.21in</Height>
+                      <Width>1in</Width>
+                    </Textbox>
+                  </ReportItems>
+                </DynamicColumns>
+                <Height>0.21in</Height>
+              </ColumnGrouping>
+            </ColumnGroupings>
+          </Matrix>
+        </ReportItems>
+        <Grouping Name="list1_BRId">
+          <GroupExpressions>
+            <GroupExpression>=Fields!BRId.Value</GroupExpression>
+          </GroupExpressions>
+          <PageBreakAtEnd>true</PageBreakAtEnd>
+        </Grouping>
+        <Sorting>
+          <SortBy>
+            <SortExpression>=Fields!BRId.Value</SortExpression>
+          </SortBy>
+        </Sorting>
+        <Top>0.37in</Top>
+        <DataSetName>DataSet1</DataSetName>
+      </List>
+    </ReportItems>
+  </Body>
+  <Language>en-US</Language>
+  <LeftMargin>1in</LeftMargin>
+  <RightMargin>1in</RightMargin>
+  <TopMargin>1in</TopMargin>
+  <BottomMargin>1in</BottomMargin>
+  <PageWidth>8.5in</PageWidth>
+  <PageHeight>11in</PageHeight>
+  <DataSets>
+    <DataSet Name="DataSet1">
+      <Fields>
+        <Field Name="BRId">
+          <DataField>BRId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="PkgName">
+          <DataField>PkgName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="StageName">
+          <DataField>StageName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="StageOrder">
+          <DataField>StageOrder</DataField>
+          <rd:TypeName>System.Int16</rd:TypeName>
+        </Field>
+        <Field Name="Sequence">
+          <DataField>Sequence</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="ShortNameOfTest">
+          <DataField>ShortNameOfTest</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ActionIdName">
+          <DataField>ActionIdName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ActionSQL">
+          <DataField>ActionSQL</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ConditionSQL">
+          <DataField>ConditionSQL</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DefaultValue">
+          <DataField>DefaultValue</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SourceObjectPhysicalName">
+          <DataField>SourceObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="TargetObjectPhysicalName">
+          <DataField>TargetObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="FactTableObjectAttributeName">
+          <DataField>FactTableObjectAttributeName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DQMF_ScheduleId">
+          <DataField>DQMF_ScheduleId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="PkgID">
+          <DataField>PkgID</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandType>Text</CommandType>
+        <CommandText>SELECT DISTINCT
+	br.BRId
+	,pkg.PkgName
+	,stg.StageName
+	,stg.StageOrder
+	,br.Sequence
+	,br.ShortNameOfTest
+	,'('+CAST(br.ActionID AS varchar)+') ' + act.ActionName AS ActionIdName
+	,br.ActionSQL
+	,br.ConditionSQL
+	,br.DefaultValue
+	,br.SourceObjectPhysicalName
+	,br.TargetObjectPhysicalName
+	,br.FactTableObjectAttributeName
+	,sch.DQMF_ScheduleId
+	,pkg.PkgID
+
+	-- ,' - - | - - | - - | - - | - - ' AS [BizRule Columns]
+	-- ,br.*
+FROM dbo.ETL_Package AS pkg
+JOIN dbo.DQMF_Schedule AS sch
+ON pkg.PkgID = sch.PkgKey
+JOIN dbo.DQMF_Stage AS stg
+ON sch.StageID = stg.StageID
+JOIN dbo.DQMF_BizRuleSchedule AS br_sch
+ON sch.DQMF_ScheduleId = br_sch.ScheduleID
+AND sch.StageID = stg.StageID
+JOIN dbo.DQMF_BizRule AS br
+ON br_sch.BRID = br.BRId
+JOIN dbo.DQMF_Action AS act
+ON br.ActionID = act.ActionID
+JOIN dbo.MD_Database AS db
+ON db.DatabaseId = br.DatabaseId
+WHERE 1=1
+AND (@IsActive IS NULL OR br.IsActive LIKE @IsActive)
+AND (@ActionID IS NULL OR br.ActionID LIKE @ActionID)
+AND (@database_name IS NULL OR db.DatabaseName LIKE @database_name)
+AND (@pkg_name IS NULL OR pkg.PkgName LIKE @pkg_name)
+AND (@stage_name IS NULL OR stg.StageName LIKE @stage_name)
+AND (@StageOrder IS NULL OR stg.StageOrder LIKE @StageOrder)
+AND (@table_name IS NULL OR ((br.SourceObjectPhysicalName LIKE @table_name OR br.TargetObjectPhysicalName LIKE @table_name) AND br.ActionID = 0))
+AND (@brid IS NULL OR br.BRID LIKE @brid)
+AND (@sql_src IS NULL OR (br.ActionSQL LIKE @sql_src OR br.ConditionSQL LIKE @sql_src))
+ORDER BY pkg.PkgName, stg.StageOrder
+, stg.StageName, br.Sequence ASC</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+        <QueryParameters>
+          <QueryParameter Name="@IsActive">
+            <Value>=Parameters!IsActive.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@ActionID">
+            <Value>=Parameters!ActionID.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@database_name">
+            <Value>=Parameters!database_name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@pkg_name">
+            <Value>=Parameters!pkg_name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@stage_name">
+            <Value>=Parameters!stage_name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@StageOrder">
+            <Value>=Parameters!StageOrder.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@table_name">
+            <Value>=Parameters!table_name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@brid">
+            <Value>=Parameters!brid.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@sql_src">
+            <Value>=Parameters!sql_src.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <Timeout>0</Timeout>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <ReportParameters>
+    <ReportParameter Name="IsActive">
+      <DataType>String</DataType>
+      <Prompt>Is Active</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ActionID">
+      <DataType>String</DataType>
+      <Prompt>Action ID</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="database_name">
+      <DataType>String</DataType>
+      <Prompt>database name</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="pkg_name">
+      <DataType>String</DataType>
+      <Prompt>pkg name</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="stage_name">
+      <DataType>String</DataType>
+      <Prompt>stage name</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="StageOrder">
+      <DataType>String</DataType>
+      <Prompt>Stage Order</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="table_name">
+      <DataType>String</DataType>
+      <Prompt>table name</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="brid">
+      <DataType>String</DataType>
+      <Prompt>brid</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="sql_src">
+      <DataType>String</DataType>
+      <Prompt>sql src</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+</Report>

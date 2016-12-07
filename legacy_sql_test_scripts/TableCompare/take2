@@ -1,0 +1,30 @@
+CREATE TABLE DataSetDefinition (
+	DataSetDefinitionID INT NOT NULL,
+	CreateDate date NOT NULL,
+	Creator varchar(100) NOT NULL,
+	Query varchar(max),
+	Table varchar(200),
+	Server varchar(200)
+);
+
+CREATE TABLE DataSetColumn (
+	Name sysname NOT NULL,
+	
+);
+
+CREATE TABLE DataSetComparison (
+	DataSetComparisonID INT NOT NULL,
+	DataSetDefinitionLhsSetDifferenceID INT NOT NULL,
+	DataSetDefinitionRhsSetDifferenceID INT NOT NULL,
+	DataSetDefinitionRhsIntersectionID INT NOT NULL,
+	DataSetDefinitionLhsIntersectionID INT NOT NULL,
+);
+
+
+CREATE TABLE DataSetHistogram (
+	DataSetHistogramID INT NOT NULL,
+	DataSetDefinitionID INT NOT NULL,
+	CreateDate date NOT NULL,
+	Creator varchar(100) NOT NULL,
+	DataSetRowCount INT
+);

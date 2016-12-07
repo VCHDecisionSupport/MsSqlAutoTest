@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "SsisProfiler", "SsisProfiler\SsisProfiler.dtproj", "{749813A8-F3AE-43C4-BA30-D020D2B2C055}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfilerMaker", "ProfilerMaker\ProfilerMaker.csproj", "{528BFE9E-50B6-4168-A941-CE472424B4BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Development|Any CPU = Development|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Debug|Any CPU.ActiveCfg = Development
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Debug|Any CPU.Build.0 = Development
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Development|Any CPU.ActiveCfg = Development
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Development|Any CPU.Build.0 = Development
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Release|Any CPU.ActiveCfg = Development
+		{749813A8-F3AE-43C4-BA30-D020D2B2C055}.Release|Any CPU.Build.0 = Development
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Development|Any CPU.ActiveCfg = Debug|Any CPU
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Development|Any CPU.Build.0 = Debug|Any CPU
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{528BFE9E-50B6-4168-A941-CE472424B4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,12 @@
+rejig interface of uspRegressionTest:
+	new inputs:
+		@pPreEtlSnapShotName
+		@pPostEtlSnapShotName
+	assume:
+		both are table names in TestLog.SnapShot schema
+		both have __pkhash__ primary key column
+	todo:
+		rejig derived snap shot names (dbo.ufnGetSnapShotName already rejigged)
+		delete snap shots at end of proc
+		
+

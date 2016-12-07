@@ -1,0 +1,565 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DQMF">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString>Data Source=PC;Initial Catalog=DQMF</ConnectString>
+        <IntegratedSecurity>true</IntegratedSecurity>
+      </ConnectionProperties>
+      <rd:SecurityType>Integrated</rd:SecurityType>
+      <rd:DataSourceID>21151e7b-a2dd-423b-afb0-ab31b6faf0de</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="BizRules">
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandText>SELECT DISTINCT
+	br.BRId
+	,pkg.PkgName
+	,stg.StageName
+	,stg.StageOrder
+	,br.Sequence
+	,br.ShortNameOfTest
+	,'('+CAST(br.ActionID AS varchar)+') ' + act.ActionName AS ActionIdName
+	,br.ActionSQL
+	,br.ConditionSQL
+	,br.DefaultValue
+	,br.SourceObjectPhysicalName
+	,br.TargetObjectPhysicalName
+	,br.FactTableObjectAttributeName
+	,sch.DQMF_ScheduleId
+	,pkg.PkgID
+
+	-- ,' - - | - - | - - | - - | - - ' AS [BizRule Columns]
+	-- ,br.*
+FROM dbo.ETL_Package AS pkg
+JOIN dbo.DQMF_Schedule AS sch
+ON pkg.PkgID = sch.PkgKey
+JOIN dbo.DQMF_Stage AS stg
+ON sch.StageID = stg.StageID
+JOIN dbo.DQMF_BizRuleSchedule AS br_sch
+ON sch.DQMF_ScheduleId = br_sch.ScheduleID
+AND sch.StageID = stg.StageID
+JOIN dbo.DQMF_BizRule AS br
+ON br_sch.BRID = br.BRId
+JOIN dbo.DQMF_Action AS act
+ON br.ActionID = act.ActionID
+JOIN dbo.MD_Database AS db
+ON db.DatabaseId = br.DatabaseId
+WHERE 1=1
+--AND (@IsActive IS NULL OR br.IsActive LIKE @IsActive)
+--AND (@ActionID IS NULL OR br.ActionID LIKE @ActionID)
+--AND (@database_name = '' OR @database_name IS NULL OR db.DatabaseName LIKE @database_name)
+--AND (@pkg_name = '' OR @pkg_name IS NULL OR pkg.PkgName LIKE @pkg_name)
+--AND (@stage_name = '' OR @stage_name IS NULL OR stg.StageName LIKE @stage_name)
+--AND (@table_name = '' OR @table_name IS NULL OR ((br.SourceObjectPhysicalName LIKE @table_name OR br.TargetObjectPhysicalName LIKE @table_name) AND br.ActionID = 0))
+--AND (@brid = '' OR @brid IS NULL OR br.BRID LIKE @brid)
+--AND (@sql_src = '' OR @sql_src IS NULL OR (br.ActionSQL LIKE @sql_src OR br.ConditionSQL LIKE @sql_src))
+ORDER BY pkg.PkgName, stg.StageOrder
+, stg.StageName, br.Sequence ASC</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+      <Fields>
+        <Field Name="BRId">
+          <DataField>BRId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="PkgName">
+          <DataField>PkgName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="StageName">
+          <DataField>StageName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="StageOrder">
+          <DataField>StageOrder</DataField>
+          <rd:TypeName>System.Int16</rd:TypeName>
+        </Field>
+        <Field Name="Sequence">
+          <DataField>Sequence</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="ShortNameOfTest">
+          <DataField>ShortNameOfTest</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ActionIdName">
+          <DataField>ActionIdName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ActionSQL">
+          <DataField>ActionSQL</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ConditionSQL">
+          <DataField>ConditionSQL</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DefaultValue">
+          <DataField>DefaultValue</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SourceObjectPhysicalName">
+          <DataField>SourceObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="TargetObjectPhysicalName">
+          <DataField>TargetObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="FactTableObjectAttributeName">
+          <DataField>FactTableObjectAttributeName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DQMF_ScheduleId">
+          <DataField>DQMF_ScheduleId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="PkgID">
+          <DataField>PkgID</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Database">
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandText>SELECT DatabaseId, DatabaseName
+FROM DQMF.dbo.MD_Database
+WHERE IsActive = 1</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="DatabaseName">
+          <DataField>DatabaseName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DatabaseId">
+          <DataField>DatabaseId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="Table">
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandText>SELECT CAST(DatabaseId AS varchar) AS DatabaseId, ObjectSchemaName, ObjectPhysicalName
+FROM DQMF.dbo.MD_Object
+WHERE IsActive = 1</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="DatabaseId">
+          <DataField>DatabaseId</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ObjectSchemaName">
+          <DataField>ObjectSchemaName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ObjectPhysicalName">
+          <DataField>ObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Filters>
+        <Filter>
+          <FilterExpression>=Fields!DatabaseId.Value</FilterExpression>
+          <Operator>Equal</Operator>
+          <FilterValues>
+            <FilterValue>=Parameters!DatabaseId.Value</FilterValue>
+          </FilterValues>
+        </Filter>
+      </Filters>
+    </DataSet>
+    <DataSet Name="Schema">
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandText>SELECT DISTINCT CAST(DatabaseId AS varchar) AS DatabaseId , ObjectSchemaName
+FROM DQMF.dbo.MD_Object
+WHERE IsActive = 1</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="DatabaseId">
+          <DataField>DatabaseId</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ObjectSchemaName">
+          <DataField>ObjectSchemaName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Filters>
+        <Filter>
+          <FilterExpression>=Fields!DatabaseId.Value</FilterExpression>
+          <Operator>Equal</Operator>
+          <FilterValues>
+            <FilterValue>=Parameters!DatabaseId.Value</FilterValue>
+          </FilterValues>
+        </Filter>
+      </Filters>
+    </DataSet>
+    <DataSet Name="ObjectNames">
+      <Query>
+        <DataSourceName>DQMF</DataSourceName>
+        <CommandText>SELECT DatabaseName, ObjectSchemaName, ObjectPhysicalName
+FROM DQMF.dbo.MD_Object AS obj
+JOIN DQMF.dbo.MD_Database AS db
+ON db.DatabaseId = obj.DatabaseId
+ORDER BY DatabaseName, ObjectSchemaName, ObjectPhysicalName</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="ObjectPhysicalName">
+          <DataField>ObjectPhysicalName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="ObjectSchemaName">
+          <DataField>ObjectSchemaName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DatabaseName">
+          <DataField>DatabaseName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="Tablix6">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>1in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1in</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>0.25in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="db">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Database Name</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox59">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Object Schema Name</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox59</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox56">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>Object Physical Name</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox56</rd:DefaultName>
+                          <Visibility>
+                            <Hidden>true</Hidden>
+                            <ToggleItem>Textbox56</ToggleItem>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.25in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="DatabaseName">
+                          <CanGrow>true</CanGrow>
+                          <CanShrink>true</CanShrink>
+                          <ToggleImage>
+                            <InitialState>true</InitialState>
+                          </ToggleImage>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!DatabaseName.Value</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>DatabaseName</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="ObjectSchemaName1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!ObjectSchemaName.Value</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>ObjectSchemaName1</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="ObjectPhysicalName1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!ObjectPhysicalName.Value</Value>
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>ObjectPhysicalName1</rd:DefaultName>
+                          <Visibility>
+                            <Hidden>true</Hidden>
+                            <ToggleItem>Textbox56</ToggleItem>
+                          </Visibility>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember />
+                <TablixMember>
+                  <Group Name="ObjectSchemaName">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!ObjectSchemaName.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!ObjectSchemaName.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+                  <TablixMembers>
+                    <TablixMember />
+                    <TablixMember />
+                  </TablixMembers>
+                </TablixMember>
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <KeepWithGroup>After</KeepWithGroup>
+                </TablixMember>
+                <TablixMember>
+                  <Group Name="Details" />
+                  <TablixMembers>
+                    <TablixMember />
+                  </TablixMembers>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>ObjectNames</DataSetName>
+            <Top>0.97444in</Top>
+            <Left>1.4675in</Left>
+            <Height>0.5in</Height>
+            <Width>3in</Width>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Tablix>
+        </ReportItems>
+        <Height>4.0925in</Height>
+        <Style />
+      </Body>
+      <Width>11.63889in</Width>
+      <Page>
+        <LeftMargin>1in</LeftMargin>
+        <RightMargin>1in</RightMargin>
+        <TopMargin>1in</TopMargin>
+        <BottomMargin>1in</BottomMargin>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="DatabaseId">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>2</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Database Name</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>Database</DataSetName>
+          <ValueField>DatabaseId</ValueField>
+          <LabelField>DatabaseName</LabelField>
+        </DataSetReference>
+      </ValidValues>
+    </ReportParameter>
+    <ReportParameter Name="Schema">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Dim</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Schema</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>Schema</DataSetName>
+          <ValueField>ObjectSchemaName</ValueField>
+          <LabelField>ObjectSchemaName</LabelField>
+        </DataSetReference>
+      </ValidValues>
+    </ReportParameter>
+  </ReportParameters>
+  <ReportParametersLayout>
+    <GridLayoutDefinition>
+      <NumberOfColumns>1</NumberOfColumns>
+      <NumberOfRows>2</NumberOfRows>
+      <CellDefinitions>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>0</RowIndex>
+          <ParameterName>DatabaseId</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>1</RowIndex>
+          <ParameterName>Schema</ParameterName>
+        </CellDefinition>
+      </CellDefinitions>
+    </GridLayoutDefinition>
+  </ReportParametersLayout>
+  <Language>en-US</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>c798f934-fb1d-4691-b678-ffba26193ae1</rd:ReportID>
+</Report>

@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#testing-utility">testing utility</a><ul>
+<li><a href="#shared-todo">Shared TODO:</a></li>
+<li><a href="#profile-todo">Profile TODO:</a></li>
+<li><a href="#comparison-todo">Comparison TODO:</a></li>
+</ul></li>
+<li><a href="#main-sql-procedures">Main Sql Procedures</a><ul>
+<li><a href="#uspprofile"><code>uspProfile</code></a><ul>
+<li><a href="#usptableprofile"><code>uspTableProfile</code></a></li>
+<li><a href="#uspcolumnprofile"><code>uspColumnProfile</code></a></li>
+<li><a href="#uspvaluehistogram"><code>uspValueHistogram</code></a></li>
+</ul></li>
+<li><a href="#uspcompare"><code>uspCompare</code></a><ul>
+<li><a href="#usptablecompare"><code>uspTableCompare</code></a></li>
+<li><a href="#uspcolumncompare"><code>uspColumnCompare</code></a></li>
+<li><a href="#uspvaluecompare"><code>uspValueCompare</code></a></li>
+</ul></li>
+</ul></li>
+<li><a href="#utilities-procedures">Utilities Procedures</a><ul>
+<li><a href="#uspinsdataset">uspInsDataSet</a></li>
+<li><a href="#uspmetacompare">uspMetaCompare</a></li>
+<li><a href="#uspcopytable">uspCopyTable</a></li>
+<li><a href="#uspinsdataset-1">uspInsDataSet</a></li>
+</ul></li>
+<li><a href="#summary-views">Summary views</a></li>
+<li><a href="#user-interface">User Interface</a><ul>
+<li><a href="#proc-prompted-summaries">Proc prompted summaries</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="testing-utility">testing utility</h1>
+<ul>
+<li>standardize and streamline testing</li>
+<li>standardize logging of test results</li>
+<li>record level comparison between servers</li>
+</ul>
+<h2 id="shared-todo">Shared TODO:</h2>
+<ul>
+<li>user interface to define/input Dataset</li>
+<li>database structure to save Dataset definitions</li>
+</ul>
+<h2 id="profile-todo">Profile TODO:</h2>
+<ul>
+<li>algorithm to profile a dataset</li>
+</ul>
+<h2 id="comparison-todo">Comparison TODO:</h2>
+<ul>
+<li>user interface to preview a comparison</li>
+<li>algorithm compare 2 Datasets</li>
+<li>database structure to save output of a comparison</li>
+<li>algorithm to identitify signifigant differences between datasets</li>
+<li>user interface to summarize sigigant differences</li>
+</ul>
+<h1 id="main-sql-procedures">Main Sql Procedures</h1>
+<h2 id="uspprofile"><code>uspProfile</code></h2>
+<p>Tester granted permission to each server. Main user interface for one table profiles. Arguments control worker procs will be called. InsDataSet, InsUserDescription - <code>@pServer</code> Default is current. The server with the DataSet to be profiled. - <code>@pTable</code> The table to be profiled. Tester's specify with this or <code>@pQuery</code> - <code>@pQuery</code> The a query that wrapped in create view. The content returned by this query is DataSet to be profiled. Tester's specify with this or <code>@pTable</code> - <code>@pProfileAllColumns</code> Default. Flag indicating if all columns will be profiled. This is ignored when <code>@pProfileColumns</code> is specified. - <code>@pProfileColumns</code> Csv list. Call uspColumnProfile - <code>@pHistogramColumns</code> Csv list. Call uspValueHistogram</p>
+<h3 id="usptableprofile"><code>uspTableProfile</code></h3>
+<p>Inserts into DataSet, TableProfile</p>
+<h3 id="uspcolumnprofile"><code>uspColumnProfile</code></h3>
+<p>Inserts into DataSetColumn, ColumnProfile</p>
+<h3 id="uspvaluehistogram"><code>uspValueHistogram</code></h3>
+<p>Inserts into DatasetValue, ValueHistogram</p>
+<h2 id="uspcompare"><code>uspCompare</code></h2>
+<p>Tester granted permission to each server.</p>
+<ul>
+<li>ServerA</li>
+<li>TableA</li>
+<li>KeyColumnsA</li>
+<li>ServerB</li>
+<li>TableB</li>
+<li>KeyColumnsB</li>
+</ul>
+<p>Inserts into DataSetComparison,</p>
+<h3 id="usptablecompare"><code>uspTableCompare</code></h3>
+<h3 id="uspcolumncompare"><code>uspColumnCompare</code></h3>
+<h3 id="uspvaluecompare"><code>uspValueCompare</code></h3>
+<h1 id="utilities-procedures">Utilities Procedures</h1>
+<h2 id="uspinsdataset">uspInsDataSet</h2>
+<p>Tester granted permission to each server. Allows tester to define and save a query as a DataSet.</p>
+<h2 id="uspmetacompare">uspMetaCompare</h2>
+<p>Tester granted permission to each server. Compare structure of two DataSets.</p>
+<h2 id="uspcopytable">uspCopyTable</h2>
+<p>Copy source table structure and data to temporary table. Throw exception if row count too</p>
+<h2 id="uspinsdataset-1">uspInsDataSet</h2>
+<p>Tester granted permission to each server.</p>
+<h1 id="summary-views">Summary views</h1>
+<h1 id="user-interface">User Interface</h1>
+<h2 id="proc-prompted-summaries">Proc prompted summaries</h2>
+<p>Server, Table, ## SSRS Profile Regression Question: Where are servers different?</p>
+<p>Answer: Compare most recent profile execution for each server.</p>
+<p>Prod, profile age, row count</p>
+<p>Beta, profile age, row count</p>
+<p>Test, profile age, row count</p>
+<p>Column, Prod row count, Beta row count, Test row count, Prod null count, Beta null count, Test null count (order by sum or % differences) Column, Value, Prod row count, Beta row count, Test row count, Prod null count, Beta null count, Test null count (order by sum or % differences)</p>
+<p>Most recent profile execution for each server; last 5 executions for same server; Date, Server, Table, row count, row count difference to (%), null count, null count difference (%) Column, Date, Server, Table, row count, row count difference (%), null count, null count difference (%) - where do</p>
+<p>Server, Date, Table, Row count, row count difference (%), null count, null count difference (%) Profile, comparison regression test.</p>
+</body>
+</html>

@@ -1,0 +1,27 @@
+﻿<Window x:Name="___No_Name_" x:Class="WPF_TablePicker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_TablePicker"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="567.5" Width="844.5" Loaded="Window_Loaded">
+    <Window.Resources>
+        <CollectionViewSource x:Key="mD_DatabaseViewSource" d:DesignSource="{d:DesignInstance {x:Type local:MD_Database}, CreateList=True}"/>
+    </Window.Resources>
+    <Grid DataContext="{StaticResource mD_DatabaseViewSource}">
+        <DataGrid x:Name="mD_DatabaseDataGrid" AutoGenerateColumns="False" EnableRowVirtualization="True" ItemsSource="{Binding}" Margin="10,27,10,198" RowDetailsVisibilityMode="VisibleWhenSelected">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Name="databaseIdColumn" Binding="{Binding DatabaseId}" Header="Database Id" Width="SizeToHeader"/>
+                <DataGridTextColumn x:Name="databaseLongDescriptionColumn" Binding="{Binding DatabaseLongDescription}" Header="Database Long Description" Width="SizeToHeader"/>
+                <DataGridTextColumn x:Name="databaseNameColumn" Binding="{Binding DatabaseName}" Header="Database Name" Width="SizeToHeader"/>
+                <DataGridTextColumn x:Name="databaseShortDescriptionColumn" Binding="{Binding DatabaseShortDescription}" Header="Database Short Description" Width="SizeToHeader"/>
+                <DataGridTextColumn x:Name="databaseTypeColumn" Binding="{Binding DatabaseType}" Header="Database Type" Width="SizeToHeader"/>
+                <DataGridCheckBoxColumn x:Name="isActiveColumn" Binding="{Binding IsActive}" Header="Is Active" Width="SizeToHeader"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="buttonSave" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="76" Click="buttonSave_Click"/>
+        <TreeView x:Name="mD_DatabaseTreeView" ItemsSource="{Binding}" Margin="10,345,10,10" DisplayMemberPath="DatabaseName" ToolTip="{Binding /DatabaseLongDescription}"/>
+
+    </Grid>
+</Window>

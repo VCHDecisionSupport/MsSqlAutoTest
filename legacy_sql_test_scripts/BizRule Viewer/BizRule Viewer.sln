@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "BizRule Viewer", "BizRule Viewer.rptproj", "{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Debug|Default.ActiveCfg = Debug
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Debug|Default.Build.0 = Debug
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Debug|Default.Deploy.0 = Debug
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.DebugLocal|Default.Build.0 = DebugLocal
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Release|Default.ActiveCfg = Release
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Release|Default.Build.0 = Release
+		{A99A45D3-0A86-4C0B-B29A-9DEBF5E0F1B9}.Release|Default.Deploy.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
