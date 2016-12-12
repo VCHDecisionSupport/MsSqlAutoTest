@@ -6,12 +6,12 @@ IF OBJECT_ID('dbo.CubeUnitTest','U') IS NOT NULL
 GO
 
 CREATE TABLE dbo.CubeUnitTest(
-	CubeName varchar(100),
+	CubeName varchar(100) NOT NULL,
 	TestResultSource varchar(100),
 	TestResultDate datetime,
-	CubeProcessDate datetime,
+	CubeProcessDate datetime NOT NULL,
 	IsMostRecentTest bit,
-	MeasureName varchar(100),
+	MeasureName varchar(100) NOT NULL,
 	MeasureValue numeric(15,3),
 	Dimension0Name varchar(100),
 	Dimension0Value varchar(100),
@@ -19,7 +19,7 @@ CREATE TABLE dbo.CubeUnitTest(
 	Dimension1Value varchar(100)
 );
 GO
-
+ALTER TABLE dbo.CubeUnitTest ADD CONSTRAINT PkCubeUnitTest PRIMARY KEY  CLUSTERED(CubeName,MeasureName,CubeProcessDate);
 IF(OBJECT_ID('dbo.uspInsertCubeUnitTestResults','P') IS NOT NULL)
 	DROP PROC dbo.uspInsertCubeUnitTestResults
 GO
@@ -85,3 +85,4 @@ BEGIN
 END
 GO
 
+DELETE dbo.CubeUnitTest

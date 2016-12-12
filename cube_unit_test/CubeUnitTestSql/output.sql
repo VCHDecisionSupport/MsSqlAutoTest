@@ -20,5 +20,5 @@ AND vw.CubeName = @CubeName
 --AND vw.MeasureName = @MeasureName
 AND vw.CubeProcessDate = @CubeProcessDate
 --AND vw.DimensionAValue != 2017
-AND vw.AbsDelta > 0
+AND ABS(vw.AbsDelta) > 0
 ORDER BY vw.TestResultDate DESC, ABS(vw.AbsDelta) DESC
