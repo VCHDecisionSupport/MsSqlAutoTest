@@ -1,9 +1,9 @@
 USE gcTest
 GO
 
-IF  NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.uspProfileTable') AND OBJECTPROPERTY(id,N'IsProcedure') = 1)
+IF  NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.uspProfileDatabase') AND OBJECTPROPERTY(id,N'IsProcedure') = 1)
 BEGIN
-	EXEC ('CREATE PROCEDURE dbo.uspProfileTable AS');
+	EXEC ('CREATE PROCEDURE dbo.uspProfileDatabase AS');
 END
 GO
 
@@ -12,21 +12,21 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE dbo.uspProfileTable
+ALTER PROCEDURE dbo.uspProfileDatabase
 	@pDatabaseName varchar(500)
 	,@pTableName varchar(500) = NULL
 	,@pDistinctCountLimit int = 10000
 AS
 BEGIN
-	PRINT('dbo.uspProfileTable(@pDatabaseName='+@pDatabaseName+', @pTableName='+@pTableName+')');
+	PRINT('dbo.uspProfileDatabase(@pDatabaseName='+@pDatabaseName+', @pTableName='+@pTableName+')');
 
-	CREATE TABLE #temp_columns (
+	CREATE TABLE #temp (
 		schema_name varchar(500)
 		,table_name varchar(500)
 		,column_name varchar(500)
 	);
 
-	INSERT INTO #temp_columns
+	INSERT INTO #temp
 	EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName, @pTableName=@pTableName
 
 	DECLARE @schema_name varchar(500)
@@ -39,7 +39,7 @@ BEGIN
 	DECLARE cur CURSOR
 	FOR
 	SELECT *
-	FROM #temp_columns;
+	FROM #temp;
 
 	OPEN cur;
 
@@ -96,7 +96,7 @@ END
 GO
 
 --DELETE gcTest.dbo.ColumnHistogram;
-EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pTableName='ReferralFact';
+EXEC dbo.uspProfileDatabase @pDatabaseName='CommunityMart', @pTableName='ReferralFact';
 
 SELECT *
 FROM gcTest.dbo.ColumnHistogram;

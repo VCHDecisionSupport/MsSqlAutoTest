@@ -3,7 +3,7 @@ GO
 
 DECLARE @sql varchar(max);
 
-DECLARE @name varchar(100) = 'dbo.ColumnProfile'
+DECLARE @name varchar(100) = 'dbo.ColumnHistogram'
 RAISERROR(@name,0,1) WITH NOWAIT;
 
 IF OBJECT_ID(@name) IS NOT NULL
@@ -15,6 +15,7 @@ GO
 CREATE TABLE dbo.ColumnHistogram
 (
 	ColumnHistogramDate datetime
+	,DatabaseName varchar(500)
 	,TableName varchar(500)
 	,ColumnName varchar(500)
 	,ColumnValue varchar(500)
