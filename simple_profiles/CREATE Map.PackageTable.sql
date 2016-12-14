@@ -3,7 +3,7 @@ GO
 
 DECLARE @sql varchar(max);
 
-DECLARE @name varchar(100) = 'dbo.ColumnHistogram'
+DECLARE @name varchar(100) = 'Map.PackageTable'
 RAISERROR(@name,0,1) WITH NOWAIT;
 
 IF OBJECT_ID(@name) IS NOT NULL
@@ -12,13 +12,9 @@ IF OBJECT_ID(@name) IS NOT NULL
 	EXEC(@sql);
 GO
 
-CREATE TABLE dbo.ColumnHistogram
+CREATE TABLE Map.PackageTable
 (
-	ColumnHistogramDate datetime
+	PackageName varchar(500)
 	,DatabaseName varchar(500)
 	,TableName varchar(500)
-	,ColumnName varchar(500)
-	,ColumnValue varchar(500)
-	,ValueCount int
-	,PkgExecKey int
 );

@@ -16,10 +16,16 @@ ALTER PROCEDURE dbo.uspProfileTable
 	@pDatabaseName varchar(500)
 	,@pTableName varchar(500) = NULL
 	,@pDistinctCountLimit int = 10000
+	,@pPkgExecKey int = NULL
 AS
 BEGIN
 	PRINT('dbo.uspProfileTable(@pDatabaseName='+@pDatabaseName+', @pTableName='+@pTableName+')');
 
+	DECLARE @profileTable varchar(500) = 'gcTest.dbo.ColumnHistogram';
+
+	--------------------------------------------------------------------
+	-- get columns of table from uspGetColumns
+	--------------------------------------------------------------------
 	CREATE TABLE #temp_columns (
 		schema_name varchar(500)
 		,table_name varchar(500)
@@ -53,6 +59,9 @@ BEGIN
 		PRINT(@schema_name);
 		PRINT(@table_name);
 		PRINT(@column_name);
+	--------------------------------------------------------------------
+	-- check distinct count of column... skip when > @pDistinctCountLimit
+	--------------------------------------------------------------------
 	SET @sql = '
 SELECT @distinct_countOUT=COUNT(DISTINCT '+@column_name+')
 FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
@@ -69,8 +78,11 @@ FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
 	END
 	ELSE
 	BEGIN
+	--------------------------------------------------------------------
+	-- insert dbo.ColumnHistogram group by counts for column @column_name in table @table_name
+	--------------------------------------------------------------------
 	SET @sql = '
-INSERT INTO gcTest.dbo.ColumnHistogram
+INSERT INTO '+@profileTable+'
 SELECT 
 	GETDATE() AS ColumnHistogramDate
 	,'''+@pDatabaseName+''' AS DatabaseName
@@ -78,6 +90,7 @@ SELECT
 	,'''+@column_name+''' AS ColumnName
 	,'+@column_name+' AS ColumnValue
 	,COUNT(*) AS ValueCount
+	,'+@pPkgExecKey+' AS PkgExecKey
 FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
 GROUP BY '+@column_name+';';
 		PRINT(@sql);
