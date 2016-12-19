@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#simple-profiles">Simple Profiles</a><ul>
+<li><a href="#user-interface">User Interface</a></li>
+<li><a href="#high-level-logical-flow">High level logical flow</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="simple-profiles">Simple Profiles</h1>
+<h2 id="user-interface">User Interface</h2>
+<p>TODO see issues.</p>
+<h2 id="high-level-logical-flow">High level logical flow</h2>
+<ul>
+<li>The profiles of each fact table is stored in 3 tables:
+<ul>
+<li><code>???.dbo.TableProfile</code></li>
+<li><code>???.dbo.ColumnProfile</code></li>
+<li><code>???.dbo.ColumnHistogram</code></li>
+<li>(<code>???</code> is TBD database)</li>
+</ul></li>
+<li>The relationship between packages and the fact tables they populate is stored in <code>Map.PackageTable</code></li>
+<li><code>Map.PackageTable</code> is populated C# app: <a href="https://github.com/grahamcrowell/SqlServerUtilities">see https://github.com/grahamcrowell/SqlServerUtilities</a></li>
+<li>The existing <code>DQMF.dbo.SetAuditPkgExecution</code> proc is extended to call new proc <code>???.dbo.uspProfilePackage</code> when <code>@pIsProcessStart = 0</code></li>
+<li><code>???.dbo.uspProfilePackage</code> calls <code>???.dbo.uspProfileTable</code> for each table in <code>Map.PackageTable</code> where <code>PackageName = @pPkgName</code></li>
+<li><code>???.dbo.uspProfileTable</code> populates
+<ul>
+<li><code>???.dbo.TableProfile</code>
+<ul>
+<li><code>TableProfileDate</code></li>
+<li><code>DatabaseName</code></li>
+<li><code>SchemaName</code></li>
+<li><code>TableName</code></li>
+<li><code>RecordCount</code></li>
+<li><code>PkgExecKey</code></li>
+</ul></li>
+<li><code>???.dbo.ColumnProfile</code>
+<ul>
+<li><code>ColumnProfileDate</code></li>
+<li><code>DatabaseName</code></li>
+<li><code>TableName</code></li>
+<li><code>ColumnName</code></li>
+<li><code>DistinctCount</code></li>
+<li><code>PkgExecKey</code></li>
+</ul></li>
+<li><code>???.dbo.ColumnHistogram</code>
+<ul>
+<li><code>ColumnHistogramDate</code></li>
+<li><code>DatabaseName</code></li>
+<li><code>TableName</code></li>
+<li><code>ColumnName</code></li>
+<li><code>ColumnValue</code></li>
+<li><code>ValueCount</code></li>
+<li><code>PkgExecKey</code></li>
+</ul></li>
+</ul></li>
+</ul>
+</body>
+</html>

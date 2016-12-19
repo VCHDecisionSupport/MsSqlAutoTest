@@ -22,6 +22,9 @@ CREATE TABLE Map.PackageTable
 GO
 
 
+------------------------------------------------------------------------------
+-- sql embedded in C# app: SqlServicesUtilies to populate Map.PackageTable
+------------------------------------------------------------------------------
 DECLARE @packageName varchar(100) = 'PackageName'
 		,@databaseName varchar(100) = 'DatabaseName'
 		,@schemaName varchar(100) = 'SchemaName'
