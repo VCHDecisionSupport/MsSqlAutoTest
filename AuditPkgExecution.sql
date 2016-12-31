@@ -1,4 +1,4 @@
-USE [DQMF]
+USE AutoTest
 GO
 
 /****** Object:  StoredProcedure [dbo].[SetAuditPkgExecution]    Script Date: 12/15/2016 12:55:22 PM ******/

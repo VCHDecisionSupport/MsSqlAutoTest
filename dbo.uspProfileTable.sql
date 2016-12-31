@@ -1,10 +1,5 @@
-USE gcTest
+USE AutoTest
 GO
-
-DELETE gcTest.dbo.TableProfile;
-DELETE gcTest.dbo.ColumnProfile;
-DELETE gcTest.dbo.ColumnHistogram;
-
 
 
 IF  NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.uspProfileTable') AND OBJECTPROPERTY(id,N'IsProcedure') = 1)
@@ -13,23 +8,24 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure dbo.uspuspGetTables   DR0000 Graham Crowell 2016-01-00 ******/
+/****** Object:  StoredProcedure dbo.uspProfileTable   DR0000 Graham Crowell 2016-01-00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON 
 GO
 ALTER PROCEDURE dbo.uspProfileTable
 	@pDatabaseName varchar(500)
+	,@pSchemaName varchar(500) = 'dbo'
 	,@pTableName varchar(500) = NULL
 	,@pDistinctCountLimit int = 10000
 	,@pPkgExecKey int = 0
 AS
 BEGIN
-	PRINT('dbo.uspProfileTable(@pDatabaseName='+@pDatabaseName+', @pTableName='+@pTableName+')');
+	PRINT('dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'');
 
-	DECLARE @tableProfileTable varchar(500) = 'gcTest.dbo.TableProfile';
-	DECLARE @columnProfileTable varchar(500) = 'gcTest.dbo.ColumnProfile';
-	DECLARE @columnHistogramTable varchar(500) = 'gcTest.dbo.ColumnHistogram';
+	DECLARE @tableProfileTable varchar(500) = 'AutoTest.dbo.TableProfile';
+	DECLARE @columnProfileTable varchar(500) = 'AutoTest.dbo.ColumnProfile';
+	DECLARE @columnHistogramTable varchar(500) = 'AutoTest.dbo.ColumnHistogram';
 	DECLARE @profileDate varchar(30) = CONVERT(nvarchar(30), GETDATE(), 126)
 	--------------------------------------------------------------------
 	-- get columns of table from uspGetColumns
@@ -41,7 +37,7 @@ BEGIN
 	);
 
 	INSERT INTO #temp_columns
-	EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName, @pTableName=@pTableName
+	EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName
 
 	DECLARE @schema_name varchar(500)
 		,@table_name varchar(500)
@@ -55,7 +51,7 @@ BEGIN
 	-- loop over distinct tables in #temp_columns
 	--------------------------------------------------------------------
 
-	DECLARE table_cur CURSOR
+	DECLARE table_cur CURSOR LOCAL
 	FOR
 	SELECT DISTINCT schema_name, table_name
 	FROM #temp_columns;
@@ -76,7 +72,7 @@ BEGIN
 		--------------------------------------------------------------------
 		SET @sql = '
 SELECT @row_countOUT=COUNT(*)
-FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
+FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 ';
 		PRINT(@sql);
 		SET @param = '@row_countOUT int OUTPUT';
@@ -101,7 +97,7 @@ VALUES (
 		-- loop over columns in @pDatabaseName.@schema_name.@table_name
 		--------------------------------------------------------------------
 
-		DECLARE column_table_cur CURSOR
+		DECLARE column_table_cur CURSOR LOCAL
 		FOR
 		SELECT DISTINCT column_name
 		FROM #temp_columns
@@ -120,14 +116,14 @@ VALUES (
 	-- check distinct count of column... skip when > @pDistinctCountLimit
 	--------------------------------------------------------------------
 	SET @sql = '
-SELECT @distinct_countOUT=COUNT(DISTINCT '+@column_name+')
-FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
+SELECT @distinct_countOUT=COUNT(DISTINCT ['+@column_name+'])
+FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 ';
 	PRINT(@sql);
 	SET @param = '@distinct_countOUT int OUTPUT';
 	EXECUTE sp_executesql @sql, @param, @distinct_countOUT=@distinct_count OUTPUT;
 
-	PRINT('COUNT(DISTINCT '+@column_name+') = '+CAST(@distinct_count AS varchar));
+	PRINT('COUNT(DISTINCT ['+@column_name+']) = '+CAST(@distinct_count AS varchar));
 
 	SET @sql = '-- ooga booga
 INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,TableName,ColumnName,DistinctCount,PkgExecKey)
@@ -160,11 +156,11 @@ SELECT
 	,'''+@pDatabaseName+''' AS DatabaseName
 	,'''+@table_name+''' AS TableName
 	,'''+@column_name+''' AS ColumnName
-	,'+@column_name+' AS ColumnValue
+	,['+@column_name+'] AS ColumnValue
 	,COUNT(*) AS ValueCount
 	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
-FROM '+@pDatabaseName+'.'+@schema_name+'.'+@table_name+'
-GROUP BY '+@column_name+';';
+FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
+GROUP BY ['+@column_name+'];';
 		PRINT(@sql);
 		EXEC(@sql);
 		END
@@ -188,15 +184,3 @@ GROUP BY '+@column_name+';';
 
 END
 GO
-
---DELETE gcTest.dbo.ColumnHistogram;
-EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pTableName='ReferralFact';
-
-SELECT *
-FROM gcTest.dbo.TableProfile;
-
-SELECT *
-FROM gcTest.dbo.ColumnProfile;
-
-SELECT *
-FROM gcTest.dbo.ColumnHistogram;
