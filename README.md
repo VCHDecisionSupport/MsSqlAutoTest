@@ -4,7 +4,9 @@
 TODO see issues.
 
 ## High level logical flow
-(`???` is TBD database)
+
+1. Package runs as usual at end of package `DQMF.dbo.SetAuditPkgExecution` is called with `@pIsProcessStart = 0`
+2. 
 
 - The profiles of each fact table is stored in 3 tables:
     + `???.dbo.TableProfile`
