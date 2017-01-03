@@ -23,9 +23,9 @@ EXEC dbo.uspGetTables @pDatabaseName='WideWorldImportersDW';
 ------------------------------------------------------------------
 
 
-DELETE AutoTest.dbo.TableProfile;
-DELETE AutoTest.dbo.ColumnProfile;
-DELETE AutoTest.dbo.ColumnHistogram;
+--DELETE AutoTest.dbo.TableProfile;
+--DELETE AutoTest.dbo.ColumnProfile;
+--DELETE AutoTest.dbo.ColumnHistogram;
 
 -- EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pSchemaName='dbo', @pTableName='ReferralFact';
 EXEC dbo.uspProfileTable @pDatabaseName='WideWorldImportersDW', @pSchemaName='Fact', @pTableName='Sale';
@@ -49,9 +49,9 @@ FROM AutoTest.dbo.ColumnHistogram;
 ------------------------------------------------------------------
 
 
-DELETE AutoTest.dbo.TableProfile;
-DELETE AutoTest.dbo.ColumnProfile;
-DELETE AutoTest.dbo.ColumnHistogram;
+--DELETE AutoTest.dbo.TableProfile;
+--DELETE AutoTest.dbo.ColumnProfile;
+--DELETE AutoTest.dbo.ColumnHistogram;
 
 GO
 DECLARE @packageName varchar(100) = 'TestPackage'

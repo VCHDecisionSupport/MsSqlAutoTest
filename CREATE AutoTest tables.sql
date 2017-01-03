@@ -33,8 +33,10 @@ CREATE TABLE dbo.TableProfile
 	TableProfileDate smalldatetime
 	,DatabaseName varchar(500)
 	,TableName varchar(500)
+	,SchemaName varchar(500)
 	,RecordCount int
 	,PkgExecKey int
+	,ProfileID int IDENTITY(1,1)
 );
 GO
 
@@ -54,10 +56,12 @@ CREATE TABLE dbo.ColumnProfile
 (
 	ColumnProfileDate smalldatetime
 	,DatabaseName varchar(500)
+	,SchemaName varchar(500)
 	,TableName varchar(500)
 	,ColumnName varchar(500)
 	,DistinctCount int
 	,PkgExecKey int
+	,ProfileID int
 );
 GO
 
@@ -78,10 +82,12 @@ CREATE TABLE dbo.ColumnHistogram
 (
 	ColumnHistogramDate smalldatetime
 	,DatabaseName varchar(500)
+	,SchemaName varchar(500)
 	,TableName varchar(500)
 	,ColumnName varchar(500)
 	,ColumnValue varchar(500)
 	,ValueCount int
 	,PkgExecKey int
+	,ProfileID int
 );
 GO

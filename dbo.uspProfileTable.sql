@@ -45,7 +45,8 @@ BEGIN
 		,@sql nvarchar(max)
 		,@param nvarchar(max)
 		,@distinct_count int
-		,@row_count int;
+		,@row_count int
+		,@profile_id int;
 
 	--------------------------------------------------------------------
 	-- loop over distinct tables in #temp_columns
@@ -80,19 +81,26 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 
 		PRINT('COUNT(*) = '+CAST(@distinct_count AS varchar));
 
-		SET @sql = '-- ooga booga
-INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,TableName,RecordCount,PkgExecKey)
+		SET @sql = '
+INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,SchemaName,TableName,RecordCount,PkgExecKey)
 VALUES (
 	CONVERT(datetime, '''+@profileDate+''' , 126)
 	,'''+@pDatabaseName+'''
-	,'''+@pTableName+'''
+	,'''+@schema_name+'''
+	,'''+@table_name+'''
 	,'+CAST(@row_count AS varchar)+'
 	,'+CAST(@pPkgExecKey AS varchar)+'
 );
 ';
 		PRINT(@sql);
-		EXEC(@sql);
+	
+		BEGIN TRANSACTION
+			
+			EXEC(@sql);
+			SELECT @profile_id = MAX(ProfileID) FROM AutoTest.dbo.TableProfile;
 
+		COMMIT
+		
 		--------------------------------------------------------------------
 		-- loop over columns in @pDatabaseName.@schema_name.@table_name
 		--------------------------------------------------------------------
@@ -126,14 +134,16 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 	PRINT('COUNT(DISTINCT ['+@column_name+']) = '+CAST(@distinct_count AS varchar));
 
 	SET @sql = '-- ooga booga
-INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,TableName,ColumnName,DistinctCount,PkgExecKey)
+INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DistinctCount,PkgExecKey,ProfileID)
 VALUES (
 	CONVERT(datetime, '''+@profileDate+''' , 126)
 	,'''+@pDatabaseName+'''
-	,'''+@pTableName+'''
+	,'''+@schema_name+'''
+	,'''+@table_name+'''
 	,'''+@column_name+'''
 	,'+CAST(@distinct_count AS varchar)+'
 	,'+CAST(@pPkgExecKey AS varchar)+'
+	,'+CAST(@profile_id AS varchar)+'
 );
 ';
 	PRINT(@sql);
@@ -154,11 +164,13 @@ INSERT INTO '+@columnHistogramTable+'
 SELECT 
 	CONVERT(datetime, '''+@profileDate+''' , 126)
 	,'''+@pDatabaseName+''' AS DatabaseName
+	,'''+@schema_name+''' AS SchemaName
 	,'''+@table_name+''' AS TableName
 	,'''+@column_name+''' AS ColumnName
 	,['+@column_name+'] AS ColumnValue
 	,COUNT(*) AS ValueCount
 	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
+	,'+CAST(@profile_id AS varchar)+'
 FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 GROUP BY ['+@column_name+'];';
 		PRINT(@sql);
