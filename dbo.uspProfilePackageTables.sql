@@ -53,7 +53,7 @@ BEGIN
 		PRINT(@schema_name);
 		PRINT(@table_name);
 
-		EXEC dbo.uspProfileTable @pDatabaseName=@database_name, @pSchemaName=@schema_name, @pTableName=@table_name, @pDistinctCountLimit=@pDistinctCountLimit, @pPkgExecKey=@pPkgExecKey
+		EXEC dbo.uspProfileTable @pDatabaseName=@database_name, @pSchemaName=@schema_name, @pTableName=@table_name, @pDistinctCountLimit=@pDistinctCountLimit, @pPkgExecKey=@pPkgExecKey, @pPackageName=@pPackageName
 		
 		FETCH NEXT FROM table_cur INTO 
 			@database_name

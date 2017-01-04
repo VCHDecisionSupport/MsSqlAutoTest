@@ -19,9 +19,10 @@ ALTER PROCEDURE dbo.uspProfileTable
 	,@pTableName varchar(500) = NULL
 	,@pDistinctCountLimit int = 10000
 	,@pPkgExecKey int = 0
+	,@pPackageName varchar(500) = ''
 AS
 BEGIN
-	PRINT('dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'');
+	PRINT('dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+', @pPackageName='+CAST(@pPackageName AS varchar)+'');
 
 	DECLARE @tableProfileTable varchar(500) = 'AutoTest.dbo.TableProfile';
 	DECLARE @columnProfileTable varchar(500) = 'AutoTest.dbo.ColumnProfile';
@@ -34,6 +35,7 @@ BEGIN
 		schema_name varchar(500)
 		,table_name varchar(500)
 		,column_name varchar(500)
+		,data_type varchar(500)
 	);
 
 	INSERT INTO #temp_columns
@@ -42,6 +44,7 @@ BEGIN
 	DECLARE @schema_name varchar(500)
 		,@table_name varchar(500)
 		,@column_name varchar(500)
+		,@data_type varchar(500)
 		,@sql nvarchar(max)
 		,@param nvarchar(max)
 		,@distinct_count int
@@ -82,7 +85,7 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 		PRINT('COUNT(*) = '+CAST(@distinct_count AS varchar));
 
 		SET @sql = '
-INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,SchemaName,TableName,RecordCount,PkgExecKey)
+INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,SchemaName,TableName,RecordCount,PkgExecKey,PackageName)
 VALUES (
 	CONVERT(datetime, '''+@profileDate+''' , 126)
 	,'''+@pDatabaseName+'''
@@ -90,6 +93,7 @@ VALUES (
 	,'''+@table_name+'''
 	,'+CAST(@row_count AS varchar)+'
 	,'+CAST(@pPkgExecKey AS varchar)+'
+	,'''+@pPackageName+'''
 );
 ';
 		PRINT(@sql);
@@ -107,7 +111,9 @@ VALUES (
 
 		DECLARE column_table_cur CURSOR LOCAL
 		FOR
-		SELECT DISTINCT column_name
+		SELECT DISTINCT 
+			column_name
+			,data_type
 		FROM #temp_columns
 		WHERE schema_name = @schema_name
 		AND table_name = @table_name;
@@ -115,7 +121,8 @@ VALUES (
 		OPEN column_table_cur;
 
 		FETCH NEXT FROM column_table_cur INTO 
-			@column_name;
+			@column_name
+			,@data_type
 		
 		WHILE @@FETCH_STATUS = 0
 		BEGIN
@@ -134,18 +141,33 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 	PRINT('COUNT(DISTINCT ['+@column_name+']) = '+CAST(@distinct_count AS varchar));
 
 	SET @sql = '-- ooga booga
-INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DistinctCount,PkgExecKey,ProfileID)
+INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DataType,DistinctCount,PkgExecKey,ProfileID)
 VALUES (
 	CONVERT(datetime, '''+@profileDate+''' , 126)
 	,'''+@pDatabaseName+'''
 	,'''+@schema_name+'''
 	,'''+@table_name+'''
 	,'''+@column_name+'''
+	,'''+@data_type+'''
 	,'+CAST(@distinct_count AS varchar)+'
 	,'+CAST(@pPkgExecKey AS varchar)+'
 	,'+CAST(@profile_id AS varchar)+'
 );
 ';
+
+	-- PRINT('-----------------------------------------------------------------------------------')
+	-- PRINT('@columnProfileTable = '+CAST(@columnProfileTable AS varchar(500)))
+	-- PRINT('@profileDate = '+CAST(@profileDate AS varchar(500)))
+	-- PRINT('@pDatabaseName = '+CAST(@pDatabaseName AS varchar(500)))
+	-- PRINT('@schema_name = '+CAST(@schema_name AS varchar(500)))
+	-- PRINT('@table_name = '+CAST(@table_name AS varchar(500)))
+	-- PRINT('@column_name = '+CAST(@column_name AS varchar(500)))
+	-- PRINT('@data_type = '+CAST(@data_type AS varchar(500)))
+	-- PRINT('@distinct_count = '+CAST(@distinct_count AS varchar(500)))
+	-- PRINT('@pPkgExecKey = '+CAST(@pPkgExecKey AS varchar(500)))
+	-- PRINT('@profile_id = '+CAST(@profile_id AS varchar(500)))
+	-- PRINT('-----------------------------------------------------------------------------------')
+
 	PRINT(@sql);
 	EXEC(@sql);
 
@@ -178,7 +200,8 @@ GROUP BY ['+@column_name+'];';
 		END
 
 		FETCH NEXT FROM column_table_cur INTO 
-			@column_name;
+			@column_name
+			,@data_type
 
 		END -- column_table_cur loop end
 

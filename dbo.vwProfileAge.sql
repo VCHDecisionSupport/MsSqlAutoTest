@@ -38,12 +38,12 @@ FROM Profiles;
 GO	
 
 
-DECLARE @NumberOfProfilesToKeep int = 5;
-SELECT *
-FROM AutoTest.dbo.vwProfileAge
-WHERE ProfileRelativeAge > @NumberOfProfilesToKeep
-ORDER BY PkgExecKey
-	,DatabaseName
-	,SchemaName
-	,TableName
-	,TableProfileDate DESC
+-- DECLARE @NumberOfProfilesToKeep int = 5;
+-- SELECT *
+-- FROM AutoTest.dbo.vwProfileAge
+-- WHERE ProfileRelativeAge > @NumberOfProfilesToKeep
+-- ORDER BY PkgExecKey
+-- 	,DatabaseName
+-- 	,SchemaName
+-- 	,TableName
+-- 	,TableProfileDate DESC

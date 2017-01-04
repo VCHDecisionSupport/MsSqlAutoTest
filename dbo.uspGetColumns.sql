@@ -28,6 +28,7 @@ SELECT
 	sch.name AS schema_name
 	,tab.name AS table_name
 	,col.name AS column_name
+	,TYPE_NAME(col.user_type_id) AS data_type
 FROM '+@pDatabaseName+'.sys.tables AS tab
 JOIN '+@pDatabaseName+'.sys.schemas AS sch
 ON tab.schema_id = sch.schema_id
