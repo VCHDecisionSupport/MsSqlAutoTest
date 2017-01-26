@@ -36,8 +36,9 @@ BEGIN
 		DatabaseName
 		,SchemaName
 		,TableName
-	FROM DQMF.Map.PackageTable
+	FROM AutoTest.Map.PackageTable
 	WHERE 1=1
+	AND IsProfilingOn = 1
 	AND PackageName = @pPackageName;
 
 	OPEN table_cur;
@@ -52,7 +53,9 @@ BEGIN
 		PRINT(@database_name);
 		PRINT(@schema_name);
 		PRINT(@table_name);
-
+		SELECT @database_name AS DatabaseName
+			,@schema_name AS SchemaName
+			,@table_name AS TableName;
 		EXEC dbo.uspProfileTable @pDatabaseName=@database_name, @pSchemaName=@schema_name, @pTableName=@table_name, @pDistinctCountLimit=@pDistinctCountLimit, @pPkgExecKey=@pPkgExecKey, @pPackageName=@pPackageName
 		
 		FETCH NEXT FROM table_cur INTO 
