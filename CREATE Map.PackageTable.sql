@@ -30,6 +30,7 @@ CREATE TABLE Map.PackageTable
 	,DatabaseName varchar(500)
 	,SchemaName varchar(500)
 	,TableName varchar(500)
+	,IsProfilingOn bit
 );
 GO
 

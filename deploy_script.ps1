@@ -17,6 +17,6 @@ $sql_scripts = New-Object System.Collections.ArrayList
 foreach($sql_script in $sql_scripts)
 {
     Write-Host $sql_script
-    SQLCMD -S localhost -E -i $sql_script
+    SQLCMD -S STDBDECSUP01 -E -i $sql_script
 }
 

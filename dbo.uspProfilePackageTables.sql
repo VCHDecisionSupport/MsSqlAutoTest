@@ -36,7 +36,7 @@ BEGIN
 		DatabaseName
 		,SchemaName
 		,TableName
-	FROM AutoTest.Map.PackageTable
+	FROM DQMF.Map.PackageTable
 	WHERE 1=1
 	AND PackageName = @pPackageName;
 

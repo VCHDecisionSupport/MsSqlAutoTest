@@ -24,8 +24,8 @@ SELECT
 	,TableProfileDate
 	,ProfileID
 	,ROW_NUMBER() OVER (
-		PARTITION BY PkgExecKey
-			,DatabaseName
+		PARTITION BY
+			DatabaseName
 			,SchemaName
 			,TableName
 		ORDER BY

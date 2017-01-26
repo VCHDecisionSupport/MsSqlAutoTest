@@ -1,4 +1,4 @@
-USE AutoTest
+USE DQMF
 GO
 
 /****** Object:  StoredProcedure [dbo].[SetAuditPkgExecution]    Script Date: 12/15/2016 12:55:22 PM ******/
@@ -64,6 +64,8 @@ BEGIN
            ,IsPackageSuccessful = @pIsPackageSuccessful
      WHERE PkgExecKey = @pPkgExecKey
 
+     --gcwashere DR????
+     EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
 
 
 END
