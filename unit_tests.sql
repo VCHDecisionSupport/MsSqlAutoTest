@@ -25,30 +25,24 @@ GO
 --EXEC dbo.uspGetTables @pDatabaseName='CommunityMart';
 DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
 EXEC dbo.uspGetTables @pDatabaseName=@pDatabaseName;
-
+GO
 
 ------------------------------------------------------------------
 -- test: uspProfileTable
 ------------------------------------------------------------------
 
+DELETE AutoTest.dbo.TableProfile;
+DELETE AutoTest.dbo.ColumnProfile;
+DELETE AutoTest.dbo.ColumnHistogram;
+GO
 
--- DELETE AutoTest.dbo.TableProfile;
--- DELETE AutoTest.dbo.ColumnProfile;
--- DELETE AutoTest.dbo.ColumnHistogram;
-
--- EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pSchemaName='dbo', @pTableName='ReferralFact';
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
 EXEC dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
+GO
 
 SELECT * FROM AutoTest.dbo.TableProfile;
-
 SELECT * FROM AutoTest.dbo.ColumnProfile;
-
 SELECT * FROM AutoTest.dbo.ColumnHistogram;
-
-
-
-
-
 
 ------------------------------------------------------------------
 -- test: uspProfilePackageTables
@@ -107,16 +101,68 @@ WHERE pkg.TableName = 'ReferralFact';
 GO
 SELECT * FROM AutoTest.Map.PackageTable;
 GO
+
+-- 4. test uspProfilePackageTables
 EXEC dbo.uspProfilePackageTables @pPackageName='gcTestPackage';
 GO
-------------------------------------------------------------------
--- test: all views/tables
-------------------------------------------------------------------
+
 SELECT * FROM AutoTest.dbo.vwProfileAge;
-
-
 SELECT * FROM AutoTest.dbo.TableProfile;
-
 SELECT * FROM AutoTest.dbo.ColumnProfile;
-
 SELECT * FROM AutoTest.dbo.ColumnHistogram;
+GO
+
+------------------------------------------------------------------
+-- test: DQMF.dbo.SetAuditPkgExecution
+------------------------------------------------------------------
+USE DQMF
+GO
+
+DELETE dbo.ETL_Package WHERE PkgName = 'gcTestPackage';
+INSERT INTO dbo.ETL_Package 
+(
+	PkgName
+	,PkgDescription
+	,CreatedBy
+	,CreatedDT
+	,UpdatedBy
+	,UpdatedDT
+)
+VALUES
+(
+	'gcTestPackage'
+	,'PkgDescription'
+	,'CreatedBy'
+	,'1999-12-31'
+	,'UpdatedBy'
+	,'1999-12-31'
+)
+
+DECLARE @pPkgExecKeyout  bigint
+
+EXEC [SetAuditPkgExecution]
+	@pPkgExecKey = null
+	,@pParentPkgExecKey = null
+	,@pPkgName = 'gcTestPackage'
+	,@pPkgVersionMajor = 1
+	,@pPkgVersionMinor  = 1
+	,@pIsProcessStart  = 1
+	,@pIsPackageSuccessful  = 0
+	,@pPkgExecKeyout  = @pPkgExecKeyout   output
+
+EXEC [SetAuditPkgExecution]
+	@pPkgExecKey = @pPkgExecKeyout
+	,@pParentPkgExecKey = null
+	,@pPkgName = 'gcTestPackage'
+	,@pPkgVersionMajor = 1
+	,@pPkgVersionMinor  = 1
+	,@pIsProcessStart  = 0
+	,@pIsPackageSuccessful  = 1
+	,@pPkgExecKeyout  = @pPkgExecKeyout   output
+GO
+
+SELECT * FROM AutoTest.dbo.vwProfileAge;
+SELECT * FROM AutoTest.dbo.TableProfile;
+SELECT * FROM AutoTest.dbo.ColumnProfile;
+SELECT * FROM AutoTest.dbo.ColumnHistogram;
+GO

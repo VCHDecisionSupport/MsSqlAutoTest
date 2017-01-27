@@ -19,6 +19,7 @@ ALTER PROCEDURE dbo.uspProfilePackageTables
 	,@pPkgExecKey int = 0
 AS
 BEGIN
+	SELECT 'dbo.uspProfilePackageTables @pPackageName='''+@pPackageName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'' AS [AutoTest profiling proc];
 	PRINT('dbo.uspProfilePackageTables @pPackageName='''+@pPackageName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'');
 
 	DECLARE 
