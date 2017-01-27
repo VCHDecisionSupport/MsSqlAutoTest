@@ -49,8 +49,24 @@ BEGIN
 		,@param nvarchar(max)
 		,@distinct_count int
 		,@row_count int
-		,@profile_id int;
+		,@profile_id int
+	--------------------------------------------------------------------
 
+
+
+	--------------------------------------------------------------------
+		-- TODO
+	--------------------------------------------------------------------
+
+
+	
+	--------------------------------------------------------------------
+		-- if @firstColumn = 1 then reset destination tables for profile data
+		-- add parameter to determine whether destination tables are temp or permanent
+		,@firstColumn bit = 1; 
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------
+		
 	--------------------------------------------------------------------
 	-- loop over distinct tables in #temp_columns
 	--------------------------------------------------------------------
@@ -210,6 +226,8 @@ GROUP BY ['+@column_name+'];';
 		FETCH NEXT FROM table_cur INTO 
 			@schema_name
 			,@table_name;
+		
+		SET @firstColumn = 0;
 
 	END -- table_cur loop end
 
