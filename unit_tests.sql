@@ -1,43 +1,49 @@
 USE AutoTest
 GO
 
+DELETE AutoTest.dbo.TableProfile;
+DELETE AutoTest.dbo.ColumnProfile;
+DELETE AutoTest.dbo.ColumnHistogram;
+DELETE AutoTest.Map.PackageTable;
+
 ------------------------------------------------------------------
 -- test: getColumns
 ------------------------------------------------------------------
 --EXEC dbo.uspGetColumns @pDatabaseName='CommunityMart'
--- EXEC dbo.uspGetColumns @pDatabaseName='CommunityMart', @pSchemaName='dbo', @pTableName='ReferralFact';
-EXEC dbo.uspGetColumns @pDatabaseName='WideWorldImportersDW', @pSchemaName='Fact', @pTableName='Sale';
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
+EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
 GO
-EXEC dbo.uspGetColumns @pDatabaseName='WideWorldImportersDW', @pSchemaName='Fact';
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
+EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName;
 GO
-EXEC dbo.uspGetColumns @pDatabaseName='WideWorldImportersDW';
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
+EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName;
 GO
 ------------------------------------------------------------------
 -- test: getTables
 ------------------------------------------------------------------
 --EXEC dbo.uspGetTables @pDatabaseName='CommunityMart';
-EXEC dbo.uspGetTables @pDatabaseName='WideWorldImportersDW';
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
+EXEC dbo.uspGetTables @pDatabaseName=@pDatabaseName;
+
 
 ------------------------------------------------------------------
 -- test: uspProfileTable
 ------------------------------------------------------------------
 
 
---DELETE AutoTest.dbo.TableProfile;
---DELETE AutoTest.dbo.ColumnProfile;
---DELETE AutoTest.dbo.ColumnHistogram;
+-- DELETE AutoTest.dbo.TableProfile;
+-- DELETE AutoTest.dbo.ColumnProfile;
+-- DELETE AutoTest.dbo.ColumnHistogram;
 
 -- EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pSchemaName='dbo', @pTableName='ReferralFact';
-EXEC dbo.uspProfileTable @pDatabaseName='WideWorldImportersDW', @pSchemaName='Fact', @pTableName='Sale';
+EXEC dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
 
-SELECT *
-FROM AutoTest.dbo.TableProfile;
+SELECT * FROM AutoTest.dbo.TableProfile;
 
-SELECT *
-FROM AutoTest.dbo.ColumnProfile;
+SELECT * FROM AutoTest.dbo.ColumnProfile;
 
-SELECT *
-FROM AutoTest.dbo.ColumnHistogram;
+SELECT * FROM AutoTest.dbo.ColumnHistogram;
 
 
 
@@ -48,69 +54,69 @@ FROM AutoTest.dbo.ColumnHistogram;
 -- test: uspProfilePackageTables
 ------------------------------------------------------------------
 
+-- 1. clean tables
+DELETE AutoTest.dbo.TableProfile;
+DELETE AutoTest.dbo.ColumnProfile;
+DELETE AutoTest.dbo.ColumnHistogram;
+DELETE AutoTest.Map.PackageTable;
 
---DELETE AutoTest.dbo.TableProfile;
---DELETE AutoTest.dbo.ColumnProfile;
---DELETE AutoTest.dbo.ColumnHistogram;
-
+USE master
 GO
-DECLARE @packageName varchar(100) = 'TestPackage'
-		,@databaseName varchar(100) = 'WideWorldImportersDW'
-		,@schemaName varchar(100) = 'Fact'
-		,@tableName varchar(100) = 'Sale'
-
-;WITH pkg_tab AS (
-	SELECT @packageName AS PackageName
-		,@databaseName AS DatabaseName
-		,@schemaName AS SchemaName
-		,@tableName AS TableName
-)
-MERGE INTO AutoTest.Map.PackageTable AS dest
-USING pkg_tab
-ON pkg_tab.PackageName = dest.PackageName
-AND pkg_tab.DatabaseName = dest.DatabaseName
-AND pkg_tab.SchemaName = dest.SchemaName
-AND pkg_tab.TableName = dest.TableName
-WHEN NOT MATCHED THEN
-INSERT (PackageName, DatabaseName, SchemaName, TableName)
-VALUES (pkg_tab.PackageName, pkg_tab.DatabaseName, pkg_tab.SchemaName, pkg_tab.TableName);
-
-
-
+-- 2. create mock database
+IF DB_ID('gcTestData') IS NOT NULL
+DROP DATABASE gcTestData;
 GO
-DECLARE @packageName varchar(100) = 'TestPackage'
-		,@databaseName varchar(100) = 'WideWorldImportersDW'
-		,@schemaName varchar(100) = 'Fact'
-		,@tableName varchar(100) = 'Order'
+CREATE DATABASE gcTestData;
+GO
+USE gcTestData
+GO
+CREATE SCHEMA Dim;
+GO
+USE AutoTest
+GO
 
-;WITH pkg_tab AS (
-	SELECT @packageName AS PackageName
-		,@databaseName AS DatabaseName
-		,@schemaName AS SchemaName
-		,@tableName AS TableName
-)
-MERGE INTO AutoTest.Map.PackageTable AS dest
-USING pkg_tab
-ON pkg_tab.PackageName = dest.PackageName
-AND pkg_tab.DatabaseName = dest.DatabaseName
-AND pkg_tab.SchemaName = dest.SchemaName
-AND pkg_tab.TableName = dest.TableName
-WHEN NOT MATCHED THEN
-INSERT (PackageName, DatabaseName, SchemaName, TableName)
-VALUES (pkg_tab.PackageName, pkg_tab.DatabaseName, pkg_tab.SchemaName, pkg_tab.TableName);
+SELECT * INTO gcTestData.Dim.Date
+FROM CommunityMart.Dim.Date;
+
+SELECT * INTO gcTestData.Dim.LocalReportingOffice
+FROM CommunityMart.Dim.LocalReportingOffice;
+
+SELECT * INTO gcTestData.dbo.ReferralWaitTimeFact
+FROM CommunityMart.dbo.ReferralWaitTimeFact;
+
+SELECT * INTO gcTestData.dbo.ReferralFact
+FROM CommunityMart.dbo.ReferralFact;
+
+-- 3. map mock data to mock package
+INSERT INTO AutoTest.Map.PackageTable
+SELECT 
+	'gcTestPackage' AS PackageName
+	,'gcTestData' AS DatabaseName
+	,sch.name AS SchemaName
+	,tab.name AS TableName
+	,1 AS IsTableProfiled
+FROM gcTestData.sys.tables AS tab
+JOIN gcTestData.sys.schemas AS sch
+ON tab.schema_id=sch.schema_id
+
+-- turn off profiling for a table
+UPDATE AutoTest.Map.PackageTable
+SET IsProfilingOn = 0
+FROM AutoTest.Map.PackageTable AS pkg
+WHERE pkg.TableName = 'ReferralFact';
+GO
+SELECT * FROM AutoTest.Map.PackageTable;
+GO
+EXEC dbo.uspProfilePackageTables @pPackageName='gcTestPackage';
+GO
+------------------------------------------------------------------
+-- test: all views/tables
+------------------------------------------------------------------
+SELECT * FROM AutoTest.dbo.vwProfileAge;
 
 
-SELECT * FROM Map.PackageTable;
+SELECT * FROM AutoTest.dbo.TableProfile;
 
--- EXEC dbo.uspProfileTable @pDatabaseName='CommunityMart', @pSchemaName='dbo', @pTableName='ReferralFact';
-EXEC dbo.uspProfilePackageTables @pPackageName='TestPackage'
+SELECT * FROM AutoTest.dbo.ColumnProfile;
 
-SELECT *
-FROM AutoTest.dbo.TableProfile;
-
-SELECT *
-FROM AutoTest.dbo.ColumnProfile;
-
-SELECT *
-FROM AutoTest.dbo.ColumnHistogram;
-
+SELECT * FROM AutoTest.dbo.ColumnHistogram;
