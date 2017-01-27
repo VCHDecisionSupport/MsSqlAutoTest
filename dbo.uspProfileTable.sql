@@ -86,15 +86,14 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 
 		SET @sql = '
 INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,SchemaName,TableName,RecordCount,PkgExecKey,PackageName)
-VALUES (
-	CONVERT(datetime, '''+@profileDate+''' , 126) 
-	,'''+@pDatabaseName+''' 
-	,'''+@schema_name+''' 
-	,'''+@table_name+''' 
-	,'+CAST(@row_count AS varchar)+' 
-	,'+CAST(@pPkgExecKey AS varchar)+' 
-	,'''+@pPackageName+''' 
-);
+SELECT
+	CONVERT(datetime, '''+@profileDate+''' , 126) AS TableProfileDate
+	,'''+@pDatabaseName+''' AS DatabaseName
+	,'''+@schema_name+''' AS SchemaName
+	,'''+@table_name+''' AS TableName
+	,'+CAST(@row_count AS varchar)+' AS RecordCount
+	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
+	,'''+@pPackageName+''' AS PackageName;
 ';
 		PRINT(@sql);
 	
