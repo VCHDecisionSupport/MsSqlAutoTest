@@ -141,17 +141,17 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 
 	SET @sql = '-- ooga booga
 INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DataType,DistinctCount,PkgExecKey,ProfileID)
-VALUES (
-	CONVERT(datetime, '''+@profileDate+''' , 126)
-	,'''+@pDatabaseName+'''
-	,'''+@schema_name+'''
-	,'''+@table_name+'''
-	,'''+@column_name+'''
-	,'''+@data_type+'''
-	,'+CAST(@distinct_count AS varchar)+'
-	,'+CAST(@pPkgExecKey AS varchar)+'
-	,'+CAST(@profile_id AS varchar)+'
-);
+SELECT
+	CONVERT(datetime, '''+@profileDate+''' , 126) AS ColumnProfileDate
+	,'''+@pDatabaseName+''' AS DatabaseName
+	,'''+@schema_name+''' AS SchemaName
+	,'''+@table_name+''' AS TableName
+	,'''+@column_name+''' AS ColumnName
+	,'''+@data_type+''' AS DataType
+	,'+CAST(@distinct_count AS varchar)+' AS DistinctCount
+	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
+	,'+CAST(@profile_id AS varchar)+' AS ProfileID
+;
 ';
 
 	-- PRINT('-----------------------------------------------------------------------------------')

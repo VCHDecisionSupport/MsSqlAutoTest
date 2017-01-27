@@ -36,8 +36,8 @@ DELETE AutoTest.dbo.ColumnProfile;
 DELETE AutoTest.dbo.ColumnHistogram;
 GO
 
-DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
-EXEC dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='Dim', @pTableName varchar(100) ='ReferralType';
+EXEC AutoTest.dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
 GO
 
 SELECT * FROM AutoTest.dbo.TableProfile;
