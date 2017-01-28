@@ -1,5 +1,9 @@
 USE AutoTest
 GO
+SELECT * FROM AutoTest.dbo.TableProfile;
+SELECT * FROM AutoTest.dbo.ColumnProfile;
+SELECT * FROM AutoTest.dbo.ColumnHistogram;
+SELECT * FROM AutoTest.Map.PackageTable;
 
 DELETE AutoTest.dbo.TableProfile;
 DELETE AutoTest.dbo.ColumnProfile;
@@ -39,10 +43,21 @@ GO
 DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='Dim', @pTableName varchar(100) ='ReferralType';
 EXEC AutoTest.dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
 GO
-
+DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='Dim', @pTableName varchar(100) ='ReferralType';
+EXEC AutoTest.dbo.uspProfileTable @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName, @pLogResults = 0;
+GO
 SELECT * FROM AutoTest.dbo.TableProfile;
 SELECT * FROM AutoTest.dbo.ColumnProfile;
 SELECT * FROM AutoTest.dbo.ColumnHistogram;
+
+------------------------------------------------------------------
+-- test: uspInsMapPackageTable
+------------------------------------------------------------------
+
+DECLARE @pPackageName varchar(100) ='gcTestMapping', @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='Dim', @pTableName varchar(100) ='ReferralType';
+EXEC AutoTest.dbo.uspInsMapPackageTable @pPackageName=@pPackageName, @pDatabaseName=@pDatabaseName, @pSchemaName=@pSchemaName, @pTableName=@pTableName;
+SELECT * FROM AutoTest.Map.PackageTable;
+GO
 
 ------------------------------------------------------------------
 -- test: uspProfilePackageTables

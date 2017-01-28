@@ -24,7 +24,7 @@ BEGIN
 	DECLARE profile_cur CURSOR LOCAL
 	FOR
 	SELECT ProfileID
-	FROM dbo.vwProfileAge
+	FROM AutoTest.dbo.vwProfileAge
 	WHERE ProfileRelativeAge > @pNumberOfProfilesToKeep
 
 	OPEN profile_cur;

@@ -31,6 +31,7 @@ CREATE TABLE Map.PackageTable
 	,SchemaName varchar(500)
 	,TableName varchar(500)
 	,IsProfilingOn bit DEFAULT 1
+	,AlertThresholdAbsolutePercentChange decimal(2,2) DEFAULT 0.1
 );
 GO
 

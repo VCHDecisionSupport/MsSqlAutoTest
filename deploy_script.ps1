@@ -2,16 +2,30 @@
 Set-Location -Path $PSScriptRoot
 Write-Host $PSScriptRoot
 $sql_scripts = New-Object System.Collections.ArrayList
-[void]$sql_scripts.Add("CREATE AutoTest tables.sql")
-[void]$sql_scripts.Add("CREATE Map.PackageTable.sql")
-[void]$sql_scripts.Add("dbo.uspDeleteOldProfiles.sql")
-[void]$sql_scripts.Add("dbo.uspGetTables.sql")
-[void]$sql_scripts.Add("dbo.uspGetColumns.sql")
-[void]$sql_scripts.Add("dbo.uspProfileTable.sql")
-[void]$sql_scripts.Add("dbo.uspProfilePackageTables.sql")
-[void]$sql_scripts.Add("dbo.uspProfilePackageTables.sql")
-[void]$sql_scripts.Add("dbo.uspUpdateAlerts.sql")
-[void]$sql_scripts.Add("dbo.vwProfileAge.sql")
+
+# database
+[void]$sql_scripts.Add("AutoTest.sql")
+# schema and table
+[void]$sql_scripts.Add("AutoTest.Map.PackageTable.sql")
+# profile tables
+[void]$sql_scripts.Add("AutoTest.dbo.TableProfile.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.ColumnProfile.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.ColumnHistogram.sql")
+# views
+[void]$sql_scripts.Add("msdb.dbo.vwPackagePath.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.vwProfileAge.sql")
+# procedures
+[void]$sql_scripts.Add("AutoTest.dbo.uspGetColumns.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspGetPackagePath.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspGetTables.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspInsMapPackageTable.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspProfilePackageTables.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspProfileTable.sql")
+[void]$sql_scripts.Add("AutoTest.dbo.uspDeleteOldProfiles.sql")
+# unit tests
+[void]$sql_scripts.Add("unit_tests.sql")
+# not used
+# [void]$sql_scripts.Add("AutoTest.dbo.Alert.sql")
 
 
 foreach($sql_script in $sql_scripts)

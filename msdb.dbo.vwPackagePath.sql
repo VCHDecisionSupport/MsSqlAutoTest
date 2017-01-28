@@ -1,13 +1,19 @@
 USE msdb
 GO
 
-IF OBJECT_ID('dbo.vwPackagePathes') IS NOT NULL
+
+IF  NOT EXISTS (SELECT TOP 1 1 FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.vwPackagePath', 'V'))
 BEGIN
-	DROP VIEW dbo.vwPackagePathes;
+	EXEC ('CREATE VIEW dbo.vwPackagePath AS SELECT 1 AS one;');
 END
 GO
 
-CREATE VIEW dbo.vwPackagePathes
+/****** Object:  StoredProcedure dbo.vwPackagePath   DR0000 Graham Crowell 2016-01-00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON 
+GO
+ALTER VIEW dbo.vwPackagePath
 AS
 WITH msdb_folders AS
 (
@@ -15,7 +21,7 @@ WITH msdb_folders AS
 		rootpkg.folderid, 
 		rootpkg.foldername, 
 		0 AS level, 
-		CAST('\' AS varchar(500)) as full_path 
+		CAST('MSDB' AS varchar(500)) as full_path 
 	FROM msdb.dbo.sysssispackagefolders AS rootpkg 
 	WHERE parentfolderid IS NULL
 	UNION ALL
@@ -33,8 +39,19 @@ WITH msdb_folders AS
 SELECT 
 	msdb_folders.full_path AS PackageFolderPath
 	,msdb_folders.full_path + '\' + pkgs.name AS PackageFullPath
+	,pkgs.name AS PackageName
 FROM msdb_folders
 JOIN msdb.dbo.sysssispackages as pkgs
 ON msdb_folders.folderid = pkgs.folderid
-GO
+GO	
 
+
+-- DECLARE @NumberOfProfilesToKeep int = 5;
+-- SELECT *
+-- FROM AutoTest.dbo.vwPackagePath
+-- WHERE ProfileRelativeAge > @NumberOfProfilesToKeep
+-- ORDER BY PkgExecKey
+-- 	,DatabaseName
+-- 	,SchemaName
+-- 	,TableName
+-- 	,TableProfileDate DESC
