@@ -8,8 +8,11 @@ SELECT * FROM AutoTest.Map.PackageTable;
 DELETE AutoTest.dbo.TableProfile;
 DELETE AutoTest.dbo.ColumnProfile;
 DELETE AutoTest.dbo.ColumnHistogram;
-DELETE AutoTest.Map.PackageTable;
-
+DELETE AutoTest.Map.PackageTable
+WHERE DatabaseName LIKE '[SourceDataArchive]'
+OR SchemaName LIKE '%Staging%'
+OR TableName LIKE '%Staging%'
+OR SchemaName LIKE '%Staging%'
 ------------------------------------------------------------------
 -- test: getColumns
 ------------------------------------------------------------------
