@@ -1,5 +1,8 @@
 # Simple Profiles
 
+## Deployment
+PowerShell script: `deploy_script.ps1` drops and creates all AutoTest objects on specified server.
+
 ## User Interface
 TODO see issues.
 
