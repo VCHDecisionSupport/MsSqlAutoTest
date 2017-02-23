@@ -2,15 +2,15 @@
 
 ## Deployment
 
-1. **Sql Backend**
+#### 1. **Sql Backend**
 
 PowerShell script: `deploy_script.ps1` prompts for server then drops and creates all Sql AutoTest objects.
 
-2. **Update DQMF proc**
+#### 2. **Update DQMF proc**
 
 ajds 
 
-3. **C\# App (Package-Table Mapper)**
+#### 3. **C\# App (Package-Table Mapper)**
 
 just do it.
 
