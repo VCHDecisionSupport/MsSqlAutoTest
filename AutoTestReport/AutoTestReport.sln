@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "AutoTestReport", "AutoTestReport\AutoTestReport.rptproj", "{DF35C160-C8FB-4642-82D3-8E27B9D3E102}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C2CFBA90-873A-48DE-A5DE-131112B01F56}"
+	ProjectSection(SolutionItems) = preProject
+		AutoTestConfigProcs.sql = AutoTestConfigProcs.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		DebugLocal|Default = DebugLocal|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Debug|Default.ActiveCfg = Debug
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Debug|Default.Build.0 = Debug
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Debug|Default.Deploy.0 = Debug
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.DebugLocal|Default.ActiveCfg = DebugLocal
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.DebugLocal|Default.Build.0 = DebugLocal
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Release|Default.ActiveCfg = Release
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Release|Default.Build.0 = Release
+		{DF35C160-C8FB-4642-82D3-8E27B9D3E102}.Release|Default.Deploy.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
