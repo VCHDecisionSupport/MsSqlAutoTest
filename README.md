@@ -1,7 +1,18 @@
 # Simple Profiles
 
 ## Deployment
-PowerShell script: `deploy_script.ps1` drops and creates all AutoTest objects on specified server.
+
+1. **Sql Backend**
+
+PowerShell script: `deploy_script.ps1` prompts for server then drops and creates all Sql AutoTest objects.
+
+2. **Update DQMF proc**
+
+ajds 
+
+3. **C\# App (Package-Table Mapper)**
+
+just do it.
 
 ## User Interface
 TODO see issues.
