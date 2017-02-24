@@ -22,3 +22,7 @@
 
 SELECT *
 FROM AutoTest.dbo.tmp 
+
+
+SELECT *
+FROM AutoTest.Map.PackageTable;

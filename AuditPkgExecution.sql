@@ -65,7 +65,17 @@ BEGIN
      WHERE PkgExecKey = @pPkgExecKey
 
      --gcwashere DR????
-     EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
+	DECLARE @PackagePath varchar(500);
+	SELECT @PackagePath=PackageFullPath
+	FROM msdb.dbo.vwPackagePath
+	WHERE PackageName = 'CommunityLoadDSDWChild1'
+
+	IF(@PackagePath IS NOT NULL)
+	BEGIN
+		-- run executable here to populate AutoTest.Map.PackageTable
+     	EXEC xp_cmdshell 'C:\\shared\\PackageTableMapper.exe "'+@PackagePath+'"'
+	END
+	EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
 
 
 END
