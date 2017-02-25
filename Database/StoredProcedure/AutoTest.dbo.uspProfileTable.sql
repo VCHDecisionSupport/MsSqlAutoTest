@@ -25,7 +25,7 @@ ALTER PROCEDURE dbo.uspProfileTable
 	,@pLogResults bit = 1
 AS
 BEGIN
-	PRINT('dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+', @pPackageName='+CAST(@pPackageName AS varchar)+'');
+	PRINT(CHAR(13) + CHAR(10)+CHAR(9)+'dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+', @pPackageName='+CAST(@pPackageName AS varchar)+'');
 
 	DECLARE @profileDate varchar(30) = CONVERT(nvarchar(30), GETDATE(), 126)
 	DECLARE @schema_name varchar(500)

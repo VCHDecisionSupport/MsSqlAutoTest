@@ -21,7 +21,7 @@ ALTER PROCEDURE dbo.uspGetColumns
 	,@pTableName varchar(500) = ''
 AS
 BEGIN 
-	PRINT 'dbo.uspGetColumns @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+'''';
+	PRINT CHAR(9)+CHAR(9)+'dbo.uspGetColumns @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+'''';
 	DECLARE @sql varchar(max);
 	DECLARE @params varchar(max);
 
@@ -56,7 +56,7 @@ WHERE 1=1
 SET @sql = @sql + 
 'ORDER BY sch.name, tab.name, col.column_id;
 '
-	PRINT(@sql)
+	-- PRINT(@sql)
 	EXEC(@sql);
 END
 GO

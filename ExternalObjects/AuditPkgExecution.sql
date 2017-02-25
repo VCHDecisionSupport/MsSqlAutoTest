@@ -79,7 +79,16 @@ BEGIN
 	BEGIN
 		-- run C# executable here to populate AutoTest.Map.PackageTable
 		DECLARE @cmd VARCHAR(500) = 'C:\\shared\\PackageTableMapper.exe "' +@PackagePath+'"';
-		EXEC xp_cmdshell @cmd
+		DECLARE @result int;  
+		EXEC @result = xp_cmdshell @cmd
+		IF (@result = 0)  
+			PRINT 'PackageTableMapper.exe no error'
+		ELSE  
+			SELECT 'PackageTableMapper.exe ERROR: '+@cmd AS Error
+	END
+	ELSE 
+	BEGIN
+		SELECT 'msdb Package path for '+@pPkgName+' not found in msdb.dbo.vwPackagePath' AS [Warning]
 	END
 	EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
 	-- AutoTest changes end
@@ -108,8 +117,3 @@ SELECT @pPkgExecKeyout
 
 */
 -- 
-
-SELECT 'sdfs'+'dsfsdfs'
-GO
-
-

@@ -22,7 +22,7 @@ ALTER PROCEDURE dbo.uspProfilePackageTables
 AS
 BEGIN
 	SELECT 'dbo.uspProfilePackageTables @pPackageName='''+@pPackageName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'' AS [AutoTest profiling proc];
-	PRINT('dbo.uspProfilePackageTables @pPackageName='''+@pPackageName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'');
+	PRINT(CHAR(10)+'dbo.uspProfilePackageTables @pPackageName='''+@pPackageName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+'');
 
 	DECLARE 
 		@database_name varchar(500)
@@ -53,9 +53,7 @@ BEGIN
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		PRINT(@database_name);
-		PRINT(@schema_name);
-		PRINT(@table_name);
+		-- PRINT(@database_name+'.'+@schema_name+'.'+@table_name);
 		SELECT @database_name AS DatabaseName
 			,@schema_name AS SchemaName
 			,@table_name AS TableName;

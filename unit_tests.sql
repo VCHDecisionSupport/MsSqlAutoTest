@@ -13,6 +13,7 @@ WHERE DatabaseName LIKE '[SourceDataArchive]'
 OR SchemaName LIKE '%Staging%'
 OR TableName LIKE '%Staging%'
 OR SchemaName LIKE '%Staging%'
+
 ------------------------------------------------------------------
 -- test: getColumns
 ------------------------------------------------------------------
@@ -26,6 +27,7 @@ GO
 DECLARE @pDatabaseName varchar(100) ='CommunityMart', @pSchemaName varchar(100) ='dbo', @pTableName varchar(100) ='ReferralFact';
 EXEC dbo.uspGetColumns @pDatabaseName=@pDatabaseName;
 GO
+
 ------------------------------------------------------------------
 -- test: getTables
 ------------------------------------------------------------------
@@ -62,11 +64,13 @@ EXEC AutoTest.dbo.uspInsMapPackageTable @pPackageName=@pPackageName, @pDatabaseN
 SELECT * FROM AutoTest.Map.PackageTable;
 GO
 
+
+
 ------------------------------------------------------------------
--- test: uspProfilePackageTables
+-- 1 setup: create mock database with data
 ------------------------------------------------------------------
 
--- 1. clean tables
+-- A. clean tables
 DELETE AutoTest.dbo.TableProfile;
 DELETE AutoTest.dbo.ColumnProfile;
 DELETE AutoTest.dbo.ColumnHistogram;
@@ -74,7 +78,7 @@ DELETE AutoTest.Map.PackageTable;
 
 USE master
 GO
--- 2. create mock database
+-- B. create mock database
 IF DB_ID('gcTestData') IS NOT NULL
 DROP DATABASE gcTestData;
 GO
@@ -99,14 +103,19 @@ FROM CommunityMart.dbo.ReferralWaitTimeFact;
 SELECT * INTO gcTestData.dbo.ReferralFact
 FROM CommunityMart.dbo.ReferralFact;
 
--- 3. map mock data to mock package
-INSERT INTO AutoTest.Map.PackageTable
+-- C. map mock data to mock package
+INSERT INTO AutoTest.Map.PackageTable 
+(
+	PackageName
+	,DatabaseName
+	,SchemaName
+	,TableName
+)
 SELECT 
 	'gcTestPackage' AS PackageName
 	,'gcTestData' AS DatabaseName
 	,sch.name AS SchemaName
 	,tab.name AS TableName
-	,1 AS IsTableProfiled
 FROM gcTestData.sys.tables AS tab
 JOIN gcTestData.sys.schemas AS sch
 ON tab.schema_id=sch.schema_id
@@ -120,78 +129,10 @@ GO
 SELECT * FROM AutoTest.Map.PackageTable;
 GO
 
--- 4. test uspProfilePackageTables
-EXEC dbo.uspProfilePackageTables @pPackageName='gcTestPackage';
-GO
-
-SELECT * FROM AutoTest.dbo.vwProfileAge;
-SELECT * FROM AutoTest.dbo.TableProfile;
-SELECT * FROM AutoTest.dbo.ColumnProfile;
-SELECT * FROM AutoTest.dbo.ColumnHistogram;
-GO
+-- D. profile data (uspProfilePackageTables or DQMF.dbo.SetAuditPkgExecution)
 
 ------------------------------------------------------------------
--- test: DQMF.dbo.SetAuditPkgExecution
-------------------------------------------------------------------
-USE DQMF
-GO
-
-DELETE dbo.ETL_Package WHERE PkgName = 'gcTestPackage';
-INSERT INTO dbo.ETL_Package 
-(
-	PkgName
-	,PkgDescription
-	,CreatedBy
-	,CreatedDT
-	,UpdatedBy
-	,UpdatedDT
-)
-VALUES
-(
-	'gcTestPackage'
-	,'PkgDescription'
-	,'CreatedBy'
-	,'1999-12-31'
-	,'UpdatedBy'
-	,'1999-12-31'
-)
-
-DECLARE @pPkgExecKeyout  bigint
-
-EXEC DQMF.dbo.[SetAuditPkgExecution]
-	@pPkgExecKey = null
-	,@pParentPkgExecKey = null
-	,@pPkgName = 'gcTestPackage'
-	,@pPkgVersionMajor = 1
-	,@pPkgVersionMinor  = 1
-	,@pIsProcessStart  = 1
-	,@pIsPackageSuccessful  = 0
-	,@pPkgExecKeyout  = @pPkgExecKeyout   output
-
-EXEC DQMF.dbo.[SetAuditPkgExecution]
-	@pPkgExecKey = @pPkgExecKeyout
-	,@pParentPkgExecKey = null
-	,@pPkgName = 'gcTestPackage'
-	,@pPkgVersionMajor = 1
-	,@pPkgVersionMinor  = 1
-	,@pIsProcessStart  = 0
-	,@pIsPackageSuccessful  = 1
-	,@pPkgExecKeyout  = @pPkgExecKeyout   output
-GO
-
-SELECT * FROM AutoTest.dbo.vwProfileAge;
-SELECT * FROM AutoTest.dbo.TableProfile;
-SELECT * FROM AutoTest.dbo.ColumnProfile
-WHERE TableName = 'LocalReportingOffice'
-ORDER BY ColumnName, ProfileID
-SELECT * FROM AutoTest.dbo.ColumnHistogram
-WHERE TableName = 'LocalReportingOffice'
-ORDER BY ColumnName, ColumnValue, ProfileID
-
-GO
-
-------------------------------------------------------------------
--- randomly change table data (mock etl)
+-- 2 setup: randomly change table data (mock etl)
 ------------------------------------------------------------------
 
 USE gcTestData
@@ -248,5 +189,65 @@ SELECT
 FROM gcTestData.Dim.LocalReportingOffice AS del_tab
 JOIN ins_ids
 ON del_tab.LocalReportingOfficeID = ins_ids.LocalReportingOfficeID
-
 ----------------------------------------------------
+
+
+
+------------------------------------------------------------------
+-- test: uspProfilePackageTables
+------------------------------------------------------------------
+USE AutoTest
+GO
+EXEC dbo.uspProfilePackageTables @pPackageName='gcTestPackage',@pPkgExecKey=123;;
+GO
+
+
+SELECT * FROM AutoTest.dbo.vwProfileAge;
+SELECT * FROM AutoTest.dbo.TableProfile;
+SELECT * FROM AutoTest.dbo.ColumnProfile
+WHERE TableName = 'LocalReportingOffice'
+ORDER BY ColumnName, ProfileID
+SELECT * FROM AutoTest.dbo.ColumnHistogram
+WHERE TableName = 'LocalReportingOffice'
+ORDER BY ColumnName, ColumnValue, ProfileID
+
+GO
+
+------------------------------------------------------------------
+-- test: DQMF.dbo.SetAuditPkgExecution
+------------------------------------------------------------------
+USE DQMF
+GO
+
+DECLARE @pPkgName varchar(500)  = 'PopulateCommunityMart'
+DECLARE @pPkgExecKeyout  bigint
+
+EXEC DQMF.dbo.[SetAuditPkgExecution]
+	@pPkgExecKey = null
+	,@pParentPkgExecKey = null
+	,@pPkgName = @pPkgName
+	,@pPkgVersionMajor = 1
+	,@pPkgVersionMinor  = 1
+	,@pIsProcessStart  = 1
+	,@pIsPackageSuccessful  = 0
+	,@pPkgExecKeyout  = @pPkgExecKeyout   output
+
+EXEC DQMF.dbo.[SetAuditPkgExecution]
+	@pPkgExecKey = @pPkgExecKeyout
+	,@pParentPkgExecKey = null
+	,@pPkgName = @pPkgName
+	,@pPkgVersionMajor = 1
+	,@pPkgVersionMinor  = 1
+	,@pIsProcessStart  = 0
+	,@pIsPackageSuccessful  = 1
+	,@pPkgExecKeyout  = @pPkgExecKeyout   output
+GO
+
+
+
+SELECT * FROM AutoTest.dbo.vwProfileAge;
+SELECT * FROM AutoTest.dbo.TableProfile;
+SELECT * FROM AutoTest.dbo.ColumnProfile;
+SELECT * FROM AutoTest.dbo.ColumnHistogram;
+
+GO
