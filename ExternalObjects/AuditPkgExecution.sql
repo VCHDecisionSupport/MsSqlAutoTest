@@ -64,18 +64,23 @@ BEGIN
            ,IsPackageSuccessful = @pIsPackageSuccessful
      WHERE PkgExecKey = @pPkgExecKey
 
-     --gcwashere DR????
+	----------------------------------------------------
+	-- AutoTest changes start
 	DECLARE @PackagePath varchar(500);
+	-- look in msdb for path of package:
 	SELECT @PackagePath=PackageFullPath
 	FROM msdb.dbo.vwPackagePath
-	WHERE PackageName = 'CommunityLoadDSDWChild1'
+	WHERE PackageName = @pPkgName
 
 	IF(@PackagePath IS NOT NULL)
 	BEGIN
 		-- run executable here to populate AutoTest.Map.PackageTable
-     	EXEC xp_cmdshell 'C:\\shared\\PackageTableMapper.exe "'+@PackagePath+'"'
+		DECLARE @cmd VARCHAR(500) = 'C:\\shared\\PackageTableMapper.exe "' +@PackagePath+'"';
+		EXEC xp_cmdshell @cmd
 	END
 	EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
+	-- AutoTest changes end
+	----------------------------------------------------
 
 
 END
@@ -99,8 +104,9 @@ SELECT @pPkgExecKeyout
 
 
 */
+-- 
 
-
+SELECT 'sdfs'+'dsfsdfs'
 GO
 
 

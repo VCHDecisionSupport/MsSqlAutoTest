@@ -8,7 +8,7 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure dbo.uspDeleteOldProfiles   DR0000 Graham Crowell 2016-01-00 ******/
+/****** Object:  StoredProcedure dbo.uspDeleteOldProfiles   DR9581 Graham Crowell 2017-02-27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON 

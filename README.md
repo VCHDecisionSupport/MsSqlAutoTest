@@ -1,5 +1,7 @@
 # Simple Profiles
 
+[AutoTest GitHub Repo](https://github.com/VCHDecisionSupport/AutoTest)
+
 ## Deployment
 
 #### 1. **Sql Backend**
