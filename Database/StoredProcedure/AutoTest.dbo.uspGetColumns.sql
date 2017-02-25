@@ -1,13 +1,16 @@
 USE AutoTest
 GO
 
+/*
+2017-02-27 Graham Crowell DR9581 initial deployment
+*/
+
 IF  NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.uspGetColumns') AND OBJECTPROPERTY(id,N'IsProcedure') = 1)
 BEGIN
 	EXEC ('CREATE PROCEDURE dbo.uspGetColumns AS');
 END
 GO
 
-/****** Object:  StoredProcedure dbo.uspGetTables   DR0000 Graham Crowell 2016-01-00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

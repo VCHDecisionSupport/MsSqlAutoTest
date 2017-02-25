@@ -66,6 +66,9 @@ BEGIN
 
 	----------------------------------------------------
 	-- AutoTest changes start
+/*
+2017-02-27 Graham Crowell DR9581 initial deployment
+*/
 	DECLARE @PackagePath varchar(500);
 	-- look in msdb for path of package:
 	SELECT @PackagePath=PackageFullPath
@@ -74,7 +77,7 @@ BEGIN
 
 	IF(@PackagePath IS NOT NULL)
 	BEGIN
-		-- run executable here to populate AutoTest.Map.PackageTable
+		-- run C# executable here to populate AutoTest.Map.PackageTable
 		DECLARE @cmd VARCHAR(500) = 'C:\\shared\\PackageTableMapper.exe "' +@PackagePath+'"';
 		EXEC xp_cmdshell @cmd
 	END

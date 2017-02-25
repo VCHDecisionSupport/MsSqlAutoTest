@@ -1,6 +1,9 @@
 USE AutoTest
 GO
 
+/*
+2017-02-27 Graham Crowell DR9581 initial deployment
+*/
 
 IF  NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.uspProfileTable') AND OBJECTPROPERTY(id,N'IsProcedure') = 1)
 BEGIN
@@ -8,7 +11,6 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure dbo.uspProfileTable   DR0000 Graham Crowell 2016-01-00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON 

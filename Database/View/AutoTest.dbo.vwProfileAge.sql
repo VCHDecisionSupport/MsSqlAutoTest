@@ -1,6 +1,9 @@
 USE AutoTest
 GO
 
+/*
+2017-02-27 Graham Crowell DR9581 initial deployment
+*/
 
 IF  NOT EXISTS (SELECT TOP 1 1 FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.vwProfileAge', 'V'))
 BEGIN
@@ -8,7 +11,6 @@ BEGIN
 END
 GO
 
-/****** Object:  StoredProcedure dbo.vwProfileAge   DR0000 Graham Crowell 2016-01-00 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON 
@@ -37,13 +39,3 @@ SELECT *
 FROM Profiles;
 GO	
 
-
--- DECLARE @NumberOfProfilesToKeep int = 5;
--- SELECT *
--- FROM AutoTest.dbo.vwProfileAge
--- WHERE ProfileRelativeAge > @NumberOfProfilesToKeep
--- ORDER BY PkgExecKey
--- 	,DatabaseName
--- 	,SchemaName
--- 	,TableName
--- 	,TableProfileDate DESC
