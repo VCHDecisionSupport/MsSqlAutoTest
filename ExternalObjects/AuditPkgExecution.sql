@@ -54,6 +54,8 @@ BEGIN
       WHERE PkgName = @pPkgName
 
     SET @pPkgExecKeyOut = @@IDENTITY
+
+	
 END
 
 IF @pIsProcessStart = 0
@@ -66,9 +68,9 @@ BEGIN
 
 	----------------------------------------------------
 	-- AutoTest changes start
-/*
-2017-02-27 Graham Crowell DR9581 initial deployment
-*/
+	/*
+	2017-02-27 Graham Crowell DR9581 initial deployment
+	*/
 	DECLARE @PackagePath varchar(500);
 	-- look in msdb for path of package:
 	SELECT @PackagePath=PackageFullPath
@@ -78,17 +80,18 @@ BEGIN
 	IF(@PackagePath IS NOT NULL)
 	BEGIN
 		-- run C# executable here to populate AutoTest.Map.PackageTable
-		DECLARE @cmd VARCHAR(500) = 'C:\\shared\\PackageTableMapper.exe "' +@PackagePath+'"';
+		DECLARE @cmd VARCHAR(500) = 'C:\\shared\\PackageTableMapper.exe "'+@PackagePath+'"';
 		DECLARE @result int;  
-		EXEC @result = xp_cmdshell @cmd
+		PRINT 'executing: xp_cmdshell '+@cmd;
+		EXEC @result = xp_cmdshell @cmd, NO_OUTPUT
 		IF (@result = 0)  
-			PRINT 'PackageTableMapper.exe no error'
+			PRINT CHAR(9)+'SUCCESS executing: '+@cmd
 		ELSE  
-			SELECT 'PackageTableMapper.exe ERROR: '+@cmd AS Error
+			PRINT CHAR(9)+'ERROR executing command: '+@cmd+CHAR(13)+'Check if C:\\shared\\PackageTableMapper.exe exists; look at error log file: C:\\shared\\PackageTableMapper_ErrorLog.txt;  rerun command from server cmd'
 	END
 	ELSE 
 	BEGIN
-		SELECT 'msdb Package path for '+@pPkgName+' not found in msdb.dbo.vwPackagePath' AS [Warning]
+		PRINT CHAR(9)+'WARNING: msdb Package path for '+@pPkgName+' not found in msdb.dbo.vwPackagePath'
 	END
 	EXEC AutoTest.dbo.uspProfilePackageTables @pPackageName=@pPkgName,@pPkgExecKey=@pPkgExecKey;
 	-- AutoTest changes end

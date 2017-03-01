@@ -249,5 +249,6 @@ SELECT * FROM AutoTest.dbo.vwProfileAge;
 SELECT * FROM AutoTest.dbo.TableProfile;
 SELECT * FROM AutoTest.dbo.ColumnProfile;
 SELECT * FROM AutoTest.dbo.ColumnHistogram;
+SELECT * FROM AutoTest.Map.PackageTable;
 
 GO
