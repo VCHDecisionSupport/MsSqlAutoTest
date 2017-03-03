@@ -1,0 +1,3 @@
+[submodule "SqlServerUtilities"]
+	path = SqlServerUtilities
+	url = https://github.com/grahamcrowell/SqlServerUtilities
