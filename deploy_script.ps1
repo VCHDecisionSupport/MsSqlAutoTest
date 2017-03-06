@@ -1,7 +1,7 @@
 ﻿Param 
 (
     [parameter(Mandatory = $true)]
-    [ValidateSet('STDBDECSUP01','STDBDECSUP02','STDBDECSUP03','SPDBDECSUP04')]
+    [ValidateSet('STDBDECSUP01','STDBDECSUP02','STDBDECSUP03','SPDBDECSUP04','PC')]
     [string] $DeploymentSqlServer
 )
 Set-Location -Path $PSScriptRoot
@@ -44,6 +44,7 @@ $sql_scripts = New-Object System.Collections.ArrayList
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspGetPackagePath.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspGetTables.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspInsMapPackageTable.sql")
+[void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspInsTableProfile.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspProfilePackageTables.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspProfileTable.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspDeleteOldProfiles.sql")
