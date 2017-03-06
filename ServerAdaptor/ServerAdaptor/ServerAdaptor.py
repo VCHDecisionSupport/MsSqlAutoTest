@@ -49,104 +49,72 @@ class OdbcServerConnection(object):
         self.__connection.commit()
         print('\tclosing'.format(self.__dns_name))
         self.__connection.close()
+    #def set_table_count_queries(self):
+    #    cur = self.__connection.cursor()
+    #    self.__table_count_queries = {}
+    #    for table_row in cur.tables():
+    #        table_fq = '"{}"."{}"."{}"'
+    #        self.__table_count_queries[table[
     def tables(self):
         cur = self.__connection.cursor()
-        for x in cur.tables():
-            print(x)
+        return cur.tables()
     def columns(self):
         cur = self.__connection.cursor()
-        for x in cur.columns():
-            print(x)
+        return cur.columns()
 
 class Schema(OdbcServerConnection):
     def __init__(self, dsn_name):
         self.__dns_name = dsn_name
-        print('{}: {}'.format(self.__class__.__name__, self.__dns_name))
+        self.__table_name_format = None
+        #print('{}: {}'.format(self.__class__.__name__, self.__dns_name))
         return super(Schema, self).__init__(self.__dns_name)
-    def get_databases(self):
+    def databases(self):
         raise NotImplementedError()
-    def get_view_tables(self, database_name=None):
-        raise NotImplementedError()
-    def get_columns(self, database_name=None, view_table_name=None):
-        raise NotImplementedError()
+
 
 class DenodoSchema(Schema):
     def __init__(self, dsn_name):
         self.__dns_name = dsn_name
         print('{}: {}'.format(self.__class__.__name__, self.__dns_name))
         return super(DenodoSchema, self).__init__(self.__dns_name)
-    def get_databases(self):
+    def databases(self):
         self.__database_query = 'SELECT DISTINCT DATABASE_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
         self.query('databases', self.__database_query)
         return self['databases']
-    def get_view_tables(self, database_name=None):
-        if database_name is None:
-            self.__view_table_query = 'SELECT DISTINCT DATABASE_NAME, VIEW_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
-        else:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}';".format(database_name)
-        self.query('view_tables', self.__view_table_query)
-        return self['view_tables']
-    def get_columns(self, database_name=None, view_table_name=None):
-        if database_name is None:
-            self.__view_table_query = 'SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
-        elif view_table_name is None:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}';".format(database_name)
-        else:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}' AND VIEW_NAME = '{}';".format(database_name, view_table_name)
-        self.query('columns', self.__view_table_query)
-        return self['columns']
-    def foo(self):
-        self.tables()
+    
 
 class MsSql(Schema):
     def __init__(self, dsn_name):
         self.__dns_name = dsn_name
+        self.__databases = []
         print('{}: {}'.format(self.__class__.__name__, self.__dns_name))
         return super(MsSql, self).__init__(self.__dns_name)
-    def get_databases(self):
-        self.__database_query = 'SELECT DISTINCT DATABASE_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
+    def databases(self):
+        self.__database_query = """EXEC sp_MSforeachdb 'SELECT ''?''';"""
         self.query('databases', self.__database_query)
-        return self['databases']
-    def get_view_tables(self, database_name=None):
-        if database_name is None:
-            self.__view_table_query = 'SELECT DISTINCT DATABASE_NAME, VIEW_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
-        else:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}';".format(database_name)
-        self.query('view_tables', self.__view_table_query)
-        return self['view_tables']
-    def get_columns(self, database_name=None, view_table_name=None):
-        if database_name is None:
-            self.__view_table_query = 'SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
-        elif view_table_name is None:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}';".format(database_name)
-        else:
-            self.__view_table_query = "SELECT DISTINCT DATABASE_NAME, VIEW_NAME, COLUMN_NAME FROM CATALOG_VDP_METADATA_VIEWS() WHERE DATABASE_NAME = '{}' AND VIEW_NAME = '{}';".format(database_name, view_table_name)
-        self.query('columns', self.__view_table_query)
-        return self['columns']
+        if len(self.__databases) == 0:
+            while self['databases'].nextset():
+                for x in self['databases']:
+                    self.__databases.append(x)
+        return self.__databases
+    
 
 if __name__ == '__main__':
     con = OdbcServerConnection('SysDsnWwi')
     con.query('sys', 'SELECT COUNT(*) FROM sys.tables')
     con.info()
+    
+    sql = MsSql('SysDsnWwi')
+    #print(list(sql.databases()))
+    #print(list(sql.tables()))
+    #print(list(sql.columns()))
 
-    den = OdbcServerConnection('DenodoODBCa')
-    #den.query('SELECT COUNT(*) FROM sys.tables','sys')
-    den.info()
+    #den = DenodoSchema('DenodoODBCa')
+    #print(list(den.databases()))
+    #print(list(den.tables()))
+    #print(list(den.columns()))
 
-    den = DenodoSchema('DenodoODBCa')
-    print(list(den.get_databases()))
-    print(list(den.get_view_tables()))
-    print(list(den.get_columns()))
-    den.tables()
-    den.columns()
-    #con.sql_cmd('sdfa',[(1,2,3),(432,2,1)])
-    #cur = con['sys']
-    #print(cur)
-    #res = cur.fetchall()
-    #print(res)
-    #print(type(res))
-    #for r in res:
-    #    print(r)
+
 
 #'SELECT DISTINCT DATABASE_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
 #'SELECT DISTINCT VIEW_NAME FROM CATALOG_VDP_METADATA_VIEWS();'
