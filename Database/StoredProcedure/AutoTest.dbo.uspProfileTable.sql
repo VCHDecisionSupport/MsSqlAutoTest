@@ -28,6 +28,8 @@ BEGIN
 	PRINT(CHAR(13) + CHAR(10)+CHAR(9)+'dbo.uspProfileTable @pDatabaseName='''+@pDatabaseName+''', @pSchemaName='''+@pSchemaName+''', @pTableName='''+@pTableName+''', @pDistinctCountLimit='+CAST(@pDistinctCountLimit AS varchar)+', @pPkgExecKey='+CAST(@pPkgExecKey AS varchar)+', @pPackageName='+CAST(@pPackageName AS varchar)+'');
 
 	DECLARE @profileDate varchar(30) = CONVERT(nvarchar(30), GETDATE(), 126)
+    DECLARE @pProfileDateIsoStr VARCHAR(23) = CONVERT(varchar(22), @profileDate, 126);
+
 	DECLARE @schema_name varchar(500)
 		,@table_name varchar(500)
 		,@column_name varchar(500)
@@ -118,7 +120,7 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 
 		IF @pLogResults = 1
 		BEGIN
-
+            -- insert into AutoTest logging table with name saved in @tableProfileTable
 			SET @sql = '
 INSERT INTO '+@tableProfileTable+'(TableProfileDate,DatabaseName,SchemaName,TableName,RecordCount,PkgExecKey,PackageName)
 SELECT
@@ -130,10 +132,12 @@ SELECT
 	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
 	,'''+@pPackageName+''' AS PackageName;
 ';
-		END
+        EXEC AutoTest.dbo.uspInsTableProfile @pProfileDateIsoStr = @pProfileDateIsoStr, @pPackageName = @pPackageName, @pDatabaseName = @pDatabaseName, @pSchemaName = @schema_name, @pTableName = @table_name, @pRowCount = @row_count, @pPkgExecKey = @pPkgExecKey;
+        END
 
 		ELSE
 		BEGIN
+            -- insert into temp table with name saved in @tableProfileTable
 			SET @sql = '
 SELECT
 	CONVERT(datetime, '''+@profileDate+''' , 126) AS TableProfileDate
@@ -193,6 +197,7 @@ FROM ['+@pDatabaseName+'].['+@schema_name+'].['+@table_name+']
 	--------------------------------------------------------------------
 	IF @pLogResults = 0 AND @isFirstColumn = 1
 	BEGIN
+
 		SET @sql = '-- ooga booga
 SELECT
 	CONVERT(datetime, '''+@profileDate+''' , 126) AS ColumnProfileDate
@@ -208,19 +213,21 @@ INTO '+@columnProfileTable+';';
 	END
 	ELSE -- @columnProfileTable table exists
 	BEGIN
-		SET @sql = '-- ooga booga
-INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DataType,DistinctCount,PkgExecKey,ProfileID)
-SELECT
-	CONVERT(datetime, '''+@profileDate+''' , 126) AS ColumnProfileDate
-	,'''+@pDatabaseName+''' AS DatabaseName
-	,'''+@schema_name+''' AS SchemaName
-	,'''+@table_name+''' AS TableName
-	,'''+@column_name+''' AS ColumnName
-	,'''+@data_type+''' AS DataType
-	,'+CAST(@distinct_count AS varchar)+' AS DistinctCount
-	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
-	,'+CAST(@profile_id AS varchar)+' AS ProfileID;
-';
+-- 		SET @sql = '-- ooga booga
+-- INSERT INTO '+@columnProfileTable+'(ColumnProfileDate,DatabaseName,SchemaName,TableName,ColumnName,DataType,DistinctCount,PkgExecKey,ProfileID)
+-- SELECT
+-- 	CONVERT(datetime, '''+@profileDate+''' , 126) AS ColumnProfileDate
+-- 	,'''+@pDatabaseName+''' AS DatabaseName
+-- 	,'''+@schema_name+''' AS SchemaName
+-- 	,'''+@table_name+''' AS TableName
+-- 	,'''+@column_name+''' AS ColumnName
+-- 	,'''+@data_type+''' AS DataType
+-- 	,'+CAST(@distinct_count AS varchar)+' AS DistinctCount
+-- 	,'+CAST(@pPkgExecKey AS varchar)+' AS PkgExecKey
+-- 	,'+CAST(@profile_id AS varchar)+' AS ProfileID;
+-- ';
+
+    EXEC AutoTest.dbo.uspInsColumnProfile @pProfileDateIsoStr = @pProfileDateIsoStr, @pDatabaseName = @pDatabaseName, @pSchemaName = @schema_name, @pTableName = @table_name, @pColumnName = @column_name, @pColumnDataType = @data_type, @pDistinctRowCount = @distinct_count, @pPkgExecKey = @pPkgExecKey, @pProfileId = @profile_id;
 	END
 	-- PRINT('-----------------------------------------------------------------------------------')
 	-- PRINT('@columnProfileTable = '+CAST(@columnProfileTable AS varchar(500)))

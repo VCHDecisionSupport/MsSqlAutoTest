@@ -65,6 +65,15 @@ SELECT * FROM AutoTest.Map.PackageTable;
 GO
 
 
+------------------------------------------------------------------
+-- test: uspInsTableProfile
+------------------------------------------------------------------
+DECLARE @pProfileDate smalldatetime = GETDATE();
+DECLARE @pProfileDateIsoStr varchar(23) = CONVERT(varchar(22), @pProfileDate, 126);
+SELECT @pProfileDate AS pProfileDate, @pProfileDateIsoStr AS IsoDateFormat
+EXEC AutoTest.dbo.uspInsTableProfile @pProfileDateIsoStr = @pProfileDateIsoStr, @pPackageName = 'sfs', @pDatabaseName = 'sdfs', @pSchemaName = 'sch', @pTableName = 'tab', @pRowCount = 123, @pPkgExecKey = 549;
+SELECT * FROM AutoTest.dbo.TableProfile;
+
 
 ------------------------------------------------------------------
 -- 1 setup: create mock database with data

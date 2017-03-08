@@ -44,6 +44,8 @@ $sql_scripts = New-Object System.Collections.ArrayList
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspGetPackagePath.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspGetTables.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspInsMapPackageTable.sql")
+[void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspInsTableProfile.sql")
+[void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspInsColumnProfile.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspProfilePackageTables.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspProfileTable.sql")
 [void]$sql_scripts.Add("Database/StoredProcedure/AutoTest.dbo.uspDeleteOldProfiles.sql")

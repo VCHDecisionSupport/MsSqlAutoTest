@@ -43,10 +43,3 @@ BEGIN
 	EXEC(@sql);
 END
 GO
-DECLARE @pProfileDate smalldatetime = GETDATE();
-SELECT @pProfileDate AS pProfileDate
-EXEC AutoTest.dbo.uspInsTableProfile @pProfileDateIsoStr = '2017-03-02T15:08:11.106', @pPackageName = 'sfs', @pDatabaseName = 'sdfs', @pSchemaName = 'sch', @pTableName = 'tab', @pRowCount = 123, @pPkgExecKey = 549;
-SELECT * FROM AutoTest.dbo.TableProfile;
-
-
-DELETE AutoTest.dbo.TableProfile
